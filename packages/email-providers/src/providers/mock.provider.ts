@@ -1,16 +1,50 @@
 import crypto from 'node:crypto';
-import { IEmailProvider, SendEmailPayload, SendEmailResult } from '../types.js';
+import {
+  IEmailProvider,
+  SendEmailPayload,
+  SendEmailResult,
+  ConnectionVerificationResult,
+  SenderVerificationResult,
+} from '../types.js';
 
 export class MockProvider implements IEmailProvider {
-  readonly providerType = 'mock';
+  readonly providerType = 'mock' as const;
   private connected = false;
 
   async connect(): Promise<void> {
     this.connected = true;
   }
 
-  async verifySender(): Promise<boolean> {
-    return true;
+  async verifyConnection(): Promise<ConnectionVerificationResult> {
+    return {
+      valid: true,
+      provider: 'mock',
+      senderEmail: 'mock-sender@mailcraft.dev',
+      accountStatus: 'active',
+      dailyQuotaRemaining: 10000,
+    };
+  }
+
+  async verifySender(senderEmail = 'mock-sender@mailcraft.dev'): Promise<SenderVerificationResult> {
+    return {
+      verified: true,
+      senderEmail,
+      domain: senderEmail.split('@')[1] || 'mailcraft.dev',
+      domainVerified: true,
+      spfStatus: 'verified',
+      dkimStatus: 'verified',
+      dmarcStatus: 'verified',
+      dnsRecords: [
+        {
+          type: 'TXT',
+          name: senderEmail.split('@')[1] || 'mailcraft.dev',
+          value: 'v=spf1 include:mailcraft.dev ~all',
+          status: 'verified',
+          description: 'SPF Record',
+        },
+      ],
+      instructions: ['Mock provider identity automatically verified.'],
+    };
   }
 
   async sendEmail(payload: SendEmailPayload): Promise<SendEmailResult> {
@@ -39,4 +73,3 @@ export class MockProvider implements IEmailProvider {
     this.connected = false;
   }
 }
-

@@ -26,6 +26,9 @@ importers:
       '@mailcraft/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@mailcraft/email-providers':
+        specifier: workspace:*
+        version: link:../../packages/email-providers
       '@mailcraft/email-renderer':
         specifier: workspace:*
         version: link:../../packages/email-renderer

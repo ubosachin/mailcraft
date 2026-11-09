@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     // Find recipient record by messageId or email
     const recipient = messageId
-      ? await CampaignRecipient.findOne({ providerMessageId: messageId })
+      ? await CampaignRecipient.findOne({ providerMessageId: messageId }).sort({ createdAt: -1 })
       : await CampaignRecipient.findOne({ email }).sort({ createdAt: -1 });
 
     if (!recipient) {

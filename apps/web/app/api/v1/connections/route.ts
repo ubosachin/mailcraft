@@ -13,15 +13,20 @@ export async function GET(request: NextRequest) {
     await connectToDatabase();
     const connections = await EmailConnection.find({
       sessionId: session._id,
-      status: 'connected',
-    });
+      status: { $ne: 'disconnected' },
+    }).sort({ updatedAt: -1 });
 
     return jsonSuccess(
       connections.map((c) => ({
         id: c._id.toString(),
         provider: c.provider,
         senderEmail: c.senderEmail,
+        senderName: c.senderName,
         status: c.status,
+        senderVerificationStatus: c.senderVerificationStatus,
+        providerAccountStatus: c.providerAccountStatus,
+        lastVerifiedAt: c.lastVerifiedAt?.toISOString(),
+        lastError: c.lastError,
         verifiedAt: c.verifiedAt?.toISOString(),
         createdAt: c.createdAt.toISOString(),
       }))
@@ -30,4 +35,3 @@ export async function GET(request: NextRequest) {
     return handleApiError(error);
   }
 }
-

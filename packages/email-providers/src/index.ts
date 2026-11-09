@@ -1,6 +1,12 @@
 export * from './types.js';
+export * from './errors/provider.errors.js';
 export * from './providers/mock.provider.js';
-export * from './providers/brevo.provider.js';
-export * from './providers/gmail.provider.js';
+export * from './providers/gmail/gmail.provider.js';
+export * from './providers/gmail/gmail.oauth.js';
+export * from './providers/gmail/gmail.client.js';
+export * from './providers/brevo/brevo.provider.js';
+export * from './providers/brevo/brevo.client.js';
+export * from './providers/ses/ses.provider.js';
+export * from './providers/ses/ses.client.js';
+export * from './providers/ses/ses.sigv4.js';
 export * from './factory.js';
-

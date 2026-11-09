@@ -1,13 +1,23 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
-import { EmailProviderType, ConnectionStatus, IEncryptedCredentials } from '@mailcraft/shared-types';
+import {
+  EmailProviderType,
+  ConnectionStatus,
+  SenderVerificationStatus,
+  IEncryptedCredentials,
+} from '@mailcraft/shared-types';
 
 export interface IEmailConnectionDoc extends Document {
   sessionId: Types.ObjectId;
   provider: EmailProviderType;
   senderEmail: string;
+  senderName?: string;
   encryptedCredentials: IEncryptedCredentials;
   credentialVersion: number;
   status: ConnectionStatus;
+  senderVerificationStatus?: SenderVerificationStatus;
+  providerAccountStatus?: string;
+  lastVerifiedAt?: Date;
+  lastError?: string;
   verifiedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -32,10 +42,15 @@ const EmailConnectionSchema = new Schema<IEmailConnectionDoc>(
       lowercase: true,
       trim: true,
     },
+    senderName: {
+      type: String,
+      trim: true,
+    },
     encryptedCredentials: {
       iv: { type: String, required: true },
       tag: { type: String, required: true },
       data: { type: String, required: true },
+      keyVersion: { type: Number, default: 1 },
     },
     credentialVersion: {
       type: Number,
@@ -43,8 +58,32 @@ const EmailConnectionSchema = new Schema<IEmailConnectionDoc>(
     },
     status: {
       type: String,
-      enum: ['connected', 'disconnected', 'revoked'],
+      enum: [
+        'connected',
+        'disconnected',
+        'revoked',
+        'verification_required',
+        'auth_failed',
+        'connecting',
+      ],
       default: 'connected',
+    },
+    senderVerificationStatus: {
+      type: String,
+      enum: ['verified', 'pending', 'unverified', 'failed'],
+      default: 'unverified',
+    },
+    providerAccountStatus: {
+      type: String,
+      default: 'active',
+    },
+    lastVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+    lastError: {
+      type: String,
+      default: null,
     },
     verifiedAt: {
       type: Date,
