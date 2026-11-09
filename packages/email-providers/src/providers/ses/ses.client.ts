@@ -131,3 +131,4 @@ export class AmazonSesClient {
     return this.request('POST', '/v2/email/outbound-emails', emailBody);
   }
 }
+

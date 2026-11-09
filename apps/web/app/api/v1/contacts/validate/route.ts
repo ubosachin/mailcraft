@@ -1,11 +1,7 @@
 import { NextRequest } from 'next/server';
-import crypto from 'node:crypto';
-import { connectToDatabase, Suppression } from '@mailcraft/database';
 import { resolveGuestSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
-
-const RFC_EMAIL_REGEX =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+import { validateEmailBatch } from '@/lib/email-validator';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,70 +14,76 @@ export async function POST(request: NextRequest) {
     let rawList: string[] = [];
 
     if (Array.isArray(body.emails)) {
-      rawList = body.emails.map((e: unknown) => String(e));
+      rawList = body.emails.map((e: unknown) => String(e).trim()).filter(Boolean);
     } else if (typeof body.rawInput === 'string') {
       // Split by commas, semicolons, whitespace, tabs, newlines
-      rawList = body.rawInput.split(/[\s,;]+/).map((s: string) => s.trim()).filter(Boolean);
+      rawList = body.rawInput
+        .split(/[\s,;]+/)
+        .map((s: string) => s.trim())
+        .filter(Boolean);
     } else {
       return jsonError('Provide emails array or rawInput string', 400);
     }
 
     const totalSubmitted = rawList.length;
+    const checkDns = body.checkDnsMx === true;
+
+    // Deduplicate in batch
     const seen = new Set<string>();
-    const validEmails: string[] = [];
-    const invalidEmails: string[] = [];
+    const deduplicatedList: string[] = [];
     let duplicatesRemovedCount = 0;
 
     for (const item of rawList) {
-      const email = item.toLowerCase().trim();
-      if (!email) continue;
-
-      if (!RFC_EMAIL_REGEX.test(email) || email.length > 254) {
-        invalidEmails.push(item);
-        continue;
-      }
-
-      if (seen.has(email)) {
+      const lower = item.toLowerCase();
+      if (seen.has(lower)) {
         duplicatesRemovedCount++;
-        continue;
+      } else {
+        seen.add(lower);
+        deduplicatedList.push(item);
       }
-
-      seen.add(email);
-      validEmails.push(email);
     }
 
-    await connectToDatabase();
-
-    // Query suppressions for valid emails
-    const hashes = validEmails.map((e) =>
-      crypto.createHash('sha256').update(e).digest('hex')
-    );
-
-    const suppressions = await Suppression.find({
-      emailHash: { $in: hashes },
-      $or: [{ scope: 'global' }, { sessionId: session._id }],
+    const validationMap = await validateEmailBatch(deduplicatedList, session._id, {
+      checkDns,
     });
 
-    const suppressedHashes = new Set(suppressions.map((s) => s.emailHash));
+    const validEmails: string[] = [];
+    const invalidEmails: string[] = [];
+    const eligibleEmails: string[] = [];
+    let suppressedCount = 0;
+    let existingCount = 0;
 
-    const eligibleEmails = validEmails.filter((email) => {
-      const h = crypto.createHash('sha256').update(email).digest('hex');
-      return !suppressedHashes.has(h);
-    });
+    for (const item of deduplicatedList) {
+      const val = validationMap.get(item);
+      if (!val || !val.syntaxValid) {
+        invalidEmails.push(item);
+      } else {
+        validEmails.push(val.normalizedEmail);
+        if (val.isSuppressed) {
+          suppressedCount++;
+        } else {
+          eligibleEmails.push(val.normalizedEmail);
+        }
+
+        if (val.isExisting) {
+          existingCount++;
+        }
+      }
+    }
 
     return jsonSuccess({
       totalSubmitted,
       validSyntaxCount: validEmails.length,
       invalidSyntaxCount: invalidEmails.length,
       duplicatesRemovedCount,
-      suppressedCount: suppressedHashes.size,
+      suppressedCount,
+      existingCount,
       eligibleCount: eligibleEmails.length,
       validEmails,
       eligibleEmails,
-      invalidEmails: invalidEmails.slice(0, 50),
+      invalidEmails: invalidEmails.slice(0, 100),
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
-

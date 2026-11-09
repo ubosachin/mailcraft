@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server';
-import crypto from 'node:crypto';
-import { connectToDatabase, Contact, Suppression } from '@mailcraft/database';
+import { connectToDatabase, ContactImport } from '@mailcraft/database';
 import { resolveGuestSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
-
-const RFC_EMAIL_REGEX =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+import {
+  parseCsvText,
+  parseXlsxBuffer,
+  prepareImportPreview,
+} from '@/lib/import-parser';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,122 +17,101 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const consentConfirmed = formData.get('consentConfirmed') === 'true';
-
-    if (!consentConfirmed) {
-      return jsonError('You must confirm that all recipients gave explicit opt-in consent', 400);
-    }
+    const sheetName = formData.get('sheetName') as string | null;
 
     if (!file) {
       return jsonError('No file provided for upload', 400);
     }
 
-    const text = await file.text();
-    const lines = text.split(/\r?\n/);
-
-    const candidates: Array<{ email: string; name: string }> = [];
-
-    // Parse CSV lines
-    let isHeader = true;
-    let emailIdx = 0;
-    let nameIdx = -1;
-
-    for (const rawLine of lines) {
-      const line = rawLine.trim();
-      if (!line) continue;
-
-      const cells = line.split(/[,;\t]/).map((c) => c.replace(/^["']|["']$/g, '').trim());
-
-      if (isHeader) {
-        // Detect headers
-        const lowerCells = cells.map((c) => c.toLowerCase());
-        const foundEmailIdx = lowerCells.findIndex((c) => c.includes('email') || c.includes('mail'));
-        const foundNameIdx = lowerCells.findIndex(
-          (c) => c.includes('name') || c.includes('first') || c.includes('contact')
-        );
-
-        if (foundEmailIdx !== -1) {
-          emailIdx = foundEmailIdx;
-          nameIdx = foundNameIdx;
-          isHeader = false;
-          continue;
-        }
-        isHeader = false;
-      }
-
-      const emailVal = (cells[emailIdx] || '').toLowerCase().trim();
-      const nameVal = nameIdx !== -1 ? (cells[nameIdx] || '').trim() : '';
-
-      if (RFC_EMAIL_REGEX.test(emailVal)) {
-        candidates.push({ email: emailVal, name: nameVal });
-      }
+    // File size limit: 10MB
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return jsonError('File size exceeds the 10MB limit', 400);
     }
 
-    if (candidates.length === 0) {
-      return jsonError('No valid email addresses found in the uploaded file', 400);
+    const filename = file.name.toLowerCase();
+    const isCsv = filename.endsWith('.csv') || file.type.includes('csv');
+    const isXlsx =
+      filename.endsWith('.xlsx') ||
+      filename.endsWith('.xls') ||
+      file.type.includes('spreadsheet') ||
+      file.type.includes('excel');
+
+    if (!isCsv && !isXlsx) {
+      return jsonError('Only CSV and XLSX files are supported', 400);
     }
 
     await connectToDatabase();
 
-    // Deduplicate
-    const seen = new Set<string>();
-    const uniqueCandidates: Array<{ email: string; name: string }> = [];
-    for (const c of candidates) {
-      if (!seen.has(c.email)) {
-        seen.add(c.email);
-        uniqueCandidates.push(c);
-      }
+    const fileType = isCsv ? 'csv' : 'xlsx';
+    let headers: string[] = [];
+    let rawRows: Array<Record<string, unknown>> = [];
+    let detectedSheets: string[] | undefined;
+    let selectedSheet: string | undefined;
+
+    if (isCsv) {
+      const text = await file.text();
+      const parsed = parseCsvText(text);
+      headers = parsed.headers;
+      rawRows = parsed.rows.map((r) => {
+        const rowObj: Record<string, unknown> = {};
+        for (let i = 0; i < headers.length; i++) {
+          rowObj[headers[i]] = r[i] || '';
+        }
+        return rowObj;
+      });
+    } else {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const parsed = parseXlsxBuffer(buffer, sheetName || undefined);
+      detectedSheets = parsed.sheets;
+      selectedSheet = parsed.selectedSheet;
+      headers = parsed.headers;
+      rawRows = parsed.rows;
     }
 
-    // Filter against suppressions
-    const hashes = uniqueCandidates.map((c) =>
-      crypto.createHash('sha256').update(c.email).digest('hex')
-    );
+    if (rawRows.length === 0) {
+      return jsonError('The uploaded file contains no data rows', 400);
+    }
 
-    const suppressions = await Suppression.find({
-      emailHash: { $in: hashes },
-      $or: [{ scope: 'global' }, { sessionId: session._id }],
-    });
-    const suppressedHashes = new Set(suppressions.map((s) => s.emailHash));
-
-    const eligible = uniqueCandidates.filter((c) => {
-      const h = crypto.createHash('sha256').update(c.email).digest('hex');
-      return !suppressedHashes.has(h);
-    });
-
-    // Bulk upsert into contacts collection
-    const ops = eligible.map((c) => ({
-      updateOne: {
-        filter: { sessionId: session._id, email: c.email },
-        update: {
-          $set: {
-            name: c.name,
-            consentStatus: 'opted_in' as const,
-            consentSource: 'csv_file_upload',
-            consentAt: new Date(),
-          },
-        },
-        upsert: true,
-      },
-    }));
-
-    const result = await Contact.bulkWrite(ops);
-
-    const totalContacts = await Contact.countDocuments({
+    // Create a temporary ContactImport record
+    const importDoc = await ContactImport.create({
       sessionId: session._id,
-      consentStatus: 'opted_in',
+      originalFilename: file.name,
+      fileType,
+      totalRows: rawRows.length,
+      status: 'previewed',
     });
 
-    return jsonSuccess({
-      totalInFile: candidates.length,
-      duplicatesRemoved: candidates.length - uniqueCandidates.length,
-      suppressedCount: suppressedHashes.size,
-      importedCount: eligible.length,
-      totalContacts,
-      message: `Imported ${eligible.length} permission-based contacts from ${file.name}`,
+    const preview = await prepareImportPreview({
+      importId: importDoc._id.toString(),
+      originalFilename: file.name,
+      fileType,
+      headers,
+      rawRows,
+      sessionId: session._id,
+      detectedSheets,
+      selectedSheet,
     });
+
+    // Update import document with preview metadata
+    importDoc.validRows = preview.validRows;
+    importDoc.invalidRows = preview.invalidRows;
+    importDoc.duplicateRows = preview.duplicateRows;
+    importDoc.existingRows = preview.existingRows;
+    importDoc.suppressedRows = preview.suppressedRows;
+    importDoc.unknownConsentRows = preview.unknownConsentRows;
+    importDoc.columnMapping = preview.columnMapping;
+    importDoc.previewRows = rawRows.slice(0, 100);
+    importDoc.failedRows = (preview.errorReport || []).map((e) => ({
+      rowNumber: e.rowNumber,
+      raw: e.raw,
+      reason: e.error,
+    }));
+    await importDoc.save();
+
+    return jsonSuccess(preview, 201, `Parsed ${rawRows.length} rows from ${file.name}`);
   } catch (error) {
     return handleApiError(error);
   }
 }
-

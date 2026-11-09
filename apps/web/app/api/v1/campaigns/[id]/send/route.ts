@@ -47,11 +47,42 @@ export async function POST(
       );
     }
 
-    // Fetch opt-in contacts for this session
-    const contacts = await Contact.find({
+    // Parse audience criteria from request body if provided
+    let audienceCriteria: {
+      audienceType?: 'all_eligible' | 'segment' | 'tag' | 'custom_selection';
+      segmentId?: string;
+      tag?: string;
+      contactIds?: string[];
+    } = {};
+
+    try {
+      audienceCriteria = await request.json();
+    } catch {
+      // Body is optional
+    }
+
+    // Build contacts query
+    const contactsQuery: Record<string, unknown> = {
       sessionId: session._id,
-      consentStatus: 'opted_in',
-    });
+      consentStatus: 'opted_in', // Mandatory: strictly opted_in for promotional campaigns
+    };
+
+    if (audienceCriteria.audienceType === 'segment' && audienceCriteria.segmentId) {
+      const { Segment } = await import('@mailcraft/database');
+      const { applySegmentFilters } = await import('@/lib/contact-service');
+      const seg = await Segment.findOne({ _id: audienceCriteria.segmentId, sessionId: session._id });
+      if (seg && seg.filters) {
+        applySegmentFilters(contactsQuery, seg.filters);
+        contactsQuery.consentStatus = 'opted_in'; // Enforce opted_in
+      }
+    } else if (audienceCriteria.audienceType === 'tag' && audienceCriteria.tag) {
+      contactsQuery.tags = audienceCriteria.tag;
+    } else if (audienceCriteria.audienceType === 'custom_selection' && Array.isArray(audienceCriteria.contactIds)) {
+      contactsQuery._id = { $in: audienceCriteria.contactIds };
+    }
+
+    // Fetch opt-in contacts for this session
+    const contacts = await Contact.find(contactsQuery);
 
     if (contacts.length === 0) {
       return jsonError(
