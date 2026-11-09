@@ -1,8 +1,9 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
+import mongoose, { Schema, Document, Model, Types } from 'mongoose';
 import { GuestSessionStatus } from '@mailcraft/shared-types';
 
 export interface IGuestSessionDoc extends Document {
   sessionTokenHash: string;
+  userId?: Types.ObjectId | null;
   verifiedEmail?: string | null;
   verificationCodeHash?: string | null;
   verificationCodeExpiresAt?: Date | null;
@@ -20,6 +21,12 @@ const GuestSessionSchema = new Schema<IGuestSessionDoc>(
       type: String,
       required: true,
       unique: true,
+      index: true,
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
       index: true,
     },
     verifiedEmail: {

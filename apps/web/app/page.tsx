@@ -97,10 +97,16 @@ export default function HomePage() {
 
           <div className="flex items-center gap-3">
             <Link
-              href="/workspace"
+              href="/login"
+              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
+            >
+              Log in
+            </Link>
+            <Link
+              href="/signup"
               className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
             >
-              Enter Workspace
+              Sign up
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

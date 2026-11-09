@@ -189,10 +189,16 @@ export default function TemplatesPage() {
 
           <div className="flex items-center gap-4 text-xs font-semibold">
             <Link
-              href="/workspace"
-              className="text-slate-600 hover:text-slate-900 transition flex items-center gap-1.5"
+              href="/login"
+              className="text-slate-600 hover:text-indigo-600 transition"
             >
-              Workspace
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="text-indigo-600 hover:text-indigo-700 transition"
+            >
+              Sign Up
             </Link>
             <Link
               href="/workspace"

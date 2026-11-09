@@ -52,6 +52,16 @@ interface SessionState {
   expiresAt: string;
 }
 
+interface UserState {
+  id: string;
+  email: string;
+  name?: string;
+  role: string;
+  emailVerified: boolean;
+  avatarUrl?: string;
+  authProvider: string;
+}
+
 interface ConnectionSummary {
   id: string;
   provider: 'gmail' | 'brevo' | 'ses';
@@ -94,6 +104,7 @@ export default function WorkspacePage() {
 
   const [activeTab, setActiveTab] = useState<'brand' | 'sending' | 'recipients' | 'templates' | 'campaigns'>('brand');
   const [session, setSession] = useState<SessionState | null>(null);
+  const [user, setUser] = useState<UserState | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -150,6 +161,15 @@ export default function WorkspacePage() {
   useEffect(() => {
     async function initWorkspace() {
       try {
+        // Check if authenticated user
+        const authRes = await fetch('/api/v1/auth/me');
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          if (authData.data?.user) {
+            setUser(authData.data.user);
+          }
+        }
+
         const meRes = await fetch('/api/v1/guest/me');
         if (meRes.ok) {
           const data = await meRes.json();
@@ -543,13 +563,34 @@ export default function WorkspacePage() {
               </span>
             </Link>
 
-            <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Guest Workspace
-              </span>
-              <span className="text-xs text-slate-400">ID: {session?.id.slice(-6)}</span>
-            </div>
+            {user ? (
+              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />
+                  {user.name || user.email}
+                </span>
+                <span className="text-xs text-slate-500 font-medium hidden md:inline">({user.email})</span>
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Guest Workspace
+                </span>
+                <Link
+                  href="/signup"
+                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md border border-indigo-200 transition"
+                >
+                  Save Work (Sign Up)
+                </Link>
+                <Link
+                  href="/login"
+                  className="text-xs font-medium text-slate-500 hover:text-slate-800 transition"
+                >
+                  Log in
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3">
@@ -563,20 +604,54 @@ export default function WorkspacePage() {
 
             <button
               onClick={() => {
-                if (confirm('End guest session?')) {
-                  fetch('/api/v1/guest/session', { method: 'DELETE' }).then(() => {
-                    window.location.href = '/';
-                  });
+                if (user) {
+                  if (confirm('Log out of your MailCraft account?')) {
+                    fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                      window.location.href = '/login';
+                    });
+                  }
+                } else {
+                  if (confirm('End guest session?')) {
+                    fetch('/api/v1/guest/session', { method: 'DELETE' }).then(() => {
+                      window.location.href = '/';
+                    });
+                  }
                 }
               }}
               className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
-              title="End Session"
+              title={user ? 'Log Out' : 'End Guest Session'}
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </header>
+
+      {/* Guest Workspace Prompt Banner */}
+      {!user && (
+        <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border-b border-indigo-100 px-4 py-2 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-600 flex-shrink-0" />
+            <span>
+              <strong>Guest Studio Active:</strong> Your drafts and contacts are stored in this browser session. Create an account with your Gmail ID to access your campaigns anywhere.
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="font-medium text-slate-600 hover:text-indigo-600 px-2 py-0.5 rounded transition"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              className="font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-md transition shadow-sm"
+            >
+              Sign Up with Gmail ID
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Navigation Wizard Tabs */}
       <div className="bg-white border-b border-slate-200">

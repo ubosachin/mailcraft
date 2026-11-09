@@ -41,9 +41,14 @@ export async function cleanupExpiredGuestData(options?: {
   );
   const dryRun = options?.dryRun || false;
 
-  // 1. Locate expired or revoked guest sessions
+  // 1. Locate expired or revoked guest sessions (excluding authenticated registered users)
   const expiredSessions = await GuestSession.find({
-    $or: [{ status: { $in: ['expired', 'revoked'] } }, { expiresAt: { $lt: cutoff } }],
+    $or: [{ userId: null }, { userId: { $exists: false } }],
+    $and: [
+      {
+        $or: [{ status: { $in: ['expired', 'revoked'] } }, { expiresAt: { $lt: cutoff } }],
+      },
+    ],
   }).select('_id');
 
   const sessionIds = expiredSessions.map((s) => s._id);

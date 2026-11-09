@@ -8,4 +8,5 @@ export * from './analytics.schema.js';
 export * from './env.schema.js';
 export * from './disposable-email.js';
 export * from './rate-limiter.js';
+export * from './auth.schema.js';
 

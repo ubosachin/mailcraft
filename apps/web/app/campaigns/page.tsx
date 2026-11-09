@@ -469,6 +469,12 @@ function CampaignsContent() {
 
           <div className="flex items-center gap-3">
             <Link
+              href="/signup"
+              className="text-xs font-semibold text-slate-400 hover:text-white px-2 py-1 transition"
+            >
+              Sign Up / Log In
+            </Link>
+            <Link
               href="/campaigns/create"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/20 transition transform active:scale-95"
             >

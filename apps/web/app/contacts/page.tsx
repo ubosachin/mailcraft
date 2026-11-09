@@ -614,10 +614,12 @@ function ContactsPageContent() {
               <Filter className="w-3.5 h-3.5 text-indigo-400" />
               Saved Segments ({segments.length})
             </Link>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Guest Mode Active
-            </div>
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm"
+            >
+              Sign Up / Log In
+            </Link>
           </div>
         </div>
       </header>

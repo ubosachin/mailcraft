@@ -9,4 +9,5 @@ export * from './suppression.js';
 export * from './event.js';
 export * from './analytics.js';
 export * from './api.js';
+export * from './auth.js';
 
