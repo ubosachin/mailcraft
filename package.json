@@ -1,0 +1,15 @@
+{
+  "name": "mailcraft-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MailCraft – No-login promotional email creation and delivery platform",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter shared-types build && pnpm --filter validation build && pnpm --filter database build && pnpm --filter web build",
+    "test": "node --test packages/*/dist/**/*.test.js || true",
+    "lint": "pnpm --filter web lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

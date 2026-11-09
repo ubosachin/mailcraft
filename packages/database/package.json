@@ -1,0 +1,19 @@
+{
+  "name": "@mailcraft/database",
+  "version": "1.0.0",
+  "description": "MongoDB Mongoose models and security encryption for MailCraft",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@mailcraft/shared-types": "workspace:*",
+    "mongoose": "^8.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
