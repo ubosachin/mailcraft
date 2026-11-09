@@ -156,3 +156,4 @@ Interactive workspace containing:
 **Step 5: Run Next.js build and test guest session creation end-to-end**
 Run: `pnpm build`
 Verify all routes compile and render cleanly.
+

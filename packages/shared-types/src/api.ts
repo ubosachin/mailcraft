@@ -18,3 +18,4 @@ export interface GuestMeResponse {
   session: GuestSessionPublic;
   brand: BrandPublic | null;
 }
+

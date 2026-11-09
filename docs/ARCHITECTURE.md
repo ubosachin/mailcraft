@@ -72,3 +72,4 @@ MailCraft is a guest-first email marketing platform engineered to allow business
 * `packages/validation`: Zod schemas enforcing runtime validation at all API boundaries.
 * `packages/database`: Mongoose models, connection caching, and encryption helpers.
 * `packages/email-renderer`: Server-side React-Email & MJML-safe HTML compiler.
+

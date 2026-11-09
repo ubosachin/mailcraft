@@ -62,3 +62,4 @@ EmailConnectionSchema.index({ sessionId: 1, provider: 1 });
 export const EmailConnection: Model<IEmailConnectionDoc> =
   mongoose.models.EmailConnection ||
   mongoose.model<IEmailConnectionDoc>('EmailConnection', EmailConnectionSchema);
+

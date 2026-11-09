@@ -59,3 +59,4 @@ ContactSchema.index({ sessionId: 1, email: 1 }, { unique: true });
 
 export const Contact: Model<IContactDoc> =
   mongoose.models.Contact || mongoose.model<IContactDoc>('Contact', ContactSchema);
+

@@ -37,3 +37,4 @@ export interface ICampaign {
   createdAt: Date;
   updatedAt: Date;
 }
+

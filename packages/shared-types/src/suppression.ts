@@ -10,3 +10,4 @@ export interface ISuppression {
   sessionId?: string;
   createdAt: Date;
 }
+

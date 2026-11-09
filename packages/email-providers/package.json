@@ -1,0 +1,20 @@
+{
+  "name": "@mailcraft/email-providers",
+  "version": "1.0.0",
+  "description": "Provider abstraction layer for Gmail API, Brevo, SES, and Mocking",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@mailcraft/database": "workspace:*",
+    "@mailcraft/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
+

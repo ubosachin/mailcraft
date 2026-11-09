@@ -57,3 +57,4 @@ CampaignEventSchema.index({ campaignId: 1, occurredAt: -1 });
 export const CampaignEvent: Model<ICampaignEventDoc> =
   mongoose.models.CampaignEvent ||
   mongoose.model<ICampaignEventDoc>('CampaignEvent', CampaignEventSchema);
+

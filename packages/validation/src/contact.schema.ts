@@ -22,3 +22,4 @@ export const rawEmailsValidateSchema = z.object({
 export type SingleContactInput = z.infer<typeof singleContactSchema>;
 export type BulkContactImportInput = z.infer<typeof bulkContactImportSchema>;
 export type RawEmailsValidateInput = z.infer<typeof rawEmailsValidateSchema>;
+

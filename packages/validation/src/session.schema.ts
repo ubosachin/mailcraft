@@ -17,3 +17,4 @@ export const confirmEmailVerificationSchema = z.object({
 export type StartGuestSessionInput = z.infer<typeof startGuestSessionSchema>;
 export type RequestEmailVerificationInput = z.infer<typeof requestEmailVerificationSchema>;
 export type ConfirmEmailVerificationInput = z.infer<typeof confirmEmailVerificationSchema>;
+

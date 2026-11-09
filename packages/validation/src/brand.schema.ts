@@ -25,3 +25,4 @@ export const updateBrandSchema = brandSchema.partial();
 
 export type BrandInput = z.infer<typeof brandSchema>;
 export type UpdateBrandInput = z.infer<typeof updateBrandSchema>;
+

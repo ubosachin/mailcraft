@@ -40,3 +40,4 @@ export function handleApiError(error: unknown) {
 
   return jsonError('Internal server error occurred', 500);
 }
+

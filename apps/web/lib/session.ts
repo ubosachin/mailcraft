@@ -96,3 +96,4 @@ export function setSessionCookie(
 export function clearSessionCookie(response: NextResponse): void {
   response.cookies.delete(SESSION_COOKIE_NAME);
 }
+

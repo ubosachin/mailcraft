@@ -1,0 +1,40 @@
+import { NextRequest } from 'next/server';
+import { sendTestEmailSchema } from '@mailcraft/validation';
+import { connectToDatabase, Campaign } from '@mailcraft/database';
+import { enqueueTestEmailJob } from '@/lib/queue';
+import { resolveGuestSession } from '@/lib/session';
+import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await resolveGuestSession(request);
+    if (!session) {
+      return jsonError('Guest session required', 401);
+    }
+
+    const { id } = await params;
+    const body = await request.json();
+    const { testEmail } = sendTestEmailSchema.parse(body);
+
+    await connectToDatabase();
+
+    const campaign = await Campaign.findOne({ _id: id, sessionId: session._id });
+    if (!campaign) {
+      return jsonError('Campaign not found', 404);
+    }
+
+    const job = await enqueueTestEmailJob(campaign._id.toString(), testEmail);
+
+    return jsonSuccess({
+      jobId: job.id,
+      testEmail,
+      message: `Test email job queued to ${testEmail}`,
+    });
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+

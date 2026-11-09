@@ -214,3 +214,4 @@ interface ICampaignEvent {
 | `campaign_recipients` | `{ campaignId: 1, status: 1 }` | Standard | Batch worker queries & counts |
 | `suppressions` | `{ emailHash: 1, scope: 1 }` | Standard | Fast suppression verification |
 | `campaign_events` | `{ campaignId: 1, occurredAt: -1 }` | Standard | Real-time event analytics |
+

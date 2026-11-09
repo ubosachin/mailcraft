@@ -1,0 +1,19 @@
+{
+  "name": "@mailcraft/email-renderer",
+  "version": "1.0.0",
+  "description": "Email HTML and plain-text compiler for MailCraft structured editor JSON",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@mailcraft/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}
+

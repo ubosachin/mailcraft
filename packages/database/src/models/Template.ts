@@ -85,3 +85,4 @@ TemplateSchema.index({ category: 1, isActive: 1 });
 
 export const Template: Model<ITemplateDoc> =
   mongoose.models.Template || mongoose.model<ITemplateDoc>('Template', TemplateSchema);
+

@@ -22,3 +22,4 @@ export interface ContactValidationSummary {
   eligibleCount: number;
   invalidEmails: string[];
 }
+

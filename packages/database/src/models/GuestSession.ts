@@ -69,3 +69,4 @@ const GuestSessionSchema = new Schema<IGuestSessionDoc>(
 
 export const GuestSession: Model<IGuestSessionDoc> =
   mongoose.models.GuestSession || mongoose.model<IGuestSessionDoc>('GuestSession', GuestSessionSchema);
+

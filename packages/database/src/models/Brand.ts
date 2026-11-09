@@ -79,3 +79,4 @@ const BrandSchema = new Schema<IBrandDoc>(
 
 export const Brand: Model<IBrandDoc> =
   mongoose.models.Brand || mongoose.model<IBrandDoc>('Brand', BrandSchema);
+

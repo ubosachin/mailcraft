@@ -21,3 +21,4 @@ export interface GuestSessionPublic {
   createdAt: string;
   expiresAt: string;
 }
+

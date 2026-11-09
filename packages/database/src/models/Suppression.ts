@@ -49,3 +49,4 @@ SuppressionSchema.index({ emailHash: 1, scope: 1 });
 export const Suppression: Model<ISuppressionDoc> =
   mongoose.models.Suppression ||
   mongoose.model<ISuppressionDoc>('Suppression', SuppressionSchema);
+

@@ -33,3 +33,4 @@ export interface BrandPublic {
   footerAddress?: string;
   socialLinks?: IBrandSocials;
 }
+

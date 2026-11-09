@@ -106,3 +106,4 @@ CampaignSchema.index({ sessionId: 1, createdAt: -1 });
 
 export const Campaign: Model<ICampaignDoc> =
   mongoose.models.Campaign || mongoose.model<ICampaignDoc>('Campaign', CampaignSchema);
+

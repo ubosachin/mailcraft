@@ -59,3 +59,4 @@ A guest-accessible platform requires defense-in-depth protections to prevent cre
    List-Unsubscribe-Post: List-Unsubscribe=One-Click
    ```
 3. **Transparent Opt-In Affirmation**: Guests must explicitly check the confirmation box certifying that all uploaded recipients gave unambiguous consent.
+

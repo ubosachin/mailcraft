@@ -87,11 +87,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <a href="#templates" className="hover:text-indigo-600 transition">12+ Templates</a>
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+            <Link href="/templates" className="hover:text-indigo-600 transition">12+ Templates</Link>
+            <Link href="/pricing" className="hover:text-indigo-600 transition">Pricing & Quotas</Link>
             <a href="#how-it-works" className="hover:text-indigo-600 transition">How it Works</a>
             <a href="#sending" className="hover:text-indigo-600 transition">Sending Channels</a>
-            <a href="#faq" className="hover:text-indigo-600 transition">Compliance & FAQ</a>
+            <Link href="/privacy" className="hover:text-indigo-600 transition">Privacy & Trust</Link>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -436,14 +437,17 @@ export default function HomePage() {
             <span className="text-slate-500">· No-login promotional email platform</span>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-6">
             <Link href="/workspace" className="hover:text-slate-200 transition">Workspace</Link>
-            <a href="#templates" className="hover:text-slate-200 transition">Templates</a>
-            <a href="#sending" className="hover:text-slate-200 transition">Sending Providers</a>
-            <span className="text-slate-600">Built for Creators & Startups</span>
+            <Link href="/templates" className="hover:text-slate-200 transition">Templates</Link>
+            <Link href="/pricing" className="hover:text-slate-200 transition">Pricing & Quotas</Link>
+            <Link href="/privacy" className="hover:text-slate-200 transition">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-slate-200 transition">Terms & Anti-Spam</Link>
+            <Link href="/contact" className="hover:text-slate-200 transition">Contact</Link>
           </div>
         </div>
       </footer>
     </div>
   );
 }
+

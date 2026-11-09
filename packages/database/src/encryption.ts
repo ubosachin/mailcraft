@@ -65,3 +65,4 @@ export function hashVerificationCode(code: string): string {
   const secret = process.env.APP_SECRET || 'mailcraft_default_app_secret_dev_2026';
   return crypto.createHmac('sha256', secret).update(code).digest('hex');
 }
+

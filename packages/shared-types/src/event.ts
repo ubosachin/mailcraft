@@ -15,3 +15,4 @@ export interface ICampaignEvent {
   metadata?: Record<string, unknown>;
   occurredAt: Date;
 }
+

@@ -18,3 +18,4 @@ export const sendTestEmailSchema = z.object({
 export type CreateCampaignInput = z.infer<typeof createCampaignSchema>;
 export type UpdateCampaignInput = z.infer<typeof updateCampaignSchema>;
 export type SendTestEmailInput = z.infer<typeof sendTestEmailSchema>;
+

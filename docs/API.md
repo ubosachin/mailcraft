@@ -197,3 +197,4 @@ Dispatches a single test email to the sender's verified address.
 
 ### `POST /api/v1/campaigns/:id/send`
 Submits campaign to BullMQ queue for batch processing with duplicate prevention.
+

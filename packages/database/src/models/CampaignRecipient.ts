@@ -74,3 +74,4 @@ CampaignRecipientSchema.index({ campaignId: 1, status: 1 });
 export const CampaignRecipient: Model<ICampaignRecipientDoc> =
   mongoose.models.CampaignRecipient ||
   mongoose.model<ICampaignRecipientDoc>('CampaignRecipient', CampaignRecipientSchema);
+

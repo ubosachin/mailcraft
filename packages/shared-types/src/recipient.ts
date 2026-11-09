@@ -21,3 +21,4 @@ export interface ICampaignRecipient {
   deliveredAt?: Date;
   createdAt: Date;
 }
+
