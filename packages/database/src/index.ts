@@ -10,4 +10,5 @@ export * from './models/Campaign.js';
 export * from './models/CampaignRecipient.js';
 export * from './models/Suppression.js';
 export * from './models/CampaignEvent.js';
+export * from './seed-templates.js';
 

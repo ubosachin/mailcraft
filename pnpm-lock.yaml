@@ -109,6 +109,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@mailcraft/email-renderer':
+        specifier: workspace:*
+        version: link:../email-renderer
       '@mailcraft/shared-types':
         specifier: workspace:*
         version: link:../shared-types

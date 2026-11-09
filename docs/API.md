@@ -181,10 +181,126 @@ Analyzes raw list (pasted or CSV) and returns summary breakdown:
 
 ---
 
-## 5. Template & Campaign Endpoints
+## 5. Template & Rendering Endpoints
 
 ### `GET /api/v1/templates`
-Retrieves pre-designed, responsive marketing templates (12 categories).
+Retrieves the template catalog with filtering, search, and category metrics.
+- **Query Parameters**:
+  - `category`: Filter by category (`ecommerce`, `fashion`, `technology`, `food`, `corporate`, `festivals`, `discounts`, `product_launches`, `welcome`)
+  - `q` or `search`: Search name, description, and features
+  - `sort`: `name`, `newest`, `popular`
+- **Response** `200 OK`:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "total": 12,
+      "categoryCounts": {
+        "all": 12,
+        "ecommerce": 1,
+        "fashion": 2,
+        "technology": 1,
+        "food": 1,
+        "corporate": 2,
+        "festivals": 1,
+        "discounts": 2,
+        "product_launches": 1,
+        "welcome": 1
+      },
+      "templates": [
+        {
+          "id": "672f0...",
+          "name": "Minimal Premium",
+          "slug": "minimal-premium",
+          "category": "ecommerce",
+          "thumbnail": "https://images.unsplash.com/...",
+          "description": "Ultra-clean editorial layout...",
+          "isPremium": false,
+          "version": 1
+        }
+      ]
+    }
+  }
+  ```
+
+### `GET /api/v1/templates/:id`
+Retrieves a single template definition and its full structured editor schema by MongoDB ObjectId or URL slug (e.g., `minimal-premium`).
+
+### `GET /api/v1/templates/:id/preview`
+Renders a live email preview with the user's active brand settings.
+- **Response** `200 OK`:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "template": { "id": "...", "name": "Minimal Premium", "slug": "minimal-premium" },
+      "html": "<!DOCTYPE html>...",
+      "text": "Plain text fallback...",
+      "subject": "Minimalist Leather Folio",
+      "preheader": "Designed for discerning creatives",
+      "htmlByteSize": 12938,
+      "textByteSize": 412
+    }
+  }
+  ```
+
+### `POST /api/v1/templates/:id/clone`
+Clones a chosen template into a new draft campaign for the current guest session.
+- **Request Body**:
+  ```json
+  {
+    "campaignName": "Spring Sale 2026"
+  }
+  ```
+- **Response** `201 Created`:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "campaignId": "672f4...",
+      "campaignName": "Spring Sale 2026",
+      "status": "draft",
+      "templateId": "672f0..."
+    }
+  }
+  ```
+
+### `POST /api/v1/email-renderer/render`
+Standalone email compiler endpoint. Accepts either a custom editor schema or a template slug, combines it with brand tokens and recipient variables, and compiles production-ready HTML/text.
+- **Request Body**:
+  ```json
+  {
+    "templateId": "festive-special",
+    "brand": {
+      "brandName": "Acme Co",
+      "primaryColor": "#B45309",
+      "footerAddress": "123 Main St"
+    },
+    "recipient": {
+      "firstName": "Alex",
+      "email": "alex@example.com"
+    }
+  }
+  ```
+- **Response** `200 OK`: Returns `{ html, text, subject, preheader, htmlByteSize, textByteSize }`.
+
+### `POST /api/v1/email-renderer/validate`
+Validates an email editor schema against strict Zod constraints (block types, container widths 320-800px, color codes).
+- **Request Body**:
+  ```json
+  {
+    "schema": {
+      "version": 1,
+      "settings": { "contentWidth": 600 },
+      "blocks": [{ "id": "b1", "type": "logo", "props": {} }]
+    }
+  }
+  ```
+- **Response** `200 OK`: Returns `{ isValid: true, blockCount: 1 }`.
+
+---
+
+## 6. Campaign & Delivery Endpoints
 
 ### `POST /api/v1/campaigns`
 Creates a new draft campaign tied to a template and brand.

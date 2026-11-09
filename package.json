@@ -5,11 +5,13 @@
   "description": "MailCraft – No-login promotional email creation and delivery platform",
   "scripts": {
     "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter shared-types build && pnpm --filter validation build && pnpm --filter database build && pnpm --filter email-renderer build && pnpm --filter email-providers build && pnpm --filter worker build && pnpm --filter web build",
+    "build": "pnpm --filter shared-types build && pnpm --filter validation build && pnpm --filter email-renderer build && pnpm --filter database build && pnpm --filter email-providers build && pnpm --filter worker build && pnpm --filter web build",
     "worker": "pnpm --filter worker start",
-    "test": "node packages/database/dist/test-phase1.js && node scripts/test-campaign-worker.mjs",
+    "db:seed": "node packages/database/dist/seed-templates.js",
+    "test": "node packages/database/dist/test-phase1.js && node scripts/test-api-e2e.mjs && node scripts/test-phase2-templates.mjs && node scripts/test-campaign-worker.mjs",
     "test:worker": "node scripts/test-campaign-worker.mjs",
     "test:api": "node scripts/test-api-e2e.mjs",
+    "test:templates": "node scripts/test-phase2-templates.mjs",
     "lint": "pnpm --filter web lint"
   },
   "devDependencies": {

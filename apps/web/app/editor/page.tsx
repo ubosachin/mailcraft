@@ -316,9 +316,12 @@ export default function EditorPage() {
       ...schema,
       blocks: schema.blocks.map((b) => {
         if (b.id === selectedBlockId) {
+          const current = (b.props || b.data || {}) as Record<string, unknown>;
+          const updated = { ...current, [field]: value };
           return {
             ...b,
-            data: { ...b.data, [field]: value },
+            props: updated,
+            data: updated,
           };
         }
         return b;
@@ -327,6 +330,7 @@ export default function EditorPage() {
   };
 
   const selectedBlock = schema.blocks.find((b) => b.id === selectedBlockId);
+  const selectedBlockData = (selectedBlock?.props || selectedBlock?.data || {}) as Record<string, unknown>;
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-900 text-slate-100">
@@ -480,7 +484,7 @@ export default function EditorPage() {
           >
             {schema.blocks.map((block, index) => {
               const isSelected = selectedBlockId === block.id;
-              const d = block.data;
+              const d = (block.props || block.data || {}) as Record<string, unknown>;
 
               return (
                 <div
@@ -769,7 +773,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Hero Title</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.title as string) || ''}
+                        value={(selectedBlockData.title as string) || ''}
                         onChange={(e) => handleUpdateBlockData('title', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -778,7 +782,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Subtitle</label>
                       <textarea
                         rows={2}
-                        value={(selectedBlock.data.subtitle as string) || ''}
+                        value={(selectedBlockData.subtitle as string) || ''}
                         onChange={(e) => handleUpdateBlockData('subtitle', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -787,7 +791,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Background Color</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.backgroundColor as string) || ''}
+                        value={(selectedBlockData.backgroundColor as string) || ''}
                         onChange={(e) => handleUpdateBlockData('backgroundColor', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200 font-mono"
                       />
@@ -802,7 +806,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Button Text</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.text as string) || ''}
+                        value={(selectedBlockData.text as string) || ''}
                         onChange={(e) => handleUpdateBlockData('text', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -811,7 +815,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Destination URL</label>
                       <input
                         type="url"
-                        value={(selectedBlock.data.url as string) || ''}
+                        value={(selectedBlockData.url as string) || ''}
                         onChange={(e) => handleUpdateBlockData('url', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -820,7 +824,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Background Color</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.backgroundColor as string) || ''}
+                        value={(selectedBlockData.backgroundColor as string) || ''}
                         onChange={(e) => handleUpdateBlockData('backgroundColor', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200 font-mono"
                       />
@@ -835,7 +839,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Coupon Code</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.code as string) || ''}
+                        value={(selectedBlockData.code as string) || ''}
                         onChange={(e) => handleUpdateBlockData('code', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200 font-mono uppercase"
                       />
@@ -844,7 +848,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Discount Headline</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.discount as string) || ''}
+                        value={(selectedBlockData.discount as string) || ''}
                         onChange={(e) => handleUpdateBlockData('discount', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -853,7 +857,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Description</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.description as string) || ''}
+                        value={(selectedBlockData.description as string) || ''}
                         onChange={(e) => handleUpdateBlockData('description', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -867,7 +871,7 @@ export default function EditorPage() {
                     <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Text Content</label>
                     <textarea
                       rows={5}
-                      value={(selectedBlock.data.text as string) || ''}
+                      value={(selectedBlockData.text as string) || ''}
                       onChange={(e) => handleUpdateBlockData('text', e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200 leading-relaxed"
                     />
@@ -881,7 +885,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Product Title</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.title as string) || ''}
+                        value={(selectedBlockData.title as string) || ''}
                         onChange={(e) => handleUpdateBlockData('title', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -890,7 +894,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Sale Price</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.price as string) || ''}
+                        value={(selectedBlockData.price as string) || ''}
                         onChange={(e) => handleUpdateBlockData('price', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -899,7 +903,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Original Price (Strike)</label>
                       <input
                         type="text"
-                        value={(selectedBlock.data.originalPrice as string) || ''}
+                        value={(selectedBlockData.originalPrice as string) || ''}
                         onChange={(e) => handleUpdateBlockData('originalPrice', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />
@@ -908,7 +912,7 @@ export default function EditorPage() {
                       <label className="block text-slate-400 text-[10px] font-bold uppercase mb-1">Product Image URL</label>
                       <input
                         type="url"
-                        value={(selectedBlock.data.imageUrl as string) || ''}
+                        value={(selectedBlockData.imageUrl as string) || ''}
                         onChange={(e) => handleUpdateBlockData('imageUrl', e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded p-2 text-slate-200"
                       />

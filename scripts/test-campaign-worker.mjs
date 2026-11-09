@@ -189,9 +189,10 @@ async function runCampaignWorkerE2E() {
     const tplRes = await fetch(`${BASE_URL}/api/v1/templates`);
     const tplData = await tplRes.json();
     assert.strictEqual(tplRes.status, 200);
-    assert(tplData.data.length >= 10, 'Expected at least 10 production templates');
-    const selectedTemplate = tplData.data[0];
-    console.log(`7. Retrieved ${tplData.data.length} templates. Selected: "${selectedTemplate.name}"`);
+    const templatesList = Array.isArray(tplData.data) ? tplData.data : (tplData.data?.templates || []);
+    assert(templatesList.length >= 10, 'Expected at least 10 production templates');
+    const selectedTemplate = templatesList[0];
+    console.log(`7. Retrieved ${templatesList.length} templates. Selected: "${selectedTemplate.name}"`);
 
     // 8. Create Campaign with Selected Template
     const campaignRes = await fetch(`${BASE_URL}/api/v1/campaigns`, {

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mailcraft/shared-types": "workspace:*",
+    "@mailcraft/email-renderer": "workspace:*",
     "mongoose": "^8.10.1"
   },
   "devDependencies": {

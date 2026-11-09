@@ -1,20 +1,27 @@
 import { NextRequest } from 'next/server';
+import mongoose from 'mongoose';
 import { connectToDatabase, Template } from '@mailcraft/database';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectToDatabase();
     const { id } = await params;
 
-    const template =
-      (await Template.findById(id)) || (await Template.findOne({ slug: id }));
+    let template = null;
+    const isHexObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+    if (isHexObjectId) {
+      template = await Template.findById(id);
+    }
+    if (!template) {
+      template = await Template.findOne({ slug: id.toLowerCase().trim() });
+    }
 
     if (!template) {
-      return jsonError('Template not found', 404);
+      return jsonError(`Template '${id}' not found`, 404);
     }
 
     return jsonSuccess({
@@ -27,9 +34,9 @@ export async function GET(
       editorSchema: template.editorSchema,
       isPremium: template.isPremium,
       version: template.version,
+      createdAt: template.createdAt.toISOString(),
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
-

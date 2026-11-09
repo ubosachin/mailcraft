@@ -1,9 +1,45 @@
 import assert from 'node:assert';
+import { spawn } from 'node:child_process';
 
 const BASE_URL = 'http://localhost:3000';
 
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+async function waitForServer(url, timeoutMs = 15000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try {
+      const res = await fetch(`${url}/api/v1/health`);
+      if (res.ok) return true;
+    } catch {
+      // waiting for server
+    }
+    await sleep(400);
+  }
+  throw new Error(`Server at ${url} failed to respond within ${timeoutMs}ms`);
+}
+
 async function runE2ETests() {
   console.log('🚀 Running MailCraft End-to-End API Integration Suite...');
+
+  let webProcess = null;
+  let isWebRunning = false;
+  try {
+    const h = await fetch(`${BASE_URL}/api/v1/health`);
+    if (h.ok) isWebRunning = true;
+  } catch {}
+
+  if (!isWebRunning) {
+    console.log('Spawning Next.js server for API tests...');
+    webProcess = spawn('pnpm', ['--filter', 'web', 'start'], {
+      stdio: 'ignore',
+      env: { ...process.env, PORT: '3000' },
+    });
+    await waitForServer(BASE_URL);
+    console.log('✓ Next.js server operational on port 3000');
+  }
 
   // 1. Healthcheck
   const healthRes = await fetch(`${BASE_URL}/api/v1/health`);
@@ -128,6 +164,11 @@ async function runE2ETests() {
   console.log('✓ Session revoked and cookie cleared (/api/v1/guest/session)');
 
   console.log('\n🎉 ALL END-TO-END API INTEGRATION TESTS PASSED PERFECTLY!\n');
+
+  if (webProcess) {
+    webProcess.kill('SIGTERM');
+  }
+  process.exit(0);
 }
 
 runE2ETests().catch((err) => {
