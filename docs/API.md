@@ -305,6 +305,17 @@ Validates an email editor schema against strict Zod constraints (block types, co
 ### `POST /api/v1/campaigns`
 Creates a new draft campaign tied to a template and brand.
 
+### `GET /api/v1/campaigns/:id`
+Retrieves full campaign data including current `editorData` structured schema, delivery status, and brand assets.
+
+### `PUT /api/v1/campaigns/:id` (and `PATCH`)
+Saves editor changes including `campaignName`, `subject`, `preheader`, and structured `editorData` JSON schema. Used by the visual editor's debounced autosave engine.
+
+### `POST /api/v1/upload/image`
+Uploads promotional images and banners. Supports Cloudinary cloud storage or high-performance base64 data URI representations with MIME and 5MB size validation.
+- **Request**: `multipart/form-data` with `file`
+- **Response** `200 OK`: `{ url, originalName, size, mimeType }`
+
 ### `POST /api/v1/campaigns/:id/render`
 Generates mobile-optimized, Gmail-safe HTML preview from structured editor JSON.
 

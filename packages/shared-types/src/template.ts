@@ -24,6 +24,11 @@ export type EditorBlockType =
   | 'coupon'
   | 'social_links'
   | 'divider'
+  | 'spacer'
+  | 'two_column'
+  | 'image_text'
+  | 'feature_section'
+  | 'announcement_bar'
   | 'footer'
   | 'unsubscribe';
 

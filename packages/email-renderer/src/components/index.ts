@@ -13,4 +13,9 @@ export * from './SocialLinks.js';
 export * from './DividerBlock.js';
 export * from './UnsubscribeBlock.js';
 export * from './DiscountBadge.js';
+export * from './SpacerBlock.js';
+export * from './TwoColumnBlock.js';
+export * from './ImageTextBlock.js';
+export * from './FeatureSection.js';
+export * from './AnnouncementBar.js';
 

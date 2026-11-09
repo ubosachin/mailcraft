@@ -159,7 +159,7 @@ export default function TemplatesPage() {
 
       const cloneData = await cloneRes.json();
       if (cloneData.data?.campaignId) {
-        router.push(`/editor?id=${cloneData.data.campaignId}`);
+        router.push(`/editor/${cloneData.data.campaignId}`);
         return;
       }
 

@@ -19,6 +19,11 @@ import { renderDiscountBadge } from './components/DiscountBadge.js';
 import { renderSocialLinks } from './components/SocialLinks.js';
 import { renderDividerBlock } from './components/DividerBlock.js';
 import { renderUnsubscribeBlock } from './components/UnsubscribeBlock.js';
+import { renderSpacerBlock } from './components/SpacerBlock.js';
+import { renderTwoColumnBlock } from './components/TwoColumnBlock.js';
+import { renderImageTextBlock } from './components/ImageTextBlock.js';
+import { renderFeatureSection } from './components/FeatureSection.js';
+import { renderAnnouncementBar } from './components/AnnouncementBar.js';
 import { interpolateVariables } from './utils/variables.js';
 import { getTemplateBySlug } from './registry/template-registry.js';
 
@@ -108,6 +113,21 @@ export function compileEmail(options: RenderEmailOptions): RenderResult {
         break;
       case 'divider':
         result = renderDividerBlock(props, ctx);
+        break;
+      case 'spacer':
+        result = renderSpacerBlock(props, ctx);
+        break;
+      case 'two_column':
+        result = renderTwoColumnBlock(props, options, ctx);
+        break;
+      case 'image_text':
+        result = renderImageTextBlock(props, options, ctx);
+        break;
+      case 'feature_section':
+        result = renderFeatureSection(props, options, ctx);
+        break;
+      case 'announcement_bar':
+        result = renderAnnouncementBar(props, options, ctx);
         break;
       case 'footer':
         result = renderEmailFooter(props, options, ctx);
