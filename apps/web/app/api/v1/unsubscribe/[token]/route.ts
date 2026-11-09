@@ -7,6 +7,8 @@ import {
   CampaignRecipient,
   Campaign,
   CampaignEvent,
+  EmailEvent,
+  UnsubscribeEvent,
   encryptCredentials,
 } from '@mailcraft/database';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
@@ -64,12 +66,19 @@ export async function POST(
     await connectToDatabase();
 
     const emailHash = crypto.createHash('sha256').update(email).digest('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     const encrypted = encryptCredentials(email);
 
     let campaign = null;
     if (payload.c) {
       campaign = await Campaign.findById(payload.c);
     }
+
+    const isOneClickHeader =
+      request.headers.get('list-unsubscribe-post') === 'List-Unsubscribe=One-Click' ||
+      request.headers.get('content-type')?.includes('application/x-www-form-urlencoded');
+
+    const source = isOneClickHeader ? 'one_click_header' : 'landing_page';
 
     // 1. Add to global suppressions table
     await Suppression.findOneAndUpdate(
@@ -80,45 +89,81 @@ export async function POST(
           reason: 'unsubscribe',
           scope: 'global',
           sessionId: campaign?.sessionId || null,
+          metadata: {
+            campaignId: campaign?._id?.toString(),
+            source,
+            reasonDetail: 'Recipient triggered unsubscribe link',
+          },
         },
       },
-      { upsert: true }
+      { upsert: true, new: true }
     );
 
     // 2. Mark contacts as unsubscribed
     await Contact.updateMany(
-      { email },
+      { normalizedEmail: email },
       { $set: { consentStatus: 'unsubscribed' } }
     );
 
-    // 3. If campaign associated, update recipient record & events
+    // 3. Record UnsubscribeEvent
+    if (campaign?.sessionId) {
+      try {
+        await UnsubscribeEvent.create({
+          sessionId: campaign.sessionId,
+          campaignId: campaign._id,
+          emailHash,
+          source,
+          unsubscribedAt: new Date(),
+          tokenHash,
+        });
+      } catch (unsubErr) {
+        console.error('[Unsubscribe] Failed to write UnsubscribeEvent:', unsubErr);
+      }
+    }
+
+    // 4. Update recipient records & campaign stats
     if (campaign) {
       await CampaignRecipient.updateMany(
         { campaignId: campaign._id, email },
         { $set: { status: 'unsubscribed' } }
       );
 
-      campaign.stats.unsubscribed += 1;
-      await campaign.save();
+      await Campaign.updateOne(
+        { _id: campaign._id },
+        { $inc: { 'stats.unsubscribed': 1 } }
+      );
 
       await CampaignEvent.create({
         campaignId: campaign._id,
         eventType: 'unsubscribed',
-        metadata: { email, source: 'one_click_unsubscribe' },
+        metadata: { email, source },
         occurredAt: new Date(),
       });
+
+      if (campaign.sessionId) {
+        await EmailEvent.create({
+          sessionId: campaign.sessionId,
+          campaignId: campaign._id,
+          provider: campaign.provider || 'mock',
+          eventType: 'unsubscribed',
+          eventTimestamp: new Date(),
+          eventId: `unsub_${emailHash}_${Date.now()}`,
+          metadata: { source },
+          processingStatus: 'processed',
+        });
+      }
     }
 
-    console.log(`[Unsubscribe] Recipient ${email} successfully suppressed.`);
+    console.log(`[Unsubscribe] Recipient ${email} successfully suppressed via ${source}.`);
 
     return jsonSuccess({
       email,
       status: 'unsubscribed',
       unsubscribed: true,
+      source,
       message: `You (${email}) have been successfully unsubscribed. You will not receive future promotional broadcasts.`,
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
-

@@ -13,5 +13,9 @@ export * from './models/Campaign.js';
 export * from './models/CampaignRecipient.js';
 export * from './models/Suppression.js';
 export * from './models/CampaignEvent.js';
+export * from './models/EmailEvent.js';
+export * from './models/TrackingToken.js';
+export * from './models/UnsubscribeEvent.js';
+export * from './models/WebhookEventLog.js';
 export * from './seed-templates.js';
 

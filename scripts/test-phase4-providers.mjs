@@ -452,7 +452,7 @@ async function runPhase4Tests() {
   const emailHash = crypto.createHash('sha256').update(uniqueBounceEmail).digest('hex');
   const suppression = await Suppression.findOne({ emailHash });
   assert(suppression, 'Bounced address must be added to global suppressions');
-  assert.strictEqual(suppression.reason, 'bounce');
+  assert(suppression.reason === 'bounce' || suppression.reason === 'hard_bounce', 'Suppression reason must indicate bounce');
 
   // 10b. SES SNS Subscription confirmation handling
   const sesConfirmRes = await fetch(`${BASE_URL}/api/v1/webhooks/ses`, {

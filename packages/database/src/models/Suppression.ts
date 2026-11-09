@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
-import { SuppressionReason, SuppressionScope } from '@mailcraft/shared-types';
+import { SuppressionReason, SuppressionScope, ISuppressionMetadata } from '@mailcraft/shared-types';
 
 export interface ISuppressionDoc extends Document {
   emailHash: string;
@@ -7,6 +7,7 @@ export interface ISuppressionDoc extends Document {
   reason: SuppressionReason;
   scope: SuppressionScope;
   sessionId?: Types.ObjectId;
+  metadata?: ISuppressionMetadata;
   createdAt: Date;
 }
 
@@ -23,7 +24,15 @@ const SuppressionSchema = new Schema<ISuppressionDoc>(
     },
     reason: {
       type: String,
-      enum: ['unsubscribe', 'bounce', 'complaint', 'manual'],
+      enum: [
+        'unsubscribe',
+        'bounce',
+        'hard_bounce',
+        'soft_bounce_threshold',
+        'complaint',
+        'manual',
+        'administrative',
+      ],
       required: true,
     },
     scope: {
@@ -37,6 +46,10 @@ const SuppressionSchema = new Schema<ISuppressionDoc>(
       default: null,
       index: true,
     },
+    metadata: {
+      type: Schema.Types.Mixed,
+      default: {},
+    },
   },
   {
     timestamps: { createdAt: true, updatedAt: false },
@@ -45,8 +58,8 @@ const SuppressionSchema = new Schema<ISuppressionDoc>(
 );
 
 SuppressionSchema.index({ emailHash: 1, scope: 1 });
+SuppressionSchema.index({ sessionId: 1, createdAt: -1 });
 
 export const Suppression: Model<ISuppressionDoc> =
   mongoose.models.Suppression ||
   mongoose.model<ISuppressionDoc>('Suppression', SuppressionSchema);
-

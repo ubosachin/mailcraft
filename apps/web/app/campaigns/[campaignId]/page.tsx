@@ -30,6 +30,7 @@ import {
   ChevronRight,
   ShieldAlert,
   FileSpreadsheet,
+  BarChart3,
 } from 'lucide-react';
 
 interface CampaignDetail {
@@ -532,6 +533,15 @@ function CampaignDetailContent() {
               Clone Draft
             </button>
 
+            <Link
+              href={`/campaigns/${campaignId}/analytics`}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-900/60 hover:bg-indigo-800 text-indigo-200 text-xs font-medium border border-indigo-700 transition"
+              title="View Complete Campaign Analytics"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
+              Analytics &amp; Engagement
+            </Link>
+
             <a
               href={`/api/v1/campaigns/${campaignId}/report?format=csv`}
               download
@@ -930,3 +940,4 @@ export default function CampaignDetailPage() {
     </Suspense>
   );
 }
+

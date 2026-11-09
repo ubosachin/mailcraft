@@ -26,12 +26,16 @@ export function jsonError(message: string, status = 400, details?: unknown) {
 export function handleApiError(error: unknown) {
   console.error('[API Error]:', error);
 
-  if (error instanceof ZodError) {
-    const formatted = error.issues.map((i) => ({
+  if (
+    error instanceof ZodError ||
+    (error && typeof error === 'object' && 'name' in error && (error as { name: string }).name === 'ZodError')
+  ) {
+    const issues = (error as ZodError).issues || [];
+    const formatted = issues.map((i) => ({
       field: i.path.join('.'),
       message: i.message,
     }));
-    return jsonError('Validation failed', 422, formatted);
+    return jsonError('Validation failed', 400, formatted);
   }
 
   if (error instanceof Error) {

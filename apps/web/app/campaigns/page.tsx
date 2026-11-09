@@ -30,6 +30,7 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreVertical,
+  BarChart3,
 } from 'lucide-react';
 
 interface CampaignItem {
@@ -451,6 +452,13 @@ function CampaignsContent() {
                 Campaigns
               </Link>
               <Link
+                href="/analytics"
+                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Analytics
+              </Link>
+              <Link
                 href="/workspace"
                 className="text-slate-400 hover:text-white transition"
               >
@@ -820,6 +828,15 @@ function CampaignsContent() {
                               <Eye className="w-4 h-4" />
                             </Link>
 
+                            {/* Analytics Button */}
+                            <Link
+                              href={`/campaigns/${camp.id}/analytics`}
+                              className="p-1.5 rounded-lg bg-slate-800 hover:bg-indigo-900/60 text-slate-300 hover:text-indigo-300 transition"
+                              title="Campaign Analytics"
+                            >
+                              <BarChart3 className="w-4 h-4 text-indigo-400" />
+                            </Link>
+
                             {/* State sensitive controls */}
                             {camp.status === 'draft' && (
                               <Link
@@ -958,3 +975,4 @@ export default function CampaignsPage() {
     </Suspense>
   );
 }
+

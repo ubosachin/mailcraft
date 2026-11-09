@@ -7,5 +7,6 @@ export * from './campaign.js';
 export * from './recipient.js';
 export * from './suppression.js';
 export * from './event.js';
+export * from './analytics.js';
 export * from './api.js';
 

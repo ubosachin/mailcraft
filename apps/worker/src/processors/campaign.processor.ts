@@ -8,6 +8,7 @@ import {
   EmailConnection,
   Suppression,
   CampaignEvent,
+  EmailEvent,
 } from '@mailcraft/database';
 import {
   createProviderFromConnection,
@@ -16,6 +17,7 @@ import {
 } from '@mailcraft/email-providers';
 import { compileEmail } from '@mailcraft/email-renderer';
 import { IEditorSchema } from '@mailcraft/shared-types';
+import { wrapEmailTracking } from '../tracking-helper.js';
 
 export interface CampaignJobPayload {
   campaignId: string;
@@ -201,6 +203,15 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
         subject = subject.replace(regex, val);
       }
 
+      // Inject secure click and open tracking tokens
+      html = await wrapEmailTracking(html, {
+        appUrl,
+        campaignId: campaign._id,
+        recipientId: recipient._id,
+        contactId: recipient.contactId,
+        sessionId: campaign.sessionId,
+      });
+
       try {
         const sendResult = await provider.sendEmail({
           to: recipient.email,
@@ -216,22 +227,59 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
           },
         });
 
-        recipient.status = 'delivered';
+        const isMockOrLocal = sendResult.provider === 'mock' || !campaign.connectionId;
+        recipient.status = isMockOrLocal ? 'delivered' : 'accepted';
         recipient.provider = sendResult.provider;
         recipient.providerMessageId = sendResult.messageId;
         recipient.sentAt = new Date();
         recipient.acceptedAt = new Date();
-        recipient.deliveredAt = new Date();
+        if (isMockOrLocal) {
+          recipient.deliveredAt = new Date();
+        }
         recipient.attempts += 1;
         await recipient.save();
 
         campaign.stats.accepted += 1;
-        campaign.stats.delivered += 1;
+        if (isMockOrLocal) {
+          campaign.stats.delivered += 1;
+        }
+
+        // Record normalized EmailEvents
+        const eventId = `send_${recipient._id}_${Date.now()}`;
+        await EmailEvent.create({
+          sessionId: campaign.sessionId,
+          campaignId: campaign._id,
+          campaignRecipientId: recipient._id,
+          contactId: recipient.contactId,
+          provider: sendResult.provider,
+          providerMessageId: sendResult.messageId,
+          eventType: 'provider_accepted',
+          eventTimestamp: new Date(),
+          eventId,
+          metadata: { to: recipient.email, subject },
+          processingStatus: 'processed',
+        });
+
+        if (isMockOrLocal) {
+          await EmailEvent.create({
+            sessionId: campaign.sessionId,
+            campaignId: campaign._id,
+            campaignRecipientId: recipient._id,
+            contactId: recipient.contactId,
+            provider: sendResult.provider,
+            providerMessageId: sendResult.messageId,
+            eventType: 'delivered',
+            eventTimestamp: new Date(),
+            eventId: `deliv_${recipient._id}_${Date.now()}`,
+            metadata: { to: recipient.email },
+            processingStatus: 'processed',
+          });
+        }
 
         await CampaignEvent.create({
           campaignId: campaign._id,
           recipientId: recipient._id,
-          eventType: 'delivered',
+          eventType: isMockOrLocal ? 'delivered' : 'sent',
           metadata: { messageId: sendResult.messageId, provider: sendResult.provider },
           occurredAt: new Date(),
         });
