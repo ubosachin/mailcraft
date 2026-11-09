@@ -1,14 +1,21 @@
 import { NextRequest } from 'next/server';
+import crypto from 'node:crypto';
 import {
   connectToDatabase,
   Campaign,
   CampaignRecipient,
   Contact,
   Brand,
+  Suppression,
+  Segment,
 } from '@mailcraft/database';
+import { compileEmail } from '@mailcraft/email-renderer';
+import { IEditorSchema } from '@mailcraft/shared-types';
 import { enqueueCampaignJob } from '@/lib/queue';
 import { resolveGuestSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+import { applySegmentFilters } from '@/lib/contact-service';
+import { validateCampaignReadiness } from '@/lib/campaign-validator';
 
 export async function POST(
   request: NextRequest,
@@ -21,6 +28,8 @@ export async function POST(
     }
 
     const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+
     await connectToDatabase();
 
     const campaign = await Campaign.findOne({ _id: id, sessionId: session._id });
@@ -28,61 +37,62 @@ export async function POST(
       return jsonError('Campaign not found', 404);
     }
 
-    if (campaign.status === 'sending' || campaign.status === 'completed') {
-      return jsonError(`Campaign is already in '${campaign.status}' state`, 400);
+    // Idempotency check: If an idempotency key was sent and campaign is already queued or sending
+    const idempotencyKey = body.idempotencyKey?.trim() || null;
+    if (idempotencyKey && campaign.idempotencyKey === idempotencyKey && ['queued', 'sending', 'completed'].includes(campaign.status)) {
+      return jsonSuccess({
+        campaignId: campaign._id.toString(),
+        status: campaign.status,
+        recipientCount: campaign.recipientCount,
+        message: 'Campaign has already been queued with this idempotency key.',
+      });
     }
 
-    // Verify brand and sender
+    // Pre-flight validation gate
+    const validation = await validateCampaignReadiness({
+      sessionId: session._id,
+      campaignId: id,
+      idempotencyKey: idempotencyKey || undefined,
+    });
+
+    if (!validation.valid) {
+      return jsonError('Campaign failed validation checks', 400, {
+        errors: validation.errors,
+        warnings: validation.warnings,
+      });
+    }
+
+    // Verify brand
     const brand = await Brand.findById(campaign.brandId);
     if (!brand) {
       return jsonError('Campaign brand profile not configured', 400);
     }
 
-    // Check sender email ownership verification
-    if (!session.verifiedEmail) {
-      return jsonError(
-        'Sender email ownership must be verified with OTP before launching a campaign',
-        403,
-        { requiresVerification: true, senderEmail: brand.senderEmail }
-      );
-    }
-
-    // Parse audience criteria from request body if provided
-    let audienceCriteria: {
-      audienceType?: 'all_eligible' | 'segment' | 'tag' | 'custom_selection';
-      segmentId?: string;
-      tag?: string;
-      contactIds?: string[];
-    } = {};
-
-    try {
-      audienceCriteria = await request.json();
-    } catch {
-      // Body is optional
-    }
-
-    // Build contacts query
+    // Audience selection resolution
+    const audienceType = body.audienceType || campaign.audienceType || 'all_eligible';
     const contactsQuery: Record<string, unknown> = {
       sessionId: session._id,
-      consentStatus: 'opted_in', // Mandatory: strictly opted_in for promotional campaigns
+      consentStatus: 'opted_in', // Strict mandatory opt-in requirement
     };
 
-    if (audienceCriteria.audienceType === 'segment' && audienceCriteria.segmentId) {
-      const { Segment } = await import('@mailcraft/database');
-      const { applySegmentFilters } = await import('@/lib/contact-service');
-      const seg = await Segment.findOne({ _id: audienceCriteria.segmentId, sessionId: session._id });
+    if (audienceType === 'segment' && (body.segmentId || campaign.audienceFilters?.segmentId)) {
+      const segId = body.segmentId || campaign.audienceFilters?.segmentId;
+      const seg = await Segment.findOne({ _id: segId, sessionId: session._id });
       if (seg && seg.filters) {
         applySegmentFilters(contactsQuery, seg.filters);
-        contactsQuery.consentStatus = 'opted_in'; // Enforce opted_in
+        contactsQuery.consentStatus = 'opted_in';
       }
-    } else if (audienceCriteria.audienceType === 'tag' && audienceCriteria.tag) {
-      contactsQuery.tags = audienceCriteria.tag;
-    } else if (audienceCriteria.audienceType === 'custom_selection' && Array.isArray(audienceCriteria.contactIds)) {
-      contactsQuery._id = { $in: audienceCriteria.contactIds };
+    } else if (audienceType === 'tag' && (body.tag || campaign.audienceFilters?.tag)) {
+      contactsQuery.tags = body.tag || campaign.audienceFilters?.tag;
+    } else if (
+      audienceType === 'custom_selection' &&
+      Array.isArray(body.contactIds || campaign.audienceFilters?.contactIds)
+    ) {
+      contactsQuery._id = { $in: body.contactIds || campaign.audienceFilters?.contactIds };
     }
 
-    // Fetch opt-in contacts for this session
-    const contacts = await Contact.find(contactsQuery);
+    // Fetch opt-in contacts
+    const contacts = await Contact.find(contactsQuery).lean();
 
     if (contacts.length === 0) {
       return jsonError(
@@ -91,27 +101,99 @@ export async function POST(
       );
     }
 
-    // Populate CampaignRecipient records in bulk (ignoring duplicates via ordered: false)
-    const recipientDocs = contacts.map((c) => ({
+    // Filter against current suppression list
+    const hashes = contacts.map((c) =>
+      crypto.createHash('sha256').update(c.normalizedEmail).digest('hex')
+    );
+    const suppressions = await Suppression.find({
+      emailHash: { $in: hashes },
+      $or: [{ scope: 'global' }, { sessionId: session._id }],
+    }).lean();
+    const suppressedHashSet = new Set(suppressions.map((s) => s.emailHash));
+
+    const eligibleContacts = contacts.filter((c) => {
+      const h = crypto.createHash('sha256').update(c.normalizedEmail).digest('hex');
+      return !suppressedHashSet.has(h);
+    });
+
+    if (eligibleContacts.length === 0) {
+      return jsonError(
+        'All selected contacts are currently suppressed. No messages can be dispatched.',
+        400
+      );
+    }
+
+    // Content Snapshotting: Freeze rendered HTML, text, and metadata
+    const editorSchema = (campaign.editorData as unknown as IEditorSchema) || {
+      settings: { background: '#FFFFFF', contentWidth: 600, fontFamily: 'sans-serif' },
+      blocks: [],
+    };
+
+    const compiled = compileEmail({
+      schema: editorSchema,
+      brand: {
+        brandName: brand.brandName,
+        logoUrl: brand.logoUrl,
+        primaryColor: brand.primaryColor,
+        secondaryColor: brand.secondaryColor,
+        footerAddress: brand.footerAddress,
+      },
+      recipient: {
+        email: 'preview@mailcraft.local',
+        unsubscribeUrl: 'https://example.com/unsubscribe/preview',
+      },
+    });
+
+    campaign.renderedHtml = compiled.html;
+    campaign.renderedText = compiled.text;
+    campaign.snapshot = {
+      subject: campaign.subject,
+      preheader: campaign.preheader,
+      senderName: brand.senderName,
+      senderEmail: brand.senderEmail,
+      provider: campaign.provider || 'mock',
+      renderedHtml: compiled.html,
+      renderedText: compiled.text,
+      editorData: campaign.editorData,
+      snapshotAt: new Date(),
+    };
+
+    // Populate CampaignRecipient records in bulk
+    const recipientDocs = eligibleContacts.map((c) => ({
       campaignId: campaign._id,
+      sessionId: session._id,
       contactId: c._id,
       email: c.email.toLowerCase().trim(),
-      status: 'queued',
+      personalizationData: {
+        firstName: c.firstName,
+        lastName: c.lastName,
+        first_name: c.firstName,
+        last_name: c.lastName,
+        name: c.name,
+        company: c.company,
+      },
+      status: 'queued' as const,
       attempts: 0,
+      queuedAt: new Date(),
     }));
 
     try {
       await CampaignRecipient.insertMany(recipientDocs, { ordered: false });
     } catch {
-      // Ignore E11000 duplicate errors if already present
+      // Ignore unique duplicate key collision errors
     }
 
     const totalQueued = await CampaignRecipient.countDocuments({
       campaignId: campaign._id,
+      status: { $in: ['pending', 'queued'] },
     });
 
     campaign.status = 'queued';
     campaign.recipientCount = totalQueued;
+    campaign.eligibleRecipientCount = totalQueued;
+    if (idempotencyKey) {
+      campaign.idempotencyKey = idempotencyKey;
+    }
     await campaign.save();
 
     // Dispatch to BullMQ Queue
@@ -122,10 +204,10 @@ export async function POST(
       jobId: job.id,
       status: 'queued',
       recipientCount: totalQueued,
+      snapshotAt: campaign.snapshot.snapshotAt,
       message: `Campaign successfully queued for background delivery to ${totalQueued} recipients`,
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
-

@@ -1,24 +1,16 @@
 export type DeliveryStatus =
   | 'pending'
   | 'queued'
+  | 'processing'
   | 'accepted'
   | 'delivered'
   | 'bounced'
   | 'failed'
+  | 'skipped'
+  | 'cancelled'
   | 'unsubscribed';
 
-export interface ICampaignRecipient {
-  _id: string;
-  campaignId: string;
-  contactId?: string;
-  email: string;
-  status: DeliveryStatus;
-  providerMessageId?: string;
-  attempts: number;
-  errorCode?: string;
-  errorMessage?: string;
-  sentAt?: Date;
-  deliveredAt?: Date;
-  createdAt: Date;
-}
-
+export type {
+  ICampaignRecipient,
+  RecipientDeliveryStatus,
+} from './campaign.js';

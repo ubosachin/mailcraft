@@ -34,13 +34,17 @@ export function getTestEmailQueue(): Queue {
   return testEmailQueue;
 }
 
-export async function enqueueCampaignJob(campaignId: string) {
+export async function enqueueCampaignJob(
+  campaignId: string,
+  options?: { delayMs?: number; jobId?: string }
+) {
   const q = getCampaignQueue();
   return await q.add(
     'dispatch-campaign',
     { campaignId },
     {
-      jobId: `camp_${campaignId}_${Date.now()}`,
+      jobId: options?.jobId || `camp_${campaignId}_${Date.now()}`,
+      delay: options?.delayMs,
       attempts: 3,
       backoff: {
         type: 'exponential',

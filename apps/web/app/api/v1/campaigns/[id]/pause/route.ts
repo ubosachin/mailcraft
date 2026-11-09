@@ -22,11 +22,11 @@ export async function POST(
     }
 
     campaign.status = 'paused';
+    campaign.pausedAt = new Date();
     await campaign.save();
 
-    return jsonSuccess({ status: 'paused' }, 200, 'Campaign paused');
+    return jsonSuccess({ status: 'paused', campaignId: id }, 200, 'Campaign paused');
   } catch (error) {
     return handleApiError(error);
   }
 }
-

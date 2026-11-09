@@ -8,13 +8,14 @@
     "build": "pnpm --filter shared-types build && pnpm --filter validation build && pnpm --filter email-renderer build && pnpm --filter database build && pnpm --filter email-providers build && pnpm --filter worker build && pnpm --filter web build",
     "worker": "pnpm --filter worker start",
     "db:seed": "node packages/database/dist/seed-templates.js",
-    "test": "node packages/database/dist/test-phase1.js && node scripts/test-api-e2e.mjs && node scripts/test-phase2-templates.mjs && node scripts/test-phase3-editor.mjs && node scripts/test-phase4-providers.mjs && node scripts/test-phase5-contacts.mjs && node scripts/test-campaign-worker.mjs",
+    "test": "node packages/database/dist/test-phase1.js && node scripts/test-api-e2e.mjs && node scripts/test-phase2-templates.mjs && node scripts/test-phase3-editor.mjs && node scripts/test-phase4-providers.mjs && node scripts/test-phase5-contacts.mjs && node scripts/test-phase6-campaigns.mjs && node scripts/test-campaign-worker.mjs",
     "test:worker": "node scripts/test-campaign-worker.mjs",
     "test:api": "node scripts/test-api-e2e.mjs",
     "test:templates": "node scripts/test-phase2-templates.mjs",
     "test:editor": "node scripts/test-phase3-editor.mjs",
     "test:providers": "node scripts/test-phase4-providers.mjs",
     "test:contacts": "node scripts/test-phase5-contacts.mjs",
+    "test:campaigns": "node scripts/test-phase6-campaigns.mjs",
     "lint": "pnpm --filter web lint"
   },
   "devDependencies": {
