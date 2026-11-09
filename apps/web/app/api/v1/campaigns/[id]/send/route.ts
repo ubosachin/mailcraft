@@ -13,6 +13,7 @@ import { compileEmail } from '@mailcraft/email-renderer';
 import { IEditorSchema } from '@mailcraft/shared-types';
 import { enqueueCampaignJob } from '@/lib/queue';
 import { resolveGuestSession } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { applySegmentFilters } from '@/lib/contact-service';
 import { validateCampaignReadiness } from '@/lib/campaign-validator';
@@ -25,6 +26,15 @@ export async function POST(
     const session = await resolveGuestSession(request);
     if (!session) {
       return jsonError('Guest session required', 401);
+    }
+
+    const rateLimit = await checkRateLimit(`camp_send:${session._id}`, 'CAMPAIGN_SEND');
+    if (!rateLimit.success) {
+      return jsonError(
+        'Campaign broadcast limit exceeded for this session. Please wait before launching another campaign.',
+        429,
+        { retryAfter: Math.ceil(rateLimit.resetMs / 1000) }
+      );
     }
 
     const { id } = await params;

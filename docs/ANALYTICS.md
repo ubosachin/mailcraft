@@ -91,3 +91,4 @@ When exporting recipient reports or event logs to CSV (`/api/v1/analytics/export
 - Any text starting with `=, +, -, @, \t, \r, |` is automatically prepended with a single quote (`'`).
 - Internal quotes are escaped (`""`) and cells are enclosed in double quotes.
 - This mitigates **CSV / Formula Injection (CWE-1236)** in Excel, LibreOffice, and Google Sheets.
+

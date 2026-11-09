@@ -85,3 +85,4 @@ When launching a new domain, IP address, or provider account:
      - Gmail: 1–2 emails/sec
      - Brevo: 5–10 emails/sec
      - Amazon SES: 14–50 emails/sec (depending on production quota)
+

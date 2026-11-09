@@ -49,7 +49,7 @@ const WebhookEventLogSchema = new Schema<IWebhookEventLogDoc>(
     receivedAt: {
       type: Date,
       default: Date.now,
-      index: true,
+      index: { expires: 30 * 24 * 3600 },
     },
   },
   {
@@ -63,3 +63,4 @@ WebhookEventLogSchema.index({ provider: 1, eventId: 1, receivedAt: -1 });
 export const WebhookEventLog: Model<IWebhookEventLogDoc> =
   mongoose.models.WebhookEventLog ||
   mongoose.model<IWebhookEventLogDoc>('WebhookEventLog', WebhookEventLogSchema);
+

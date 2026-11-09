@@ -27,3 +27,4 @@ export const removeSuppressionSchema = z.object({
 
 export type AddSuppressionInput = z.infer<typeof addSuppressionSchema>;
 export type RemoveSuppressionInput = z.infer<typeof removeSuppressionSchema>;
+

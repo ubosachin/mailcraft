@@ -91,7 +91,7 @@ const TrackingTokenSchema = new Schema<ITrackingTokenDoc>(
     expiresAt: {
       type: Date,
       required: true,
-      index: true,
+      index: { expires: 0 },
     },
     createdAt: {
       type: Date,
@@ -110,3 +110,4 @@ TrackingTokenSchema.index({ sessionId: 1, type: 1 });
 export const TrackingToken: Model<ITrackingTokenDoc> =
   mongoose.models.TrackingToken ||
   mongoose.model<ITrackingTokenDoc>('TrackingToken', TrackingTokenSchema);
+

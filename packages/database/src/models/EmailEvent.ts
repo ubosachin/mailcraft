@@ -109,3 +109,4 @@ EmailEventSchema.index({ eventType: 1, eventTimestamp: -1 });
 export const EmailEvent: Model<IEmailEventDoc> =
   mongoose.models.EmailEvent ||
   mongoose.model<IEmailEventDoc>('EmailEvent', EmailEventSchema);
+

@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { requestEmailVerificationSchema } from '@mailcraft/validation';
 import { generateVerificationCode, hashVerificationCode } from '@mailcraft/database';
 import { resolveGuestSession } from '@/lib/session';
+import { isDisposableEmail } from '@/lib/disposable-email';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
@@ -13,6 +14,13 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { email } = requestEmailVerificationSchema.parse(body);
+
+    if (isDisposableEmail(email)) {
+      return jsonError(
+        'Disposable and temporary email addresses are not permitted for sender verification.',
+        400
+      );
+    }
 
     const code = generateVerificationCode();
     const codeHash = hashVerificationCode(code);

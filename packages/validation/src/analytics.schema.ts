@@ -27,3 +27,4 @@ export const dnsCheckSchema = z.object({
 export type AnalyticsFilterInput = z.infer<typeof analyticsFilterSchema>;
 export type ComplianceValidateInput = z.infer<typeof complianceValidateSchema>;
 export type DnsCheckInput = z.infer<typeof dnsCheckSchema>;
+

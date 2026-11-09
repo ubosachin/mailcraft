@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import { createCampaignSchema } from '@mailcraft/validation';
 import { connectToDatabase, Campaign, Brand, EmailConnection } from '@mailcraft/database';
 import { resolveGuestSession } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
@@ -9,6 +10,13 @@ export async function POST(request: NextRequest) {
     const session = await resolveGuestSession(request);
     if (!session) {
       return jsonError('Guest session required', 401);
+    }
+
+    const rateLimit = await checkRateLimit(`camp_create:${session._id}`, 'CAMPAIGN_CREATE');
+    if (!rateLimit.success) {
+      return jsonError('Campaign creation limit reached for this session. Please try again later.', 429, {
+        retryAfter: Math.ceil(rateLimit.resetMs / 1000),
+      });
     }
 
     const body = await request.json();

@@ -70,3 +70,4 @@ To enable secure, no-login opt-outs without exposing sensitive recipient records
 Once an unsubscribe event is processed:
 1. **Global Persistence**: The address is added to the global suppression list. Even if a user attempts to re-import the contact via CSV, the system detects the suppressed hash and blocks sending.
 2. **In-Flight Pre-Send Recheck**: If a multi-thousand contact campaign is currently processing in background queues, worker threads perform a **just-in-time suppression query immediately prior to socket dispatch**. If the contact unsubscribed 2 seconds ago while earlier batches were sending, the job is transitioned to `skipped` with code `SUPPRESSED_UNSUBSCRIBED`.
+

@@ -76,6 +76,12 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
 
   await provider.connect();
 
+  // Stalled job recovery: recover any recipients previously stuck in 'processing' status from a crashed worker
+  await CampaignRecipient.updateMany(
+    { campaignId: campaign._id, status: 'processing' },
+    { $set: { status: 'queued' } }
+  );
+
   const editorSchema = (campaign.editorData as unknown as IEditorSchema) || {
     settings: {
       background: '#FFFFFF',
@@ -284,10 +290,17 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
           occurredAt: new Date(),
         });
       } catch (sendError) {
-        recipient.status = 'failed';
-        recipient.errorCode = 'DISPATCH_ERROR';
-        recipient.errorMessage =
+        const errorMsg =
           sendError instanceof Error ? sendError.message : 'Unknown dispatch error';
+        const isTimeout = /timeout|timedout|ETIMEDOUT|ESOCKETTIMEDOUT|ECONNRESET/i.test(
+          errorMsg
+        );
+
+        recipient.status = 'failed';
+        recipient.errorCode = isTimeout ? 'TIMEOUT_UNCERTAIN' : 'DISPATCH_ERROR';
+        recipient.errorMessage = isTimeout
+          ? `Provider request timed out (${errorMsg}). Message may have been accepted; not blindly retrying.`
+          : errorMsg;
         recipient.lastErrorCode = recipient.errorCode;
         recipient.lastErrorMessage = recipient.errorMessage;
         recipient.attempts += 1;
@@ -299,7 +312,7 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
           campaignId: campaign._id,
           recipientId: recipient._id,
           eventType: 'bounced',
-          metadata: { error: recipient.errorMessage },
+          metadata: { error: recipient.errorMessage, isTimeout },
           occurredAt: new Date(),
         });
       }

@@ -14,6 +14,7 @@
     "@mailcraft/email-providers": "workspace:*",
     "@mailcraft/email-renderer": "workspace:*",
     "@mailcraft/shared-types": "workspace:*",
+    "@mailcraft/validation": "workspace:*",
     "bullmq": "^5.41.0",
     "dotenv": "^16.4.7",
     "ioredis": "^5.6.0"

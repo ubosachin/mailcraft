@@ -66,3 +66,4 @@ UnsubscribeEventSchema.index({ sessionId: 1, unsubscribedAt: -1 });
 export const UnsubscribeEvent: Model<IUnsubscribeEventDoc> =
   mongoose.models.UnsubscribeEvent ||
   mongoose.model<IUnsubscribeEventDoc>('UnsubscribeEvent', UnsubscribeEventSchema);
+

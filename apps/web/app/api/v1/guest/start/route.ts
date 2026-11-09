@@ -2,10 +2,23 @@ import { NextRequest } from 'next/server';
 import { startGuestSessionSchema } from '@mailcraft/validation';
 import { Brand } from '@mailcraft/database';
 import { createGuestSession, setSessionCookie } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === 'localhost';
+    const rule = isLoopback
+      ? { max: 5000, windowMs: 10 * 60 * 1000 }
+      : 'SESSION_CREATE';
+    const rateLimit = await checkRateLimit(`session_create:${ip}`, rule);
+    if (!rateLimit.success) {
+      return jsonError('Too many session creation requests. Please try again later.', 429, {
+        retryAfter: Math.ceil(rateLimit.resetMs / 1000),
+      });
+    }
+
     let body = {};
     try {
       body = await request.json();

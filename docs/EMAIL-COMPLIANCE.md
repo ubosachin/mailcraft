@@ -68,3 +68,4 @@ MailCraft maintains an immutable audit trail of compliance events:
 - `unsubscribe_events`: Records `recipientId`, `campaignId`, `token`, `timestamp`, `ipHash`, and `userAgent`.
 - `webhook_event_logs`: Retains raw provider webhook payloads with delivery timestamps.
 - `suppressions`: Logs the original source and justification (`source`, `reason`, `auditTrail`) for every suppressed record. Suppressions for spam complaints and hard bounces cannot be purged without administrative justification.
+

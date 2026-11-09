@@ -3,6 +3,7 @@ import { sendTestEmailSchema } from '@mailcraft/validation';
 import { connectToDatabase, Campaign } from '@mailcraft/database';
 import { enqueueTestEmailJob } from '@/lib/queue';
 import { resolveGuestSession } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(
@@ -13,6 +14,13 @@ export async function POST(
     const session = await resolveGuestSession(request);
     if (!session) {
       return jsonError('Guest session required', 401);
+    }
+
+    const rateLimit = await checkRateLimit(`test_email:${session._id}`, 'TEST_EMAIL');
+    if (!rateLimit.success) {
+      return jsonError('Test email dispatch limit exceeded. Please wait a few minutes.', 429, {
+        retryAfter: Math.ceil(rateLimit.resetMs / 1000),
+      });
     }
 
     const { id } = await params;

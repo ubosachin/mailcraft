@@ -1,27 +1,17 @@
 import { NextResponse } from 'next/server';
-import { connectToDatabase } from '@mailcraft/database';
+import { checkReadiness } from '@/lib/health-checker';
 
 export async function GET() {
-  try {
-    await connectToDatabase();
-    return NextResponse.json({
-      status: 'healthy',
-      service: 'MailCraft API',
+  const readiness = await checkReadiness();
+  return NextResponse.json(
+    {
+      status: readiness.ready ? 'healthy' : 'degraded',
+      service: 'MailCraft API v1',
+      database: (readiness.checks.mongodb as { status?: string })?.status || 'connected',
       timestamp: new Date().toISOString(),
-      database: 'connected',
+      dependencies: readiness.checks,
       version: '1.0.0',
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        status: 'degraded',
-        service: 'MailCraft API',
-        timestamp: new Date().toISOString(),
-        database: 'disconnected',
-        error: error instanceof Error ? error.message : 'Unknown database error',
-      },
-      { status: 503 }
-    );
-  }
+    },
+    { status: readiness.ready ? 200 : 503 }
+  );
 }
-

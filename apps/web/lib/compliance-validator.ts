@@ -320,3 +320,4 @@ export async function validateCampaignCompliance(
       'Disclaimer: MailCraft automated compliance audits verify technical safeguards against commercial communication standards (including US CAN-SPAM Act, EU GDPR, and Indian DPDP Act / TRAI regulations). Automated validation does not constitute formal legal counsel.',
   };
 }
+

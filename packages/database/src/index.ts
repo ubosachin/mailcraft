@@ -17,5 +17,6 @@ export * from './models/EmailEvent.js';
 export * from './models/TrackingToken.js';
 export * from './models/UnsubscribeEvent.js';
 export * from './models/WebhookEventLog.js';
+export * from './cleanup.js';
 export * from './seed-templates.js';
 

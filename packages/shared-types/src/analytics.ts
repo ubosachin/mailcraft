@@ -89,3 +89,4 @@ export interface IDnsCheckResult {
     guidance: string;
   };
 }
+

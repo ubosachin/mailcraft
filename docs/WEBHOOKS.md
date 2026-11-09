@@ -93,3 +93,4 @@ When any webhook reports a **hard bounce** or **spam complaint**:
    - `metadata`: includes bounce diagnostic code or feedback loop provider.
 3. The contact's `consentStatus` in the `contacts` collection is immediately updated to `'suppressed'`.
 4. Any in-flight or future campaign targeting this address will be automatically blocked by the **Pre-Send Recheck Gate**.
+
