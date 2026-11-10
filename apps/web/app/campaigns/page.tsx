@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import {
   Send,
   Plus,
@@ -20,9 +20,6 @@ import {
   Clock,
   AlertTriangle,
   Layers,
-  Server,
-  Users,
-  SlidersHorizontal,
   Mail,
   Loader2,
   Download,
@@ -408,86 +405,20 @@ function CampaignsContent() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header Navigation */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="group">
-              <MailCraftLogo size="md" variant="dark" />
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link
-                href="/templates"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Layers className="w-4 h-4" />
-                Templates
-              </Link>
-              <Link
-                href="/editor"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                Visual Editor
-              </Link>
-              <Link
-                href="/connect"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Server className="w-4 h-4" />
-                Sender Accounts
-              </Link>
-              <Link
-                href="/contacts"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Users className="w-4 h-4" />
-                Contacts &amp; Audience
-              </Link>
-              <Link
-                href="/campaigns"
-                className="text-indigo-400 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5"
-              >
-                <Send className="w-4 h-4" />
-                Campaigns
-              </Link>
-              <Link
-                href="/analytics"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <BarChart3 className="w-4 h-4" />
-                Analytics
-              </Link>
-              <Link
-                href="/workspace"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Workspace
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
-                  window.location.href = '/login';
-                });
-              }}
-              className="text-xs font-semibold text-slate-400 hover:text-rose-400 px-2 py-1 transition"
-            >
-              Log Out
-            </button>
-            <Link
-              href="/campaigns/create"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/20 transition transform active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              New Campaign
-            </Link>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        activeNav="campaigns"
+        showLogout
+        rightActions={
+          <Link
+            href="/campaigns/create"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs sm:text-sm shadow-lg shadow-indigo-600/20 transition transform active:scale-95 whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">New Campaign</span>
+            <span className="sm:hidden">New</span>
+          </Link>
+        }
+      />
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -613,7 +544,7 @@ function CampaignsContent() {
 
         {/* Filter Bar */}
         <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex flex-1 items-center gap-3 w-full">
+          <div className="flex flex-col sm:flex-row flex-1 items-stretch sm:items-center gap-3 w-full">
             <div className="relative flex-1">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
@@ -634,7 +565,7 @@ function CampaignsContent() {
                 setStatusFilter(e.target.value);
                 setPage(1);
               }}
-              className="bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-300 px-3 py-2 focus:outline-none focus:border-indigo-500 transition"
+              className="w-full sm:w-auto bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-300 px-3 py-2 focus:outline-none focus:border-indigo-500 transition"
             >
               <option value="all">All Lifecycles</option>
               <option value="draft">Drafts</option>
@@ -674,7 +605,7 @@ function CampaignsContent() {
                     : 'Get started by creating your first promotional email campaign with real sender integration.'}
                 </p>
               </div>
-              <div className="flex items-center justify-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <Link
                   href="/campaigns/create"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition"

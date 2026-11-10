@@ -2,24 +2,18 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import {
   ShieldCheck,
   Search,
   CheckCircle,
   AlertTriangle,
   XCircle,
-  Server,
   ArrowLeft,
   Loader2,
   Info,
   Copy,
   ExternalLink,
-  Layers,
-  Users,
-  Send,
-  SlidersHorizontal,
-  ShieldAlert,
 } from 'lucide-react';
 
 interface DnsCheckResult {
@@ -125,44 +119,20 @@ function EmailAuthenticationContent() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="group">
-              <MailCraftLogo size="md" variant="dark" />
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link href="/templates" className="text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                <Layers className="w-4 h-4" />
-                Templates
-              </Link>
-              <Link href="/connect" className="text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                <Server className="w-4 h-4" />
-                Sender Accounts
-              </Link>
-              <Link href="/campaigns" className="text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                <Send className="w-4 h-4" />
-                Campaigns
-              </Link>
-              <Link href="/analytics" className="text-slate-400 hover:text-white transition flex items-center gap-1.5">
-                Analytics
-              </Link>
-              <Link href="/settings/email-authentication" className="text-indigo-400 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4" />
-                Domain Authentication
-              </Link>
-            </nav>
-          </div>
-
+      <DashboardHeader
+        activeNav="email-auth"
+        showComplianceNav
+        showLogout
+        rightActions={
           <Link
             href="/connect"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:underline"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:underline whitespace-nowrap"
           >
-            Manage Provider Accounts &rarr;
+            <span className="hidden sm:inline">Manage Providers &rarr;</span>
+            <span className="sm:hidden">Providers &rarr;</span>
           </Link>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Container */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-8">

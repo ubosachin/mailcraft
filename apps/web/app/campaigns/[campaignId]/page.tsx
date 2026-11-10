@@ -455,23 +455,23 @@ function CampaignDetailContent() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
       <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2.5 lg:py-0 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
             <Link
               href="/campaigns"
-              className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
-              Campaigns
+              <span className="hidden sm:inline">Campaigns</span>
             </Link>
-            <div className="h-4 w-px bg-slate-800" />
-            <div className="flex items-center gap-3">
-              <span className="font-semibold text-white text-sm">{campaign.campaignName}</span>
+            <div className="h-4 w-px bg-slate-800 shrink-0" />
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <span className="font-semibold text-white text-sm truncate max-w-[160px] sm:max-w-xs">{campaign.campaignName}</span>
               {getStatusBadge(campaign.status)}
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {campaign.status === 'sending' && (
               <button
                 onClick={handlePause}

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Loader2, AlertCircle, ArrowLeft, RefreshCw, LayoutTemplate } from 'lucide-react';
+import { Loader2, AlertCircle, ArrowLeft, RefreshCw, LayoutTemplate, Blocks, Eye, Sliders } from 'lucide-react';
 import { IEditorSchema, IEditorBlock, EditorBlockType } from '@mailcraft/shared-types';
 import { TEMPLATE_CATALOG, compileEmail } from '@mailcraft/email-renderer';
 import { EditorTopNav } from '../components/EditorTopNav';
@@ -33,6 +33,7 @@ export default function CampaignEditorPage({ params }: PageProps) {
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [inspectorTab, setInspectorTab] = useState<'block' | 'settings'>('block');
+  const [mobilePanel, setMobilePanel] = useState<'blocks' | 'canvas' | 'inspector'>('canvas');
 
   const [brand, setBrand] = useState<{
     brandName?: string;
@@ -199,6 +200,7 @@ export default function CampaignEditorPage({ params }: PageProps) {
 
       setSelectedBlockId(newId);
       setInspectorTab('block');
+      setMobilePanel('canvas');
     },
     [updateSchema]
   );
@@ -457,7 +459,7 @@ export default function CampaignEditorPage({ params }: PageProps) {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-slate-100 overflow-hidden font-sans">
+    <div className="min-h-screen lg:h-screen w-full flex flex-col bg-slate-100 lg:overflow-hidden font-sans">
       {/* Top Navigation */}
       <EditorTopNav
         campaignId={campaignId}
@@ -477,45 +479,92 @@ export default function CampaignEditorPage({ params }: PageProps) {
         onContinue={handleContinue}
       />
 
+      {/* Mobile / Tablet Panel Switcher */}
+      <div className="lg:hidden bg-white border-b border-slate-200 px-3 py-2 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setMobilePanel('blocks')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+            mobilePanel === 'blocks'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Blocks className="w-3.5 h-3.5" />
+          <span>Blocks</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobilePanel('canvas')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+            mobilePanel === 'canvas'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Eye className="w-3.5 h-3.5" />
+          <span>Canvas</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobilePanel('inspector')}
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+            mobilePanel === 'inspector'
+              ? 'bg-indigo-600 text-white shadow-xs'
+              : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          <Sliders className="w-3.5 h-3.5" />
+          <span>Style</span>
+        </button>
+      </div>
+
       {/* Main Three-Panel Studio Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Panel: Content Blocks Library */}
-        <BlockSidebar onAddBlock={handleAddBlock} />
+        <div className={`${mobilePanel === 'blocks' ? 'flex' : 'hidden lg:flex'} w-full lg:w-80 shrink-0`}>
+          <BlockSidebar onAddBlock={handleAddBlock} />
+        </div>
 
         {/* Center Panel: Email Canvas */}
-        <EmailCanvas
-          schema={schema}
-          viewport={viewport}
-          selectedBlockId={selectedBlockId}
-          brand={brand}
-          onSelectBlock={(id) => {
-            setSelectedBlockId(id);
-            if (id) setInspectorTab('block');
-          }}
-          onReorderBlocks={handleReorderBlocks}
-          onMoveUp={handleMoveUp}
-          onMoveDown={handleMoveDown}
-          onDuplicate={handleDuplicate}
-          onDelete={handleDelete}
-        />
+        <div className={`${mobilePanel === 'canvas' ? 'flex' : 'hidden lg:flex'} flex-1 min-w-0 overflow-hidden`}>
+          <EmailCanvas
+            schema={schema}
+            viewport={viewport}
+            selectedBlockId={selectedBlockId}
+            brand={brand}
+            onSelectBlock={(id) => {
+              setSelectedBlockId(id);
+              if (id) setInspectorTab('block');
+            }}
+            onReorderBlocks={handleReorderBlocks}
+            onMoveUp={handleMoveUp}
+            onMoveDown={handleMoveDown}
+            onDuplicate={handleDuplicate}
+            onDelete={handleDelete}
+            onOpenAddModal={() => setMobilePanel('blocks')}
+          />
+        </div>
 
         {/* Right Panel: Properties Inspector & Global Settings */}
-        <PropertiesInspector
-          selectedBlock={selectedBlock}
-          onUpdateBlockProps={handleUpdateBlockProps}
-          onDeselect={() => setSelectedBlockId(null)}
-          settings={schema.settings || {}}
-          onUpdateSettings={handleUpdateSettings}
-          campaignName={campaignName}
-          onCampaignNameChange={setCampaignName}
-          subject={subject}
-          onSubjectChange={setSubject}
-          preheader={preheader}
-          onPreheaderChange={setPreheader}
-          brand={brand}
-          activeTab={inspectorTab}
-          onTabChange={setInspectorTab}
-        />
+        <div className={`${mobilePanel === 'inspector' ? 'flex' : 'hidden lg:flex'} w-full lg:w-80 shrink-0`}>
+          <PropertiesInspector
+            selectedBlock={selectedBlock}
+            onUpdateBlockProps={handleUpdateBlockProps}
+            onDeselect={() => setSelectedBlockId(null)}
+            settings={schema.settings || {}}
+            onUpdateSettings={handleUpdateSettings}
+            campaignName={campaignName}
+            onCampaignNameChange={setCampaignName}
+            subject={subject}
+            onSubjectChange={setSubject}
+            preheader={preheader}
+            onPreheaderChange={setPreheader}
+            brand={brand}
+            activeTab={inspectorTab}
+            onTabChange={setInspectorTab}
+          />
+        </div>
       </div>
 
       {/* Sandboxed Live HTML Preview Modal */}

@@ -343,7 +343,7 @@ export function BlockSidebar({ onAddBlock }: BlockSidebarProps) {
   }, [search, selectedCategory]);
 
   return (
-    <aside className="w-80 border-r border-slate-200 bg-white flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none">
+    <aside className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white flex flex-col h-[calc(100vh-116px)] lg:h-[calc(100vh-64px)] overflow-hidden select-none">
       {/* Sidebar Header & Search */}
       <div className="p-4 border-b border-slate-200 bg-slate-50/50">
         <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2.5">

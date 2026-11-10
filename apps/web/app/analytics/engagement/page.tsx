@@ -104,7 +104,7 @@ function EngagementContent() {
 
         <button
           onClick={fetchData}
-          className="p-2 text-slate-500 hover:text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
+          className="self-start sm:self-auto p-2 text-slate-500 hover:text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50"
         >
           <RefreshCw className="w-4 h-4" />
         </button>

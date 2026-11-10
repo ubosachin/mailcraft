@@ -1,8 +1,14 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { getAppUrl } from '@/lib/url';
 import './globals.css';
 
 const appUrl = getAppUrl();
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#4F46E5',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
@@ -41,7 +47,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-slate-50 text-slate-900 flex flex-col selection:bg-indigo-500 selection:text-white">
+      <body className="min-h-screen bg-slate-50 text-slate-900 flex flex-col overflow-x-hidden selection:bg-indigo-500 selection:text-white">
         {children}
       </body>
     </html>

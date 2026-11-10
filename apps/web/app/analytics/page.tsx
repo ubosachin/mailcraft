@@ -116,7 +116,7 @@ function AnalyticsDashboardContent() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link
             href="/analytics/deliverability"
             className="inline-flex items-center gap-2 px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 shadow-sm"
@@ -150,8 +150,8 @@ function AnalyticsDashboardContent() {
       </div>
 
       {/* Filter Toolbar */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+        <div className="flex flex-wrap items-center gap-3">
           <Filter className="w-4 h-4 text-slate-400" />
           <span className="text-xs font-semibold uppercase text-slate-600 tracking-wider">Filter by Provider:</span>
           <select

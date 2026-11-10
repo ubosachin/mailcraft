@@ -54,33 +54,34 @@ export function EditorTopNav({
   onContinue,
 }: EditorTopNavProps) {
   return (
-    <header className="h-16 border-b border-slate-200 bg-white px-4 flex items-center justify-between z-30 select-none shadow-sm">
+    <header className="min-h-16 border-b border-slate-200 bg-white px-3 sm:px-4 py-2 lg:py-0 flex flex-wrap items-center justify-between gap-2 z-30 select-none shadow-sm">
       {/* Left: Brand & Campaign Title */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
         <Link
           href="/workspace"
-          className="flex items-center space-x-1.5 text-slate-500 hover:text-slate-800 text-xs font-semibold px-2 py-1.5 rounded-md hover:bg-slate-100 transition-colors"
+          className="flex items-center space-x-1 text-slate-500 hover:text-slate-800 text-xs font-semibold px-1.5 sm:px-2 py-1.5 rounded-md hover:bg-slate-100 transition-colors shrink-0"
           title="Return to Workspace"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Exit</span>
+          <span className="hidden sm:inline">Exit</span>
         </Link>
 
-        <div className="h-4 w-px bg-slate-200" />
+        <div className="h-4 w-px bg-slate-200 shrink-0" />
 
-        <MailCraftLogo size="sm" variant="light" />
+        <MailCraftLogo size="sm" variant="light" showText={false} className="sm:hidden" />
+        <MailCraftLogo size="sm" variant="light" className="hidden sm:inline-flex" />
 
-        <div className="h-4 w-px bg-slate-200 hidden sm:block" />
+        <div className="h-4 w-px bg-slate-200 hidden sm:block shrink-0" />
 
         {/* Editable Campaign Name */}
-        <div className="flex items-center">
+        <div className="flex items-center min-w-0">
           <input
             type="text"
             value={campaignName}
             onChange={(e) => onCampaignNameChange(e.target.value)}
             placeholder="Campaign Name..."
             aria-label="Campaign Name"
-            className="text-xs sm:text-sm font-semibold text-slate-800 bg-transparent hover:bg-slate-50 focus:bg-white px-2 py-1 rounded border border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none max-w-[140px] sm:max-w-[220px] md:max-w-[320px] truncate transition-colors"
+            className="text-xs sm:text-sm font-semibold text-slate-800 bg-transparent hover:bg-slate-50 focus:bg-white px-2 py-1 rounded border border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none w-28 sm:w-44 md:w-64 truncate transition-colors"
           />
         </div>
 

@@ -14,6 +14,8 @@ import {
   Users,
   Eye,
   Lock,
+  Menu,
+  X,
 } from 'lucide-react';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
 
@@ -39,6 +41,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
@@ -98,20 +101,20 @@ export default function HomePage() {
             <Link href="/privacy" className="hover:text-indigo-600 transition">Privacy & Trust</Link>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isAuthenticated ? (
               <>
                 <Link
                   href="/campaigns"
-                  className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
+                  className="hidden sm:inline-block text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
                 >
                   Campaigns
                 </Link>
                 <Link
                   href="/workspace"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition whitespace-nowrap"
                 >
-                  Open Workspace
+                  <span>Workspace</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </>
@@ -119,21 +122,65 @@ export default function HomePage() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
+                  className="hidden sm:inline-block text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition whitespace-nowrap"
                 >
-                  Sign up
+                  <span>Sign up</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </>
             )}
+
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen((prev) => !prev)}
+              className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition"
+              aria-label="Toggle navigation menu"
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Drawer */}
+        {mobileNavOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-2 shadow-lg">
+            <div className="grid grid-cols-1 gap-1 text-sm font-medium text-slate-700">
+              <Link href="/templates" prefetch={false} onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
+                12+ Templates
+              </Link>
+              <Link href="/pricing" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
+                Pricing & Quotas
+              </Link>
+              <a href="#how-it-works" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
+                How it Works
+              </a>
+              <a href="#sending" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
+                Sending Channels
+              </a>
+              <Link href="/privacy" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
+                Privacy & Trust
+              </Link>
+            </div>
+            <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+              {isAuthenticated ? (
+                <Link href="/campaigns" onClick={() => setMobileNavOpen(false)} className="w-full text-center px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm font-semibold">
+                  Go to Campaigns
+                </Link>
+              ) : (
+                <Link href="/login" onClick={() => setMobileNavOpen(false)} className="w-full text-center px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm font-semibold">
+                  Log in
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -267,7 +314,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {INITIAL_TEMPLATES.map((tpl, i) => (
               <div
                 key={i}

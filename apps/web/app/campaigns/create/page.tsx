@@ -521,21 +521,21 @@ function CampaignWizardContent() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
       <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 sm:py-0 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
             <Link
               href="/campaigns"
-              className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition"
+              className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
-              Campaigns
+              <span className="hidden sm:inline">Campaigns</span>
             </Link>
             <div className="h-4 w-px bg-slate-800" />
-            <div>
-              <span className="font-semibold text-white text-sm">
+            <div className="min-w-0">
+              <span className="font-semibold text-white text-sm truncate block sm:inline">
                 {campaignName || 'New Campaign Wizard'}
               </span>
-              <span className="text-xs text-slate-500 ml-2">
+              <span className="text-xs text-slate-500 sm:ml-2 block sm:inline">
                 Step {currentStep} of 9: {steps[currentStep - 1].title}
               </span>
             </div>
@@ -831,7 +831,7 @@ function CampaignWizardContent() {
             </div>
 
             {/* Audience Stats Badge */}
-            <div className="grid grid-cols-3 gap-3 p-4 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-950 border border-slate-800 text-center">
               <div>
                 <div className="text-xs text-slate-400">Total Contacts</div>
                 <div className="text-xl font-bold text-white mt-1">
@@ -1187,7 +1187,7 @@ function CampaignWizardContent() {
             <div className="flex justify-center bg-slate-950/80 border border-slate-800 rounded-xl p-4 overflow-hidden">
               <div
                 className={`bg-white text-slate-900 rounded-lg shadow-2xl transition-all duration-300 p-6 overflow-y-auto max-h-[600px] ${
-                  previewDevice === 'mobile' ? 'w-[375px]' : 'w-full max-w-[600px]'
+                  previewDevice === 'mobile' ? 'w-full max-w-[375px]' : 'w-full max-w-[600px]'
                 }`}
               >
                 {renderedHtml ? (

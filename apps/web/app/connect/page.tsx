@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import {
   Mail,
   CheckCircle2,
@@ -19,11 +19,9 @@ import {
   Server,
   Cloud,
   Trash2,
-  SlidersHorizontal,
   Loader2,
   Check,
   AlertCircle,
-  Layers,
   Sparkles,
 } from 'lucide-react';
 
@@ -441,59 +439,20 @@ function ConnectPageContent() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="group">
-              <MailCraftLogo size="md" variant="dark" />
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link
-                href="/templates"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Layers className="w-4 h-4" />
-                Templates
-              </Link>
-              <Link
-                href="/editor"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                Visual Editor
-              </Link>
-              <Link
-                href="/connect"
-                className="text-indigo-400 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5"
-              >
-                <Server className="w-4 h-4" />
-                Sender Accounts
-              </Link>
-              <Link
-                href="/workspace"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Workspace
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-              Authenticated Vault
-            </div>
-            <Link
-              href="/templates"
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              Browse Templates
-            </Link>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        activeNav="connect"
+        showLogout
+        rightActions={
+          <Link
+            href="/templates"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm whitespace-nowrap"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Templates</span>
+            <span className="sm:hidden">Themes</span>
+          </Link>
+        }
+      />
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">

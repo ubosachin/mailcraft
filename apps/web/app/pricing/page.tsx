@@ -13,16 +13,16 @@ export default function PricingPage() {
             <MailCraftLogo size="md" variant="light" />
           </Link>
 
-          <div className="flex items-center gap-4 text-xs font-semibold">
-            <Link href="/templates" prefetch={false} className="text-slate-600 hover:text-slate-900 transition">
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
+            <Link href="/templates" prefetch={false} className="hidden sm:inline text-slate-600 hover:text-slate-900 transition">
               Templates
             </Link>
             <Link
               href="/workspace"
               prefetch={false}
-              className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+              className="px-3 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition whitespace-nowrap"
             >
-              Enter Workspace
+              <span className="hidden sm:inline">Enter </span>Workspace
             </Link>
           </div>
         </div>

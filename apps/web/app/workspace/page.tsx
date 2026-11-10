@@ -574,10 +574,12 @@ export default function WorkspacePage() {
           <div className="flex items-center gap-3">
             <Link
               href="/editor"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition whitespace-nowrap"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Email Studio</span>
+              <span>
+                <span className="hidden sm:inline">Email </span>Studio
+              </span>
             </Link>
 
             <button
@@ -1156,7 +1158,7 @@ export default function WorkspacePage() {
                 {contacts.length === 0 ? (
                   <p className="text-xs text-slate-500 italic">No contacts added yet.</p>
                 ) : (
-                  <div className="max-h-60 overflow-y-auto rounded-lg border border-slate-200">
+                  <div className="max-h-60 overflow-auto rounded-lg border border-slate-200">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px]">
                         <tr>
@@ -1397,7 +1399,7 @@ export default function WorkspacePage() {
                   </button>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto rounded-lg border border-slate-200">
+                <div className="max-h-60 overflow-auto rounded-lg border border-slate-200">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase text-[10px]">
                       <tr>

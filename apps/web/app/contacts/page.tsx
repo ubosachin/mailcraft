@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import {
   Users,
   UserPlus,
@@ -30,9 +30,6 @@ import {
   Edit2,
   Check,
   FileText,
-  SlidersHorizontal,
-  Layers,
-  Server,
   Sparkles,
   RefreshCw,
   Copy,
@@ -560,72 +557,20 @@ function ContactsPageContent() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-8">
-            <Link href="/" className="group">
-              <MailCraftLogo size="md" variant="dark" />
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-              <Link
-                href="/templates"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Layers className="w-4 h-4" />
-                Templates
-              </Link>
-              <Link
-                href="/editor"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-                Visual Editor
-              </Link>
-              <Link
-                href="/connect"
-                className="text-slate-400 hover:text-white transition flex items-center gap-1.5"
-              >
-                <Server className="w-4 h-4" />
-                Sender Accounts
-              </Link>
-              <Link
-                href="/contacts"
-                className="text-indigo-400 border-b-2 border-indigo-500 pb-0.5 flex items-center gap-1.5"
-              >
-                <Users className="w-4 h-4" />
-                Contacts &amp; Audience
-              </Link>
-              <Link
-                href="/workspace"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Workspace
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/contacts/segments"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
-            >
-              <Filter className="w-3.5 h-3.5 text-indigo-400" />
-              Saved Segments ({segments.length})
-            </Link>
-            <button
-              onClick={() => {
-                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
-                  window.location.href = '/login';
-                });
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/50 text-slate-300 hover:text-rose-400 border border-slate-700 transition"
-            >
-              Log Out
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        activeNav="contacts"
+        showLogout
+        rightActions={
+          <Link
+            href="/contacts/segments"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition whitespace-nowrap"
+          >
+            <Filter className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="hidden sm:inline">Segments ({segments.length})</span>
+            <span className="sm:hidden">({segments.length})</span>
+          </Link>
+        }
+      />
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -1274,7 +1219,7 @@ function ContactsPageContent() {
               {pasteValidation ? (
                 <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2.5">
                   <span className="font-bold text-slate-200 block">Analysis Summary</span>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
                       <span className="text-slate-500 block text-[10px]">Detected</span>
                       <span className="font-bold text-white">{pasteValidation.totalSubmitted}</span>
@@ -1503,7 +1448,7 @@ function ContactsPageContent() {
             {uploadStep === 'preview' && previewResult && (
               <div className="space-y-4">
                 {/* Stats Breakdown */}
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-4 gap-3 text-xs">
+                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                   <div>
                     <span className="text-slate-500 block text-[10px]">Total Rows</span>
                     <span className="font-bold text-white text-base">{previewResult.totalRows}</span>
@@ -1523,7 +1468,7 @@ function ContactsPageContent() {
                 </div>
 
                 {/* Sample Rows Preview */}
-                <div className="border border-slate-800 rounded-xl overflow-hidden max-h-52 overflow-y-auto">
+                <div className="border border-slate-800 rounded-xl overflow-auto max-h-52">
                   <table className="w-full text-left text-[11px] text-slate-300">
                     <thead className="bg-slate-950 text-slate-400 uppercase font-semibold">
                       <tr>

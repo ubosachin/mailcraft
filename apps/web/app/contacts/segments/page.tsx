@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import {
   Users,
   Filter,
@@ -285,55 +285,20 @@ function SegmentsPageContent() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {/* Top Navigation */}
-      <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="group">
-              <MailCraftLogo size="sm" variant="dark" />
-            </Link>
-            <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
-              <Link
-                href="/contacts"
-                className="text-indigo-400 font-semibold transition"
-              >
-                Audience & Contacts
-              </Link>
-              <Link
-                href="/templates"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Templates
-              </Link>
-              <Link
-                href="/connect"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Sending Providers
-              </Link>
-              <Link
-                href="/workspace"
-                className="text-slate-400 hover:text-white transition"
-              >
-                Workspace
-              </Link>
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/contacts"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              All Contacts
-            </Link>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <span className="w-2 h-2 rounded-full bg-indigo-400"></span>
-              Workspace Active
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        activeNav="contacts"
+        showLogout
+        rightActions={
+          <Link
+            href="/contacts"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition whitespace-nowrap"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">All Contacts</span>
+            <span className="sm:hidden">Contacts</span>
+          </Link>
+        }
+      />
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">

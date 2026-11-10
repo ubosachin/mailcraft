@@ -65,7 +65,7 @@ export function PropertiesInspector({
   };
 
   return (
-    <aside className="w-80 border-l border-slate-200 bg-white flex flex-col h-[calc(100vh-64px)] overflow-hidden select-none">
+    <aside className="w-full lg:w-80 border-t lg:border-t-0 lg:border-l border-slate-200 bg-white flex flex-col h-[calc(100vh-116px)] lg:h-[calc(100vh-64px)] overflow-hidden select-none">
       {/* Top Tabs */}
       <div className="flex border-b border-slate-200 bg-slate-50/50 p-1">
         <button

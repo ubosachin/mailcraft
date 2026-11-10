@@ -210,7 +210,7 @@ export default function TemplatesPage() {
           <div className="flex items-center gap-4 text-xs font-semibold">
             <Link
               href="/workspace"
-              className="text-slate-600 hover:text-indigo-600 transition"
+              className="hidden sm:inline text-slate-600 hover:text-indigo-600 transition"
             >
               Workspace
             </Link>
@@ -220,15 +220,15 @@ export default function TemplatesPage() {
                   window.location.href = '/login';
                 });
               }}
-              className="text-slate-600 hover:text-rose-600 transition"
+              className="text-slate-600 hover:text-rose-600 transition whitespace-nowrap"
             >
               Log Out
             </button>
             <Link
               href="/workspace"
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs flex items-center gap-1.5"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs flex items-center gap-1.5 whitespace-nowrap"
             >
-              Open Studio <ArrowRight className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Open </span>Studio <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -502,9 +502,9 @@ export default function TemplatesPage() {
               <div
                 className={`transition-all duration-300 bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 h-full flex flex-col ${
                   previewViewport === 'desktop'
-                    ? 'w-[640px]'
+                    ? 'w-full max-w-[640px]'
                     : previewViewport === 'mobile'
-                    ? 'w-[375px]'
+                    ? 'w-full max-w-[375px]'
                     : 'w-full max-w-4xl'
                 }`}
               >

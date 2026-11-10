@@ -104,16 +104,17 @@ export function EmailCanvas({
   return (
     <div
       onClick={() => onSelectBlock(null)}
-      className="flex-1 bg-slate-100/80 overflow-y-auto p-4 sm:p-8 flex justify-center items-start min-h-[calc(100vh-64px)]"
+      className="flex-1 bg-slate-100/80 overflow-auto p-3 sm:p-6 lg:p-8 flex justify-center items-start min-h-[calc(100vh-116px)] lg:min-h-[calc(100vh-64px)]"
     >
       {/* Viewport Frame */}
       <div
         style={{
-          width: viewport === 'mobile' ? '375px' : `${contentWidth}px`,
+          width: '100%',
+          maxWidth: viewport === 'mobile' ? '375px' : `${contentWidth}px`,
           fontFamily,
         }}
         className={`transition-all duration-300 mx-auto bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden ${
-          viewport === 'mobile' ? 'ring-8 ring-slate-800 rounded-3xl' : ''
+          viewport === 'mobile' ? 'ring-4 sm:ring-8 ring-slate-800 rounded-3xl' : ''
         }`}
       >
         {/* Mobile Top Notch Simulator */}
