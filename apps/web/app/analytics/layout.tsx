@@ -9,3 +9,4 @@ export default function AnalyticsLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
