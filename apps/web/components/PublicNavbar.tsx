@@ -99,12 +99,14 @@ export function PublicNavbar({
             <>
               <Link
                 href="/campaigns"
+                prefetch={false}
                 className="hidden sm:inline-flex items-center px-3 py-2 text-sm font-semibold text-slate-700 hover:text-indigo-600 rounded-xl hover:bg-slate-50 transition"
               >
                 Campaigns
               </Link>
               <Link
                 href="/workspace"
+                prefetch={false}
                 className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm transition whitespace-nowrap"
               >
                 <span>Workspace</span>
@@ -171,6 +173,7 @@ export function PublicNavbar({
               <>
                 <Link
                   href="/campaigns"
+                  prefetch={false}
                   onClick={() => setMobileOpen(false)}
                   className="text-center px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition"
                 >
@@ -178,6 +181,7 @@ export function PublicNavbar({
                 </Link>
                 <Link
                   href="/workspace"
+                  prefetch={false}
                   onClick={() => setMobileOpen(false)}
                   className="text-center px-3 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition"
                 >

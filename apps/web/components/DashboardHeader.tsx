@@ -138,10 +138,14 @@ export function DashboardHeader({
     };
   }, []);
 
-  const handleLogout = () => {
-    fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' }).then(() => {
-      window.location.href = '/login';
-    });
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/v1/auth/logout', { method: 'POST', credentials: 'same-origin' });
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    } finally {
+      window.location.replace('/login');
+    }
   };
 
   const navLinkClass = (isActive: boolean) =>

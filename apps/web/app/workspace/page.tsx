@@ -164,6 +164,7 @@ export default function WorkspacePage() {
   // Initial Load
   useEffect(() => {
     async function initWorkspace() {
+      let sessionVerified = false;
       try {
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
@@ -261,6 +262,7 @@ export default function WorkspacePage() {
 
         setUser(authData.data.user);
         setSession(authData.data.session);
+        sessionVerified = true;
 
         // Fetch full brand settings
         const brandRes = await fetch('/api/v1/brands/current');
@@ -293,6 +295,12 @@ export default function WorkspacePage() {
         await Promise.all([fetchConnections(), fetchContacts(), fetchCampaigns()]);
       } catch (err) {
         console.error('Failed to load workspace data:', err);
+        if (!sessionVerified) {
+          setStatusMessage({
+            type: 'error',
+            text: 'Unable to reach server to verify session. Please refresh and try again.',
+          });
+        }
       } finally {
         setLoading(false);
       }
@@ -678,6 +686,43 @@ export default function WorkspacePage() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-sm font-medium text-slate-600">Loading your workspace...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user || !session) {
+    if (statusMessage?.type === 'error') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+          <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm text-center space-y-4">
+            <h1 className="text-lg font-semibold text-slate-900">Session verification failed</h1>
+            <p className="text-sm text-slate-600">{statusMessage.text}</p>
+            <div className="flex items-center justify-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-sm font-semibold text-slate-700 transition"
+              >
+                Retry
+              </button>
+              <a
+                href="/login?redirect=/workspace"
+                className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold text-white transition"
+              >
+                Sign In
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm font-medium text-slate-600">Redirecting to login...</p>
         </div>
       </div>
     );

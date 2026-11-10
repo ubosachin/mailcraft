@@ -5,7 +5,7 @@ import {
   Campaign,
   Contact,
 } from '@mailcraft/database';
-import { resolveUser } from '@/lib/session';
+import { SESSION_COOKIE_NAME, resolveUser, clearSessionCookie } from '@/lib/session';
 import { handleApiError } from '@/lib/api-response';
 
 export const dynamic = 'force-dynamic';
@@ -29,13 +29,17 @@ export async function GET(request: NextRequest) {
 
     const authContext = await resolveUser(request);
     if (!authContext) {
-      return jsonNoStore({
+      const response = jsonNoStore({
         authenticated: false,
         user: null,
         session: null,
         brand: null,
         stats: { campaignCount: 0, contactCount: 0 },
       });
+      if (request.cookies.get(SESSION_COOKIE_NAME)?.value) {
+        clearSessionCookie(response, request);
+      }
+      return response;
     }
 
     const { session, user } = authContext;
