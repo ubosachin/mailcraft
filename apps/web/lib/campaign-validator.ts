@@ -33,7 +33,7 @@ export async function validateCampaignReadiness(
       ? new Types.ObjectId(context.campaignId)
       : context.campaignId;
 
-  // 1 & 2: Campaign exists and belongs to guest
+  // 1 & 2: Campaign exists and belongs to authenticated user
   const campaign = await Campaign.findOne({
     _id: campaignObjId,
     sessionId: sessionObjId,
@@ -74,8 +74,8 @@ export async function validateCampaignReadiness(
   }
 
   // 4: Sender verification check
-  const { GuestSession } = await import('@mailcraft/database');
-  const sessionDoc = await GuestSession.findById(sessionObjId);
+  const { UserSession } = await import('@mailcraft/database');
+  const sessionDoc = await UserSession.findById(sessionObjId);
   const senderEmail = brand?.senderEmail || campaign.senderEmail;
 
   if (

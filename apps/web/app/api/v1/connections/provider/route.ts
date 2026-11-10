@@ -6,7 +6,7 @@ import {
   encryptCredentials,
 } from '@mailcraft/database';
 import { BrevoProvider, SesProvider } from '@mailcraft/email-providers';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 const connectProviderSchema = z.object({
@@ -18,7 +18,7 @@ const connectProviderSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

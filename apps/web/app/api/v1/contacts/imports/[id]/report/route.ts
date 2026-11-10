@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as XLSX from 'xlsx';
 import { connectToDatabase, ContactImport } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { sanitizeFormulaInjection } from '@/lib/import-parser';
 
@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

@@ -24,7 +24,7 @@ const BrandSchema = new Schema<IBrandDoc>(
   {
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonError, handleApiError } from '@/lib/api-response';
 import { exportContactsBuffer } from '@/lib/contact-service';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

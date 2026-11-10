@@ -4,14 +4,14 @@ import {
   Contact,
   Suppression,
   Brand,
-  GuestSession,
+  UserSession,
 } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) return jsonError('Authentication required', 401);
 
     await connectToDatabase();
@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
         $or: [{ sessionId: session._id }, { scope: 'global' }],
       }),
       Brand.findOne({ sessionId: session._id }),
-      GuestSession.findById(session._id),
+      UserSession.findById(session._id),
     ]);
 
     return jsonSuccess({

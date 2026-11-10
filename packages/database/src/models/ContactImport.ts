@@ -24,7 +24,7 @@ const ContactImportSchema = new Schema<IContactImportDoc>(
   {
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

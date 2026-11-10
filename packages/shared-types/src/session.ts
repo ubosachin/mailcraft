@@ -1,12 +1,13 @@
-export type GuestSessionStatus = 'active' | 'expired' | 'revoked';
+export type UserSessionStatus = 'active' | 'expired' | 'revoked';
 
-export interface IGuestSession {
+export interface IUserSession {
   _id: string;
+  userId: string;
   sessionTokenHash: string;
   verifiedEmail?: string | null;
   verificationCodeHash?: string | null;
   verificationCodeExpiresAt?: Date | null;
-  status: GuestSessionStatus;
+  status: UserSessionStatus;
   ipAddressHash?: string | null;
   userAgent?: string | null;
   createdAt: Date;
@@ -14,11 +15,11 @@ export interface IGuestSession {
   lastActivityAt: Date;
 }
 
-export interface GuestSessionPublic {
+export interface UserSessionPublic {
   id: string;
-  status: GuestSessionStatus;
+  userId: string;
+  status: UserSessionStatus;
   verifiedEmail?: string | null;
   createdAt: string;
   expiresAt: string;
 }
-

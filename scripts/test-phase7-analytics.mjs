@@ -10,7 +10,7 @@ import {
   Brand,
   Suppression,
   EmailConnection,
-  GuestSession,
+  UserSession,
   EmailEvent,
   TrackingToken,
   UnsubscribeEvent,
@@ -38,7 +38,7 @@ async function waitForServer(url, timeoutMs = 15000) {
   throw new Error(`Server at ${url} failed to respond within ${timeoutMs}ms`);
 }
 
-async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
+async function createUserSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
   const unique = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
   const email = `${senderEmail.split('@')[0]}.${unique}@gmail.com`;
   const res = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
@@ -74,7 +74,7 @@ async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@
   });
 
   // Mark session verifiedEmail (simulating OTP completion)
-  await GuestSession.findByIdAndUpdate(data.data.session.id, {
+  await UserSession.findByIdAndUpdate(data.data.session.id, {
     verifiedEmail: senderEmail,
     emailVerifiedAt: new Date(),
   });
@@ -118,7 +118,7 @@ async function runPhase7Tests() {
     // Test 1: Brevo Webhook Processing (delivery, bounce, complaint)
     // -------------------------------------------------------------
     console.log('🧪 TEST 1: Brevo Webhook Event Processing...');
-    const session1 = await createGuestSession('Brevo Test Brand', 'brevo-sender@test.com');
+    const session1 = await createUserSession('Brevo Test Brand', 'brevo-sender@test.com');
 
     // Create a mock campaign and recipient to receive webhook events
     const camp1 = await Campaign.create({
@@ -608,7 +608,7 @@ async function runPhase7Tests() {
     // Test 10: Zero-Denominator Analytics Math & CSV Sanitization
     // -------------------------------------------------------------
     console.log('🧪 TEST 10: Zero-Denominator Analytics Safety & CSV Sanitization...');
-    const emptySession = await createGuestSession('Empty Brand', 'empty@test.com');
+    const emptySession = await createUserSession('Empty Brand', 'empty@test.com');
 
     // Overview with 0 dispatches must return null rates (N/A), not NaN or 0%
     const emptyOverviewRes = await fetch(`${BASE_URL}/api/v1/analytics/overview`, {
@@ -654,9 +654,9 @@ async function runPhase7Tests() {
     // -------------------------------------------------------------
     // Test 11: Multi-Tenant Session Isolation
     // -------------------------------------------------------------
-    console.log('🧪 TEST 11: Multi-Tenant Guest Session Isolation...');
+    console.log('🧪 TEST 11: Multi-Tenant User Session Isolation...');
     // Session 2 attempting to access Session 1's campaign analytics
-    const session2 = await createGuestSession('Tenant Two', 'tenant2@test.com');
+    const session2 = await createUserSession('Tenant Two', 'tenant2@test.com');
     const tenantBreachRes = await fetch(`${BASE_URL}/api/v1/analytics/campaigns/${camp1._id}`, {
       headers: { Cookie: session2.cookie },
     });

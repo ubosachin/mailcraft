@@ -168,7 +168,7 @@ async function runAuthTests() {
   assert.strictEqual(meData.success, true);
   assert.strictEqual(meData.data.authenticated, true);
   assert.strictEqual(meData.data.user.email, testGmail);
-  assert.strictEqual(meData.data.session.isGuest, false);
+  assert.strictEqual(meData.data.session.isGuest, undefined);
   console.log(`✓ Test 6 Passed: /api/v1/auth/me resolved authenticated user (${meData.data.user.name})\n`);
 
   // -------------------------------------------------------------
@@ -183,24 +183,31 @@ async function runAuthTests() {
   console.log('✓ Test 7 Passed: Unauthenticated request reported authenticated: false\n');
 
   // -------------------------------------------------------------
-  // TEST 8: Guest Mode Removal & Cross-Login Workspace Persistence
+  // TEST 8: Guest Removal (404), Route Protection & Workspace Persistence
   // -------------------------------------------------------------
-  console.log('🧪 TEST 8: Guest Mode Removal (410 Gone) & Workspace Persistence...');
-  // 8a. Verify guest endpoints are disabled
+  console.log('🧪 TEST 8: Guest Endpoint Removal (404), Auth Guards & Workspace Persistence...');
+  // 8a. Verify guest routes are completely removed (404 Not Found)
   const guestStartRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ brandName: 'Should Fail' }),
   });
-  assert.strictEqual(guestStartRes.status, 410, 'Guest start must return 410 Gone');
+  assert.strictEqual(guestStartRes.status, 404, 'Removed /api/v1/guest/start must return 404');
 
   const guestMeRes = await fetch(`${BASE_URL}/api/v1/guest/me`);
-  assert.strictEqual(guestMeRes.status, 410, 'Guest me must return 410 Gone');
+  assert.strictEqual(guestMeRes.status, 404, 'Removed /api/v1/guest/me must return 404');
 
-  // 8b. Verify unauthenticated UI route redirects cleanly to /login
+  // 8b. Verify all protected routes & APIs strictly enforce login
   const workspaceRedirectRes = await fetch(`${BASE_URL}/workspace`, { redirect: 'manual' });
   assert([307, 308, 302].includes(workspaceRedirectRes.status), 'Protected /workspace must redirect unauthenticated request');
   assert(workspaceRedirectRes.headers.get('location')?.includes('/login'), 'Redirect target must be /login');
+
+  const templatesRedirectRes = await fetch(`${BASE_URL}/templates`, { redirect: 'manual' });
+  assert([307, 308, 302].includes(templatesRedirectRes.status), 'Protected /templates must redirect unauthenticated request');
+  assert(templatesRedirectRes.headers.get('location')?.includes('/login'), 'Redirect target must be /login');
+
+  const unauthTplApi = await fetch(`${BASE_URL}/api/v1/templates`);
+  assert.strictEqual(unauthTplApi.status, 401, 'Protected /api/v1/templates must return 401');
 
   // 8c. Create user with initial brand and contacts, logout, and log back in
   const newAccountGmail = `founder.quantum.${runId}@gmail.com`;
@@ -264,7 +271,7 @@ async function runAuthTests() {
   assert.strictEqual(contactCheckRes.status, 200);
   assert(contactCheckData.data.contacts.length >= 1, 'Contacts must persist across logout/login');
   assert.strictEqual(contactCheckData.data.contacts[0].email, `lead.${runId}@client.org`);
-  console.log('✓ Test 8 Passed: Guest mode disabled (410), protected route redirects verified & user workspace persisted across login cycles\n');
+  console.log('✓ Test 8 Passed: Guest routes removed (404), protected routes redirect & user workspace persisted across login cycles\n');
 
   // -------------------------------------------------------------
   // TEST 9: User Logout

@@ -10,12 +10,13 @@ import {
   Brand,
   Suppression,
   EmailConnection,
-  GuestSession,
+  User,
+  UserSession,
   EmailEvent,
   TrackingToken,
   UnsubscribeEvent,
   WebhookEventLog,
-  cleanupExpiredGuestData,
+  cleanupExpiredSessions,
 } from '../packages/database/dist/index.js';
 import { processCampaignJob } from '../apps/worker/dist/processors/campaign.processor.js';
 import { checkMemoryRateLimit, isDisposableEmail } from '../packages/validation/dist/index.js';
@@ -430,10 +431,17 @@ async function runPhase8E2ETest() {
     // 15. Cascading Cleanup & Global Suppression Protection
     // -------------------------------------------------------------
     console.log('🧪 15. Testing Cascading Data Retention & Suppression Invariance...');
-    // Create an expired dummy session
+    // Create an expired dummy session bound to a test user
+    const expiredUser = await User.create({
+      email: `expired.${runId}@test.com`,
+      name: 'Expired User',
+      role: 'user',
+      authProvider: 'local',
+    });
     const expiredToken = crypto.randomBytes(32).toString('hex');
-    const expiredSession = await GuestSession.create({
+    const expiredSession = await UserSession.create({
       sessionTokenHash: crypto.createHash('sha256').update(expiredToken).digest('hex'),
+      userId: expiredUser._id,
       status: 'expired',
       expiresAt: new Date(Date.now() - 10 * 24 * 3600 * 1000), // 10 days ago
     });
@@ -448,7 +456,7 @@ async function runPhase8E2ETest() {
     });
 
     // Run cleanup
-    const cleanupResult = await cleanupExpiredGuestData();
+    const cleanupResult = await cleanupExpiredSessions();
     assert(cleanupResult.expiredSessionsCount >= 1, 'Must clean expired session');
     assert(cleanupResult.deletedContacts >= 1, 'Must clean orphaned contacts');
 

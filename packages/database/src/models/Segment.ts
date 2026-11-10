@@ -15,7 +15,7 @@ const SegmentSchema = new Schema<ISegmentDoc>(
   {
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

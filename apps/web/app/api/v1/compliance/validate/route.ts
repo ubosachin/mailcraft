@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server';
 import { complianceValidateSchema } from '@mailcraft/validation';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { validateCampaignCompliance } from '@/lib/compliance-validator';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) return jsonError('Authentication required', 401);
 
     const body = await request.json();

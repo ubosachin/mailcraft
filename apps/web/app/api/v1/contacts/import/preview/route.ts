@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { connectToDatabase, ContactImport } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { prepareImportPreview } from '@/lib/import-parser';
 
@@ -13,7 +13,7 @@ const importPreviewSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

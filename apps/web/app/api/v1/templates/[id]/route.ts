@@ -1,13 +1,19 @@
 import { NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import { connectToDatabase, Template } from '@mailcraft/database';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await resolveAuthSession(request);
+    if (!session) {
+      return jsonError('Authentication required', 401);
+    }
+
     await connectToDatabase();
     const { id } = await params;
 

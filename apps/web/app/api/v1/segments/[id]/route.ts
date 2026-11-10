@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { updateSegmentSchema } from '@mailcraft/validation';
 import { connectToDatabase, Segment, Contact } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { applySegmentFilters } from '@/lib/contact-service';
 
@@ -10,7 +10,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }
@@ -48,7 +48,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }
@@ -91,7 +91,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

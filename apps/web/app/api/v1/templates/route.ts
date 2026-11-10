@@ -1,9 +1,15 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase, Template, seedTemplates } from '@mailcraft/database';
-import { jsonSuccess, handleApiError } from '@/lib/api-response';
+import { resolveAuthSession } from '@/lib/session';
+import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await resolveAuthSession(request);
+    if (!session) {
+      return jsonError('Authentication required', 401);
+    }
+
     await connectToDatabase();
 
     const searchParams = request.nextUrl.searchParams;

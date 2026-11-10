@@ -52,7 +52,6 @@ export async function GET(request: NextRequest) {
         status: session.status,
         expiresAt: session.expiresAt.toISOString(),
         verifiedEmail: session.verifiedEmail,
-        isGuest: !user,
       },
       brand: brand
         ? {

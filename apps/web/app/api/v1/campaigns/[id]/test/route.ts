@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { sendTestEmailSchema } from '@mailcraft/validation';
 import { connectToDatabase, Campaign } from '@mailcraft/database';
 import { enqueueTestEmailJob } from '@/lib/queue';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
@@ -11,7 +11,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

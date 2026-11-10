@@ -8,7 +8,8 @@ import {
   hashVerificationCode,
   encryptCredentials,
   decryptCredentials,
-  GuestSession,
+  User,
+  UserSession,
   Brand,
 } from './index.js';
 
@@ -53,17 +54,25 @@ async function runTests() {
   await connectToDatabase();
   console.log('✓ Connected to MongoDB successfully');
 
-  // Create test guest session
+  // Create test user & session
+  const userDoc = await User.create({
+    email: `test.phase1.${Date.now()}@gmail.com`,
+    name: 'Phase1 Tester',
+    role: 'user',
+    authProvider: 'local',
+  });
+
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  const sessionDoc = await GuestSession.create({
+  const sessionDoc = await UserSession.create({
     sessionTokenHash: hash1,
+    userId: userDoc._id,
     status: 'active',
     expiresAt,
   });
 
-  assert(sessionDoc._id, 'GuestSession document should have _id');
+  assert(sessionDoc._id, 'UserSession document should have _id');
   assert.strictEqual(sessionDoc.sessionTokenHash, hash1);
-  console.log('✓ GuestSession persistence in MongoDB verified');
+  console.log('✓ User & UserSession persistence in MongoDB verified');
 
   // Create test brand linked to session
   const brandDoc = await Brand.create({
@@ -81,7 +90,8 @@ async function runTests() {
 
   // Cleanup test documents
   await Brand.deleteOne({ _id: brandDoc._id });
-  await GuestSession.deleteOne({ _id: sessionDoc._id });
+  await UserSession.deleteOne({ _id: sessionDoc._id });
+  await User.deleteOne({ _id: userDoc._id });
   console.log('✓ Test cleanup complete');
 
   await disconnectDatabase();

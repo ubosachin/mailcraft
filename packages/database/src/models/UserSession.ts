@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document, Model, Types } from 'mongoose';
-import { GuestSessionStatus } from '@mailcraft/shared-types';
+import { UserSessionStatus } from '@mailcraft/shared-types';
 
-export interface IGuestSessionDoc extends Document {
+export interface IUserSessionDoc extends Document {
   sessionTokenHash: string;
   tokenHashes?: string[];
-  userId?: Types.ObjectId | null;
+  userId: Types.ObjectId;
   verifiedEmail?: string | null;
   verificationCodeHash?: string | null;
   verificationCodeExpiresAt?: Date | null;
-  status: GuestSessionStatus;
+  status: UserSessionStatus;
   ipAddressHash?: string | null;
   userAgent?: string | null;
   createdAt: Date;
@@ -16,7 +16,7 @@ export interface IGuestSessionDoc extends Document {
   lastActivityAt: Date;
 }
 
-const GuestSessionSchema = new Schema<IGuestSessionDoc>(
+const UserSessionSchema = new Schema<IUserSessionDoc>(
   {
     sessionTokenHash: {
       type: String,
@@ -32,7 +32,7 @@ const GuestSessionSchema = new Schema<IGuestSessionDoc>(
     userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      default: null,
+      required: true,
       index: true,
     },
     verifiedEmail: {
@@ -76,10 +76,10 @@ const GuestSessionSchema = new Schema<IGuestSessionDoc>(
   },
   {
     timestamps: { createdAt: true, updatedAt: false },
-    collection: 'guest_sessions',
+    collection: 'user_sessions',
   }
 );
 
-export const GuestSession: Model<IGuestSessionDoc> =
-  mongoose.models.GuestSession || mongoose.model<IGuestSessionDoc>('GuestSession', GuestSessionSchema);
+export const UserSession: Model<IUserSessionDoc> =
+  mongoose.models.UserSession || mongoose.model<IUserSessionDoc>('UserSession', UserSessionSchema);
 

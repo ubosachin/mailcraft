@@ -56,7 +56,7 @@ const TrackingTokenSchema = new Schema<ITrackingTokenDoc>(
     },
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

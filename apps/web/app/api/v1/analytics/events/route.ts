@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase, Campaign, EmailEvent } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 function maskEmail(email?: string): string {
@@ -14,7 +14,7 @@ function maskEmail(email?: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

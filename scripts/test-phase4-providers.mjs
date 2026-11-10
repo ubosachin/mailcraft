@@ -5,7 +5,7 @@ import {
   connectToDatabase,
   disconnectDatabase,
   EmailConnection,
-  GuestSession,
+  UserSession,
   Campaign,
   CampaignRecipient,
   CampaignEvent,
@@ -123,7 +123,7 @@ async function runPhase4Tests() {
 
   // 2b. Gmail OAuth State generation & tamper detection
   const oauthClient = new GmailOAuthClient();
-  const testSessionId = new GuestSession()._id.toString();
+  const testSessionId = new UserSession()._id.toString();
   const validState = oauthClient.generateState(testSessionId);
   assert(oauthClient.validateState(validState, testSessionId), 'Valid state must pass');
   assert(!oauthClient.validateState(validState, 'different_session_id'), 'Cross-session state must be rejected');
@@ -420,9 +420,9 @@ async function runPhase4Tests() {
   console.log('--- TEST 9: Delivery Event Webhook Pipeline ---');
 
   // Setup a test campaign recipient for webhook tracking
-  const guestSession = await GuestSession.findById(sessionAId);
+  const userSession = await UserSession.findById(sessionAId);
   const testCampaign = await Campaign.create({
-    sessionId: guestSession._id,
+    sessionId: userSession._id,
     brandId: sessionAData.data.brand.id,
     campaignName: 'Webhook Verification Campaign',
     subject: 'Flash Deals',
@@ -434,7 +434,7 @@ async function runPhase4Tests() {
 
   const testRecipient = await CampaignRecipient.create({
     campaignId: testCampaign._id,
-    sessionId: guestSession._id,
+    sessionId: userSession._id,
     email: uniqueBounceEmail,
     status: 'accepted',
     providerMessageId: uniqueMessageId,

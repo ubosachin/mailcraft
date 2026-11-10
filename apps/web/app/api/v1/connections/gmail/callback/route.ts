@@ -5,7 +5,7 @@ import {
   encryptCredentials,
 } from '@mailcraft/database';
 import { GmailOAuthClient } from '@mailcraft/email-providers';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${appUrl}/connect?error=missing_oauth_code`);
     }
 
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return NextResponse.redirect(`${appUrl}/connect?error=authentication_required`);
     }

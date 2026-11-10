@@ -10,7 +10,7 @@ import {
   Brand,
   Suppression,
   EmailConnection,
-  GuestSession,
+  UserSession,
 } from '../packages/database/dist/index.js';
 import { processCampaignJob } from '../apps/worker/dist/processors/campaign.processor.js';
 
@@ -34,7 +34,7 @@ async function waitForServer(url, timeoutMs = 15000) {
   throw new Error(`Server at ${url} failed to respond within ${timeoutMs}ms`);
 }
 
-async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
+async function createUserSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
   const unique = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
   const email = `${senderEmail.split('@')[0]}.${unique}@gmail.com`;
   const res = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
@@ -70,7 +70,7 @@ async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@
   });
 
   // Mark session verifiedEmail (simulating OTP completion)
-  await GuestSession.findByIdAndUpdate(data.data.session.id, {
+  await UserSession.findByIdAndUpdate(data.data.session.id, {
     verifiedEmail: senderEmail,
     emailVerifiedAt: new Date(),
   });
@@ -109,10 +109,10 @@ async function runPhase6Tests() {
 
   await connectToDatabase();
 
-  const userA = await createGuestSession('Acme Marketing Corp', 'alex@acmemarketing.com');
-  const userB = await createGuestSession('Beta Industries', 'ben@betaindustries.com');
+  const userA = await createUserSession('Acme Marketing Corp', 'alex@acmemarketing.com');
+  const userB = await createUserSession('Beta Industries', 'ben@betaindustries.com');
 
-  console.log('✓ Guest test sessions established:');
+  console.log('✓ User test sessions established:');
   console.log(`  - User A: ${userA.sessionId}`);
   console.log(`  - User B: ${userB.sessionId}\n`);
 

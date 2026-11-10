@@ -2,13 +2,13 @@ import { NextRequest } from 'next/server';
 import crypto from 'node:crypto';
 import { bulkContactImportSchema } from '@mailcraft/validation';
 import { connectToDatabase, Contact, Suppression, Tag } from '@mailcraft/database';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { validateEmailSyntax } from '@/lib/email-validator';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

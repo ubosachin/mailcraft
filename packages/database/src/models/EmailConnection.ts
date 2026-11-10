@@ -27,7 +27,7 @@ const EmailConnectionSchema = new Schema<IEmailConnectionDoc>(
   {
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

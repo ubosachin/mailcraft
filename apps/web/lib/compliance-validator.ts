@@ -5,7 +5,7 @@ import {
   Contact,
   Suppression,
   EmailConnection,
-  GuestSession,
+  UserSession,
 } from '@mailcraft/database';
 import { IComplianceReport, IComplianceCheckResult } from '@mailcraft/shared-types';
 import { isDangerousUrlScheme } from '@/lib/tracking-service';
@@ -71,7 +71,7 @@ export async function validateCampaignCompliance(
   }
 
   // 2. Sender Verification
-  const sessionDoc = await GuestSession.findById(sessionId);
+  const sessionDoc = await UserSession.findById(sessionId);
   let senderVerified = false;
   if (sessionDoc?.verifiedEmail && senderEmail && sessionDoc.verifiedEmail.toLowerCase() === senderEmail.toLowerCase()) {
     senderVerified = true;

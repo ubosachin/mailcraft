@@ -65,7 +65,7 @@ const UserSchema = new Schema<IUserDoc>(
     },
     primarySessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       default: null,
     },
     lastLoginAt: {

@@ -49,14 +49,14 @@ async function runE2ETests() {
   assert.strictEqual(healthData.database, 'connected');
   console.log('✓ Healthcheck endpoint operational (/api/v1/health)');
 
-  // 2. Verify Guest Mode Disabled
+  // 2. Verify Guest Endpoints Removed
   const disabledGuestRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({}),
   });
-  assert.strictEqual(disabledGuestRes.status, 410, 'Guest mode must return 410 Gone');
-  console.log('✓ Confirmed guest mode is disabled (/api/v1/guest/start -> 410)');
+  assert.strictEqual(disabledGuestRes.status, 404, 'Removed guest endpoint must return 404 Not Found');
+  console.log('✓ Confirmed guest endpoints completely removed (/api/v1/guest/start -> 404)');
 
   // 3. Sign Up Authenticated User
   const runId = Date.now();

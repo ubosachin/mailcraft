@@ -189,7 +189,9 @@ async function runCampaignWorkerE2E() {
     console.log(`6. Bulk imported ${contactsData.data.importedCount} permission-based opt-in contacts`);
 
     // 7. Fetch Available Templates
-    const tplRes = await fetch(`${BASE_URL}/api/v1/templates`);
+    const tplRes = await fetch(`${BASE_URL}/api/v1/templates`, {
+      headers: { Cookie: sessionCookie },
+    });
     const tplData = await tplRes.json();
     assert.strictEqual(tplRes.status, 200);
     const templatesList = Array.isArray(tplData.data) ? tplData.data : (tplData.data?.templates || []);

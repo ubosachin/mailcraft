@@ -89,6 +89,17 @@ async function main() {
     process.exit(1);
   }
 
+  const signupRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: `loadtest.${Date.now()}@gmail.com`,
+      password: `LoadTest#${Date.now()}`,
+      name: 'Load Tester',
+    }),
+  });
+  const authCookie = signupRes.headers.get('set-cookie')?.split(';')[0] || '';
+
   const results = [];
 
   // 1. Health Probe Liveness & Readiness
@@ -107,10 +118,12 @@ async function main() {
     }, 60)
   );
 
-  // 3. Template Catalog Browsing & Filter API
+  // 3. Template Catalog Browsing & Filter API (Authenticated)
   results.push(
     await runScenario('Template Catalog & Filtering (/api/v1/templates)', async () => {
-      const res = await fetch(`${BASE_URL}/api/v1/templates?category=ecommerce`);
+      const res = await fetch(`${BASE_URL}/api/v1/templates?category=ecommerce`, {
+        headers: { Cookie: authCookie },
+      });
       return res.status === 200;
     }, 60)
   );
@@ -118,15 +131,19 @@ async function main() {
   // 4. Auth Session Resolution Endpoint
   results.push(
     await runScenario('User Auth Resolution (/api/v1/auth/me)', async () => {
-      const res = await fetch(`${BASE_URL}/api/v1/auth/me`);
+      const res = await fetch(`${BASE_URL}/api/v1/auth/me`, {
+        headers: { Cookie: authCookie },
+      });
       return res.status === 200;
     }, 60)
   );
 
-  // 5. Public Templates Browsing Page
+  // 5. Protected Templates Catalog (/templates)
   results.push(
-    await runScenario('Public Templates Catalog (/templates)', async () => {
-      const res = await fetch(`${BASE_URL}/templates`);
+    await runScenario('Templates Catalog Page (/templates)', async () => {
+      const res = await fetch(`${BASE_URL}/templates`, {
+        headers: { Cookie: authCookie },
+      });
       return res.status === 200;
     }, 60)
   );

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { connectToDatabase, cleanupExpiredGuestData } from '@mailcraft/database';
+import { connectToDatabase, cleanupExpiredSessions } from '@mailcraft/database';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     await connectToDatabase();
 
     const cutoffDate = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-    const result = await cleanupExpiredGuestData({
+    const result = await cleanupExpiredSessions({
       cutoffDate,
       webhookRetentionDays,
       dryRun,
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
       200,
       dryRun
         ? 'Data retention cleanup preview generated (dry-run)'
-        : 'Expired guest sessions and orphaned records pruned successfully'
+        : 'Expired sessions and orphaned records pruned successfully'
     );
   } catch (error) {
     return handleApiError(error);

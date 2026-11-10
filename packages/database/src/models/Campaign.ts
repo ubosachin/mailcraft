@@ -37,7 +37,7 @@ const CampaignSchema = new Schema<ICampaignDoc>(
   {
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       required: true,
       index: true,
     },

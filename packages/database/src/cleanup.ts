@@ -1,4 +1,4 @@
-import { GuestSession } from './models/GuestSession.js';
+import { UserSession } from './models/UserSession.js';
 import { Brand } from './models/Brand.js';
 import { Contact } from './models/Contact.js';
 import { ContactImport } from './models/ContactImport.js';
@@ -27,10 +27,10 @@ export interface CleanupResult {
 }
 
 /**
- * Performs cascading data retention cleanup on expired or revoked guest sessions.
+ * Performs data retention cleanup on expired sessions and old webhook logs.
  * CRITICAL LEGAL GUARANTEE: Global suppression records are NEVER deleted during cleanup.
  */
-export async function cleanupExpiredGuestData(options?: {
+export async function cleanupExpiredSessions(options?: {
   cutoffDate?: Date;
   webhookRetentionDays?: number;
   dryRun?: boolean;
@@ -41,14 +41,9 @@ export async function cleanupExpiredGuestData(options?: {
   );
   const dryRun = options?.dryRun || false;
 
-  // 1. Locate expired or revoked guest sessions (excluding authenticated registered users)
-  const expiredSessions = await GuestSession.find({
-    $or: [{ userId: null }, { userId: { $exists: false } }],
-    $and: [
-      {
-        $or: [{ status: { $in: ['expired', 'revoked'] } }, { expiresAt: { $lt: cutoff } }],
-      },
-    ],
+  // 1. Locate expired sessions
+  const expiredSessions = await UserSession.find({
+    $or: [{ status: 'expired' }, { expiresAt: { $lt: cutoff } }],
   }).select('_id');
 
   const sessionIds = expiredSessions.map((s) => s._id);
@@ -57,7 +52,6 @@ export async function cleanupExpiredGuestData(options?: {
   const globalSuppressionsPreserved = await Suppression.countDocuments({ scope: 'global' });
 
   if (sessionIds.length === 0) {
-    // Also clean old webhook logs
     let deletedWebhookLogs = 0;
     if (!dryRun) {
       const webhookRes = await WebhookEventLog.deleteMany({
@@ -83,7 +77,7 @@ export async function cleanupExpiredGuestData(options?: {
     };
   }
 
-  // Count or delete associated data
+  // Count or delete associated expired records
   if (dryRun) {
     const [
       brands,
@@ -124,7 +118,7 @@ export async function cleanupExpiredGuestData(options?: {
     };
   }
 
-  // Execute cascading deletion
+  // Execute cascading deletion for expired sessions
   const [
     brandRes,
     contactRes,
@@ -146,10 +140,10 @@ export async function cleanupExpiredGuestData(options?: {
     EmailConnection.deleteMany({ sessionId: { $in: sessionIds } }),
     TrackingToken.deleteMany({ sessionId: { $in: sessionIds } }),
     WebhookEventLog.deleteMany({ receivedAt: { $lt: webhookCutoff } }),
-    GuestSession.deleteMany({ _id: { $in: sessionIds } }),
+    UserSession.deleteMany({ _id: { $in: sessionIds } }),
   ]);
 
-  // Notice: Suppression collection with scope 'global' is untouched!
+  // Global suppressions remain untouched!
   return {
     expiredSessionsCount: sessionRes.deletedCount || sessionIds.length,
     deletedBrands: brandRes.deletedCount || 0,
@@ -166,4 +160,3 @@ export async function cleanupExpiredGuestData(options?: {
     executedAt: new Date().toISOString(),
   };
 }
-

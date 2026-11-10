@@ -8,7 +8,7 @@ import {
   decryptCredentials,
 } from '@mailcraft/database';
 import { addSuppressionSchema } from '@mailcraft/validation';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 function maskEmail(email: string): string {
@@ -22,7 +22,7 @@ function maskEmail(email: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

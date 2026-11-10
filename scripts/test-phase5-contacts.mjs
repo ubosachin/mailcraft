@@ -9,7 +9,7 @@ import {
   ContactImport,
   Segment,
   Tag,
-  GuestSession,
+  UserSession,
   Campaign,
   CampaignRecipient,
   Suppression,
@@ -43,7 +43,7 @@ function extractCookie(res) {
   return match ? `mailcraft_session=${match[1]}` : null;
 }
 
-async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
+async function createUserSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
   const unique = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
   const email = `${senderEmail.split('@')[0]}.${unique}@gmail.com`;
   const res = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
@@ -96,10 +96,10 @@ async function runPhase5Tests() {
 
   await connectToDatabase();
 
-  const userA = await createGuestSession('Brand A', 'usera@example.com');
-  const userB = await createGuestSession('Brand B', 'userb@example.com');
+  const userA = await createUserSession('Brand A', 'usera@example.com');
+  const userB = await createUserSession('Brand B', 'userb@example.com');
 
-  console.log(`✓ Guest sessions established:`);
+  console.log(`✓ User sessions established:`);
   console.log(`  - User A: ${userA.sessionId}`);
   console.log(`  - User B: ${userB.sessionId}\n`);
 
@@ -607,9 +607,9 @@ async function runPhase5Tests() {
   console.log(`✓ Strict Compliance Verified: ${queuedRecipients.length} queued, 100% have consentStatus: opted_in\n`);
 
   // --------------------------------------------------------------------------
-  // TEST 12: MULTI-TENANT GUEST SESSION DATA ISOLATION
+  // TEST 12: MULTI-TENANT USER SESSION DATA ISOLATION
   // --------------------------------------------------------------------------
-  console.log('--- TEST 12: Multi-Tenant Guest Session Isolation ---');
+  console.log('--- TEST 12: Multi-Tenant User Session Isolation ---');
   // User B lists contacts
   const userBContactsRes = await fetch(`${BASE_URL}/api/v1/contacts`, {
     headers: { Cookie: userB.cookie },

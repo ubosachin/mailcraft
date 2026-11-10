@@ -35,7 +35,7 @@ export class GmailOAuthClient {
   }
 
   /**
-   * Generates cryptographically secure signed state bound to guest session to prevent CSRF.
+   * Generates cryptographically secure signed state bound to user session to prevent CSRF.
    */
   generateState(sessionId: string): string {
     const secret = process.env.APP_SECRET || 'mailcraft_oauth_state_secret_2026';
@@ -47,7 +47,7 @@ export class GmailOAuthClient {
   }
 
   /**
-   * Validates state and ensures it belongs to the active guest session and is not expired (max 15 mins).
+   * Validates state and ensures it belongs to the active user session and is not expired (max 15 mins).
    */
   validateState(rawState: string, expectedSessionId: string): boolean {
     try {

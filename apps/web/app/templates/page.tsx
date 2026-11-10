@@ -56,17 +56,25 @@ export default function TemplatesPage() {
     footerAddress?: string;
   } | null>(null);
 
-  // Load user brand if authenticated
+  // Verify user auth and load brand
   useEffect(() => {
-    fetch('/api/v1/brands/current')
+    fetch('/api/v1/auth/me')
       .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.data) {
-          setUserBrand(data.data);
+      .then((authData) => {
+        if (!authData?.data?.authenticated) {
+          router.replace('/login?redirect=/templates');
+          return;
         }
+        return fetch('/api/v1/brands/current')
+          .then((res) => (res.ok ? res.json() : null))
+          .then((data) => {
+            if (data?.data) {
+              setUserBrand(data.data);
+            }
+          });
       })
       .catch(() => {});
-  }, []);
+  }, [router]);
 
   // Filter and sort templates
   const filteredTemplates = useMemo(() => {
@@ -187,17 +195,21 @@ export default function TemplatesPage() {
 
           <div className="flex items-center gap-4 text-xs font-semibold">
             <Link
-              href="/login"
+              href="/workspace"
               className="text-slate-600 hover:text-indigo-600 transition"
             >
-              Log In
+              Workspace
             </Link>
-            <Link
-              href="/signup"
-              className="text-indigo-600 hover:text-indigo-700 transition"
+            <button
+              onClick={() => {
+                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                  window.location.href = '/login';
+                });
+              }}
+              className="text-slate-600 hover:text-rose-600 transition"
             >
-              Sign Up
-            </Link>
+              Log Out
+            </button>
             <Link
               href="/workspace"
               className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs flex items-center gap-1.5"

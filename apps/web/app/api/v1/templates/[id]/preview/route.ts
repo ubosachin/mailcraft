@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import mongoose from 'mongoose';
 import { connectToDatabase, Template, Brand } from '@mailcraft/database';
 import { compileEmail, getTemplateBySlug } from '@mailcraft/email-renderer';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 async function handlePreview(
@@ -10,6 +10,11 @@ async function handlePreview(
   params: { id: string },
   customBody?: Record<string, unknown>
 ) {
+  const session = await resolveAuthSession(request);
+  if (!session) {
+    return jsonError('Authentication required', 401);
+  }
+
   await connectToDatabase();
   const { id } = params;
 
@@ -40,11 +45,7 @@ async function handlePreview(
     return jsonError(`Template '${id}' not found`, 404);
   }
 
-  const session = await resolveGuestSession(request);
-  let brand = null;
-  if (session) {
-    brand = await Brand.findOne({ sessionId: session._id }).sort({ createdAt: -1 });
-  }
+  const brand = await Brand.findOne({ sessionId: session._id }).sort({ createdAt: -1 });
 
   // Custom body overrides
   let editorSchema = template.editorSchema;

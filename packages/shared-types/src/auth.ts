@@ -17,7 +17,6 @@ export interface IAuthResponse {
   session: {
     id: string;
     expiresAt: string;
-    isGuestUpgraded?: boolean;
   };
 }
 
@@ -28,7 +27,6 @@ export interface IAuthMeResponse {
     id: string;
     status: string;
     expiresAt: string;
-    isGuest: boolean;
   } | null;
   brand?: {
     id: string;
@@ -40,4 +38,3 @@ export interface IAuthMeResponse {
     contactCount: number;
   };
 }
-

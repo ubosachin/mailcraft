@@ -2,16 +2,16 @@ import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   connectToDatabase,
-  GuestSession,
+  UserSession,
   User,
   generateSessionToken,
   hashSessionToken,
-  IGuestSessionDoc,
+  IUserSessionDoc,
   IUserDoc,
 } from '@mailcraft/database';
 
 export const SESSION_COOKIE_NAME = 'mailcraft_session';
-const AUTH_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days for authenticated users
+const AUTH_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export function extractSessionToken(request: NextRequest): string | null {
   const cookie = request.cookies.get(SESSION_COOKIE_NAME);
@@ -29,11 +29,10 @@ export function extractSessionToken(request: NextRequest): string | null {
 
 /**
  * Resolves an authenticated user workspace session.
- * Unauthenticated guest sessions are strictly disallowed.
  */
 export async function resolveAuthSession(
   request: NextRequest
-): Promise<IGuestSessionDoc | null> {
+): Promise<IUserSessionDoc | null> {
   await connectToDatabase();
 
   const rawToken = extractSessionToken(request);
@@ -44,7 +43,7 @@ export async function resolveAuthSession(
   const tokenHash = hashSessionToken(rawToken);
   const now = new Date();
 
-  const session = await GuestSession.findOne({
+  const session = await UserSession.findOne({
     userId: { $ne: null },
     status: 'active',
     expiresAt: { $gt: now },
@@ -60,22 +59,15 @@ export async function resolveAuthSession(
   return session;
 }
 
-// Keep alias so existing API imports transparently enforce authenticated sessions
-export const resolveGuestSession = resolveAuthSession;
-
 export async function resolveUser(
   request: NextRequest
-): Promise<{ session: IGuestSessionDoc; user: IUserDoc | null } | null> {
+): Promise<{ session: IUserSessionDoc; user: IUserDoc } | null> {
   const session = await resolveAuthSession(request);
   if (!session) {
     return null;
   }
 
-  let user: IUserDoc | null = null;
-  if (session.userId) {
-    user = await User.findById(session.userId);
-  }
-
+  const user = await User.findById(session.userId);
   if (!user) {
     return null;
   }
@@ -89,7 +81,7 @@ export async function resolveUser(
 export async function createAuthenticatedSession(
   request: NextRequest | undefined,
   user: IUserDoc
-): Promise<{ session: IGuestSessionDoc; token: string }> {
+): Promise<{ session: IUserSessionDoc; token: string }> {
   await connectToDatabase();
 
   const token = generateSessionToken();
@@ -99,7 +91,7 @@ export async function createAuthenticatedSession(
   const userAgent = request?.headers.get('user-agent') || undefined;
 
   if (user.primarySessionId) {
-    const existingSession = await GuestSession.findById(user.primarySessionId);
+    const existingSession = await UserSession.findById(user.primarySessionId);
     if (existingSession) {
       const existingHashes = (existingSession.tokenHashes || []).slice(-9);
       existingHashes.push(tokenHash);
@@ -121,7 +113,7 @@ export async function createAuthenticatedSession(
     }
   }
 
-  const session = await GuestSession.create({
+  const session = await UserSession.create({
     sessionTokenHash: tokenHash,
     tokenHashes: [tokenHash],
     userId: user._id,
@@ -141,7 +133,7 @@ export async function createAuthenticatedSession(
 }
 
 export async function revokeSessionToken(
-  session: IGuestSessionDoc,
+  session: IUserSessionDoc,
   rawToken: string | null
 ): Promise<void> {
   if (!rawToken) {

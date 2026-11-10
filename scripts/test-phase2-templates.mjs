@@ -161,60 +161,11 @@ async function runPhase2Tests() {
     console.log('✓ Next.js server already running on port 3000');
   }
 
-  // 4.1 GET /api/v1/templates (Catalog, search, sort, filter)
-  const tplAllRes = await fetch(`${BASE_URL}/api/v1/templates`);
-  const tplAllData = await tplAllRes.json();
-  assert.strictEqual(tplAllRes.status, 200);
-  assert(tplAllData.data.templates.length >= 12, 'Expected 12+ templates returned');
-  assert(tplAllData.data.categoryCounts, 'Expected category counts summary');
-  console.log(`✓ GET /api/v1/templates: Retrieved ${tplAllData.data.templates.length} templates with category metrics`);
+  // 4.0 Verify unauthenticated access to /api/v1/templates is rejected (401)
+  const unauthRes = await fetch(`${BASE_URL}/api/v1/templates`);
+  assert.strictEqual(unauthRes.status, 401, 'Unauthenticated GET /api/v1/templates must return 401');
 
-  // Filter by category: fashion
-  const tplFashionRes = await fetch(`${BASE_URL}/api/v1/templates?category=fashion`);
-  const tplFashionData = await tplFashionRes.json();
-  assert.strictEqual(tplFashionRes.status, 200);
-  assert(tplFashionData.data.templates.every((t) => t.category === 'fashion'));
-  console.log(`✓ GET /api/v1/templates?category=fashion: Filtered ${tplFashionData.data.templates.length} fashion templates`);
-
-  // Search by keyword: luxury
-  const tplSearchRes = await fetch(`${BASE_URL}/api/v1/templates?q=luxury`);
-  const tplSearchData = await tplSearchRes.json();
-  assert.strictEqual(tplSearchRes.status, 200);
-  assert(tplSearchData.data.templates.length >= 1);
-  console.log(`✓ GET /api/v1/templates?q=luxury: Search query returned ${tplSearchData.data.templates.length} matching design(s)`);
-
-  // Sort by name
-  const tplSortRes = await fetch(`${BASE_URL}/api/v1/templates?sort=name`);
-  const tplSortData = await tplSortRes.json();
-  assert.strictEqual(tplSortRes.status, 200);
-  const names = tplSortData.data.templates.map((t) => t.name);
-  const sortedNames = [...names].sort((a, b) => a.localeCompare(b));
-  assert.deepStrictEqual(names, sortedNames, 'Templates must be sorted alphabetically by name');
-  console.log(`✓ GET /api/v1/templates?sort=name: Verified alphabetical sorting`);
-
-  // 4.2 GET /api/v1/templates/:id (by slug and ObjectId)
-  const tplSlugRes = await fetch(`${BASE_URL}/api/v1/templates/minimal-premium`);
-  const tplSlugData = await tplSlugRes.json();
-  assert.strictEqual(tplSlugRes.status, 200);
-  assert.strictEqual(tplSlugData.data.slug, 'minimal-premium');
-  const templateId = tplSlugData.data.id;
-
-  const tplIdRes = await fetch(`${BASE_URL}/api/v1/templates/${templateId}`);
-  const tplIdData = await tplIdRes.json();
-  assert.strictEqual(tplIdRes.status, 200);
-  assert.strictEqual(tplIdData.data.id, templateId);
-  console.log(`✓ GET /api/v1/templates/:id: Resolved template by both slug ('minimal-premium') and MongoDB ID (${templateId})`);
-
-  // 4.3 GET /api/v1/templates/:id/preview
-  const prevRes = await fetch(`${BASE_URL}/api/v1/templates/minimal-premium/preview`);
-  const prevData = await prevRes.json();
-  assert.strictEqual(prevRes.status, 200);
-  assert(prevData.data.html.includes('Minimalist Leather Folio'));
-  assert(prevData.data.text.includes('Minimalist Leather Folio'));
-  console.log(`✓ GET /api/v1/templates/:id/preview: Rendered preview HTML (${prevData.data.html.length} bytes)`);
-
-  // 4.4 POST /api/v1/templates/:id/clone (Requires authenticated user session)
-  // First sign up user
+  // Sign up user for authenticated template requests
   const runId = Date.now();
   const authRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
@@ -225,10 +176,77 @@ async function runPhase2Tests() {
       brandName: 'Nordic Audio Co',
     }),
   });
-  const authData = await authRes.json();
   assert.strictEqual(authRes.status, 201);
   const cookieHeader = authRes.headers.get('set-cookie')?.split(';')[0];
   assert(cookieHeader, 'Session cookie must be returned');
+
+  // 4.1 GET /api/v1/templates (Catalog, search, sort, filter)
+  const tplAllRes = await fetch(`${BASE_URL}/api/v1/templates`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplAllData = await tplAllRes.json();
+  assert.strictEqual(tplAllRes.status, 200);
+  assert(tplAllData.data.templates.length >= 12, 'Expected 12+ templates returned');
+  assert(tplAllData.data.categoryCounts, 'Expected category counts summary');
+  console.log(`✓ GET /api/v1/templates: Retrieved ${tplAllData.data.templates.length} templates with category metrics`);
+
+  // Filter by category: fashion
+  const tplFashionRes = await fetch(`${BASE_URL}/api/v1/templates?category=fashion`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplFashionData = await tplFashionRes.json();
+  assert.strictEqual(tplFashionRes.status, 200);
+  assert(tplFashionData.data.templates.every((t) => t.category === 'fashion'));
+  console.log(`✓ GET /api/v1/templates?category=fashion: Filtered ${tplFashionData.data.templates.length} fashion templates`);
+
+  // Search by keyword: luxury
+  const tplSearchRes = await fetch(`${BASE_URL}/api/v1/templates?q=luxury`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplSearchData = await tplSearchRes.json();
+  assert.strictEqual(tplSearchRes.status, 200);
+  assert(tplSearchData.data.templates.length >= 1);
+  console.log(`✓ GET /api/v1/templates?q=luxury: Search query returned ${tplSearchData.data.templates.length} matching design(s)`);
+
+  // Sort by name
+  const tplSortRes = await fetch(`${BASE_URL}/api/v1/templates?sort=name`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplSortData = await tplSortRes.json();
+  assert.strictEqual(tplSortRes.status, 200);
+  const names = tplSortData.data.templates.map((t) => t.name);
+  const sortedNames = [...names].sort((a, b) => a.localeCompare(b));
+  assert.deepStrictEqual(names, sortedNames, 'Templates must be sorted alphabetically by name');
+  console.log(`✓ GET /api/v1/templates?sort=name: Verified alphabetical sorting`);
+
+  // 4.2 GET /api/v1/templates/:id (by slug and ObjectId)
+  const tplSlugRes = await fetch(`${BASE_URL}/api/v1/templates/minimal-premium`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplSlugData = await tplSlugRes.json();
+  assert.strictEqual(tplSlugRes.status, 200);
+  assert.strictEqual(tplSlugData.data.slug, 'minimal-premium');
+  const templateId = tplSlugData.data.id;
+
+  const tplIdRes = await fetch(`${BASE_URL}/api/v1/templates/${templateId}`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const tplIdData = await tplIdRes.json();
+  assert.strictEqual(tplIdRes.status, 200);
+  assert.strictEqual(tplIdData.data.id, templateId);
+  console.log(`✓ GET /api/v1/templates/:id: Resolved template by both slug ('minimal-premium') and MongoDB ID (${templateId})`);
+
+  // 4.3 GET /api/v1/templates/:id/preview
+  const prevRes = await fetch(`${BASE_URL}/api/v1/templates/minimal-premium/preview`, {
+    headers: { Cookie: cookieHeader },
+  });
+  const prevData = await prevRes.json();
+  assert.strictEqual(prevRes.status, 200);
+  assert(prevData.data.html.includes('Minimalist Leather Folio'));
+  assert(prevData.data.text.includes('Minimalist Leather Folio'));
+  console.log(`✓ GET /api/v1/templates/:id/preview: Rendered preview HTML (${prevData.data.html.length} bytes)`);
+
+  // 4.4 POST /api/v1/templates/:id/clone (Requires authenticated user session)
 
   // Clone template into new campaign
   const cloneRes = await fetch(`${BASE_URL}/api/v1/templates/product-launch/clone`, {

@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase, Campaign, EmailEvent, CampaignRecipient } from '@mailcraft/database';
 import { IAnalyticsOverview, IAnalyticsTimelinePoint } from '@mailcraft/shared-types';
-import { resolveGuestSession } from '@/lib/session';
+import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await resolveGuestSession(request);
+    const session = await resolveAuthSession(request);
     if (!session) {
       return jsonError('Authentication required', 401);
     }

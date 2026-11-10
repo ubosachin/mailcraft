@@ -42,7 +42,7 @@ const SuppressionSchema = new Schema<ISuppressionDoc>(
     },
     sessionId: {
       type: Schema.Types.ObjectId,
-      ref: 'GuestSession',
+      ref: 'UserSession',
       default: null,
       index: true,
     },
