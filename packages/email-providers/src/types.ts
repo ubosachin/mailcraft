@@ -1,4 +1,4 @@
-import { SenderVerificationDetails } from '@mailcraft/shared-types';
+import { EmailProviderType, SenderVerificationDetails } from '@mailcraft/shared-types';
 
 export interface SendEmailPayload {
   to: string;
@@ -13,13 +13,13 @@ export interface SendEmailPayload {
 export interface SendEmailResult {
   messageId: string;
   accepted: boolean;
-  provider: 'gmail' | 'brevo' | 'ses';
+  provider: EmailProviderType;
   rawResponse?: unknown;
 }
 
 export interface ConnectionVerificationResult {
   valid: boolean;
-  provider: 'gmail' | 'brevo' | 'ses';
+  provider: EmailProviderType;
   senderEmail?: string;
   accountStatus?: string;
   dailyQuotaRemaining?: number;
@@ -29,7 +29,7 @@ export interface ConnectionVerificationResult {
 export type SenderVerificationResult = SenderVerificationDetails;
 
 export interface IEmailProvider {
-  readonly providerType: 'gmail' | 'brevo' | 'ses';
+  readonly providerType: EmailProviderType;
   connect(): Promise<void>;
   verifyConnection(): Promise<ConnectionVerificationResult>;
   verifySender(senderEmail?: string): Promise<SenderVerificationResult>;

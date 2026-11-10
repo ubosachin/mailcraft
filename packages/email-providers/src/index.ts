@@ -3,6 +3,7 @@ export * from './errors/provider.errors.js';
 export * from './providers/gmail/gmail.provider.js';
 export * from './providers/gmail/gmail.oauth.js';
 export * from './providers/gmail/gmail.client.js';
+export * from './providers/gmail-smtp/gmail-smtp.provider.js';
 export * from './providers/brevo/brevo.provider.js';
 export * from './providers/brevo/brevo.client.js';
 export * from './providers/ses/ses.provider.js';

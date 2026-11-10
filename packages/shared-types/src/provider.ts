@@ -1,4 +1,6 @@
-export type EmailProviderType = 'gmail' | 'brevo' | 'ses';
+export type EmailProviderType = 'gmail' | 'gmail_smtp' | 'brevo' | 'ses';
+
+export const GMAIL_SMTP_DAILY_LIMIT = 1500;
 export type ConnectionStatus =
   | 'connected'
   | 'disconnected'
@@ -51,6 +53,9 @@ export interface IEmailConnection {
   status: ConnectionStatus;
   senderVerificationStatus?: SenderVerificationStatus;
   providerAccountStatus?: string;
+  dailyQuotaLimit?: number | null;
+  dailySentCount?: number;
+  dailySentWindowStart?: Date | null;
   lastVerifiedAt?: Date;
   lastError?: string;
   verifiedAt?: Date;
@@ -66,9 +71,11 @@ export interface EmailProviderSummary {
   status: ConnectionStatus;
   senderVerificationStatus?: SenderVerificationStatus;
   providerAccountStatus?: string;
+  dailyQuotaLimit?: number | null;
+  dailySentCount?: number;
+  dailyRemaining?: number | null;
   lastVerifiedAt?: string;
   lastError?: string;
   verifiedAt?: string;
   createdAt: string;
 }
-

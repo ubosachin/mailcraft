@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     '@mailcraft/email-renderer',
     '@mailcraft/email-providers',
   ],
-  serverExternalPackages: ['mongoose', 'mongodb', 'bullmq', 'ioredis'],
+  serverExternalPackages: ['mongoose', 'mongodb', 'bullmq', 'ioredis', 'nodemailer'],
   images: {
     remotePatterns: [
       {

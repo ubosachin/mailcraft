@@ -16,6 +16,9 @@ export interface IEmailConnectionDoc extends Document {
   status: ConnectionStatus;
   senderVerificationStatus?: SenderVerificationStatus;
   providerAccountStatus?: string;
+  dailyQuotaLimit?: number | null;
+  dailySentCount: number;
+  dailySentWindowStart?: Date | null;
   lastVerifiedAt?: Date;
   lastError?: string;
   verifiedAt?: Date;
@@ -33,7 +36,7 @@ const EmailConnectionSchema = new Schema<IEmailConnectionDoc>(
     },
     provider: {
       type: String,
-      enum: ['gmail', 'brevo', 'ses'],
+      enum: ['gmail', 'gmail_smtp', 'brevo', 'ses'],
       required: true,
     },
     senderEmail: {
@@ -76,6 +79,18 @@ const EmailConnectionSchema = new Schema<IEmailConnectionDoc>(
     providerAccountStatus: {
       type: String,
       default: 'active',
+    },
+    dailyQuotaLimit: {
+      type: Number,
+      default: null,
+    },
+    dailySentCount: {
+      type: Number,
+      default: 0,
+    },
+    dailySentWindowStart: {
+      type: Date,
+      default: null,
     },
     lastVerifiedAt: {
       type: Date,

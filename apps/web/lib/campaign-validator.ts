@@ -7,9 +7,14 @@ import {
   Suppression,
   Segment,
   ICampaignDoc,
+  getConnectionDailyQuotaStatus,
 } from '@mailcraft/database';
 import { compileEmail } from '@mailcraft/email-renderer';
-import { IEditorSchema, ICampaignValidationResult } from '@mailcraft/shared-types';
+import {
+  GMAIL_SMTP_DAILY_LIMIT,
+  IEditorSchema,
+  ICampaignValidationResult,
+} from '@mailcraft/shared-types';
 import { applySegmentFilters } from './contact-service';
 
 export interface ValidationContext {
@@ -125,7 +130,7 @@ export async function validateCampaignReadiness(
   } else {
     errors.push({
       code: 'PROVIDER_REQUIRED',
-      message: 'You must select an active email sending provider (Gmail, Brevo, or Amazon SES) to launch a campaign.',
+      message: 'You must select an active email sending provider (Gmail OAuth, Gmail App Password, Brevo, or Amazon SES) to launch a campaign.',
     });
   }
 
@@ -252,12 +257,28 @@ export async function validateCampaignReadiness(
     });
   }
 
-  // 18: Provider rate limits check
+  // 18: Provider rate limits & daily quota enforcement
   if (connectionDoc?.provider === 'gmail') {
     if (eligibleCount > 500) {
       warnings.push({
         code: 'GMAIL_QUOTA_WARNING',
-        message: `Gmail allows approximately 500 emails/day. You have ${eligibleCount} recipients selected.`,
+        message: `Gmail OAuth allows approximately 500 emails/day. You have ${eligibleCount} recipients selected.`,
+      });
+    }
+  } else if (connectionDoc?.provider === 'gmail_smtp') {
+    const quota = getConnectionDailyQuotaStatus(connectionDoc);
+    const remaining = quota.remaining ?? GMAIL_SMTP_DAILY_LIMIT;
+    const limit = quota.limit ?? GMAIL_SMTP_DAILY_LIMIT;
+
+    if (remaining <= 0) {
+      errors.push({
+        code: 'DAILY_QUOTA_EXCEEDED',
+        message: `Daily sending limit of ${limit.toLocaleString()} emails/day has been reached for this Gmail App Password account (${quota.sentToday}/${limit} sent today). Quota resets at 00:00 UTC.`,
+      });
+    } else if (eligibleCount > remaining) {
+      errors.push({
+        code: 'DAILY_QUOTA_EXCEEDED',
+        message: `This campaign targets ${eligibleCount.toLocaleString()} recipients, which exceeds your remaining Gmail App Password daily quota (${remaining.toLocaleString()} of ${limit.toLocaleString()} emails left today).`,
       });
     }
   }

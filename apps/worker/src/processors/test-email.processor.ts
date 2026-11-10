@@ -4,6 +4,7 @@ import {
   Campaign,
   Brand,
   EmailConnection,
+  reserveConnectionDailyQuota,
 } from '@mailcraft/database';
 import {
   createProviderFromConnection,
@@ -46,7 +47,14 @@ export async function processTestEmailJob(job: Job<TestEmailJobPayload>): Promis
 
   if (!connection || connection.status !== 'connected') {
     throw new Error(
-      'No connected email sending provider found. Connect Gmail, Brevo, or Amazon SES to send a test email.'
+      'No connected email sending provider found. Connect Gmail, Gmail App Password, Brevo, or Amazon SES to send a test email.'
+    );
+  }
+
+  const quota = await reserveConnectionDailyQuota(connection._id);
+  if (!quota.allowed) {
+    throw new Error(
+      `Daily sending limit of ${quota.limit?.toLocaleString() || '1,500'} emails/day reached for this account.`
     );
   }
 

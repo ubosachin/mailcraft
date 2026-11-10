@@ -64,9 +64,12 @@ interface UserState {
 
 interface ConnectionSummary {
   id: string;
-  provider: 'gmail' | 'brevo' | 'ses';
+  provider: 'gmail' | 'gmail_smtp' | 'brevo' | 'ses';
   senderEmail: string;
   status: string;
+  dailyQuotaLimit?: number | null;
+  dailySentCount?: number;
+  dailyRemaining?: number | null;
   verifiedAt?: string;
   createdAt: string;
 }
@@ -127,8 +130,13 @@ export default function WorkspacePage() {
 
   // 2. Connections State
   const [connections, setConnections] = useState<ConnectionSummary[]>([]);
-  const [showConnectModal, setShowConnectModal] = useState<'brevo' | 'gmail' | null>(null);
+  const [showConnectModal, setShowConnectModal] = useState<'brevo' | 'gmail' | 'gmail_smtp' | null>(null);
   const [brevoApiKey, setBrevoApiKey] = useState('');
+  const [gmailSmtpForm, setGmailSmtpForm] = useState({
+    email: '',
+    appPassword: '',
+    senderName: '',
+  });
   const [connectingProvider, setConnectingProvider] = useState(false);
 
   // 3. Recipients State
@@ -424,6 +432,42 @@ export default function WorkspacePage() {
         type: 'error',
         text: err instanceof Error ? err.message : 'Network error initiating Google OAuth.',
       });
+      setConnectingProvider(false);
+    }
+  };
+
+  const handleConnectGmailSmtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setConnectingProvider(true);
+    setStatusMessage(null);
+    try {
+      const targetEmail = (gmailSmtpForm.email || brand.senderEmail || user?.email || '').trim();
+      const res = await fetch('/api/v1/connections/provider', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'gmail_smtp',
+          senderEmail: targetEmail,
+          senderName: gmailSmtpForm.senderName.trim() || brand.senderName || undefined,
+          credentials: { appPassword: gmailSmtpForm.appPassword },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(extractApiErrorMessage(data, 'Failed to verify Gmail App Password'));
+
+      setShowConnectModal(null);
+      setGmailSmtpForm({ email: '', appPassword: '', senderName: '' });
+      await fetchConnections();
+      setStatusMessage({
+        type: 'success',
+        text: 'Gmail App Password verified & encrypted with AES-256-GCM (strict 1,500 emails/day limit enabled)!',
+      });
+    } catch (err) {
+      setStatusMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Gmail App Password verification failed',
+      });
+    } finally {
       setConnectingProvider(false);
     }
   };
@@ -1011,11 +1055,18 @@ export default function WorkspacePage() {
                             {c.provider.slice(0, 2)}
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-bold text-slate-900 text-sm uppercase">{c.provider}</h4>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-bold text-slate-900 text-sm uppercase">
+                                {c.provider === 'gmail_smtp' ? 'Gmail App Password' : c.provider}
+                              </h4>
                               <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-800">
                                 Active & Encrypted
                               </span>
+                              {c.provider === 'gmail_smtp' && (
+                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-100 text-indigo-700">
+                                  {c.dailySentCount ?? 0} / {c.dailyQuotaLimit ?? 1500} today
+                                </span>
+                              )}
                             </div>
                             <p className="text-xs text-slate-500">Sender: {c.senderEmail}</p>
                           </div>
@@ -1035,7 +1086,7 @@ export default function WorkspacePage() {
               </div>
 
               {/* Connect Providers Grid */}
-              <div className="grid md:grid-cols-2 gap-6 mt-8 pt-8 border-t border-slate-100">
+              <div className="grid md:grid-cols-3 gap-6 mt-8 pt-8 border-t border-slate-100">
                 {/* Brevo Card */}
                 <div className="p-6 rounded-xl border border-slate-200 bg-white flex flex-col justify-between">
                   <div>
@@ -1054,6 +1105,36 @@ export default function WorkspacePage() {
                     className="mt-6 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-xs transition"
                   >
                     Configure Brevo Key
+                  </button>
+                </div>
+
+                {/* Gmail App Password Card */}
+                <div className="p-6 rounded-xl border border-slate-200 bg-white flex flex-col justify-between">
+                  <div>
+                    <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold mb-3">
+                      <Key className="w-5 h-5" />
+                    </div>
+                    <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
+                      1,500 Emails / Day Cap
+                    </span>
+                    <h3 className="text-base font-bold text-slate-900 mt-1">Gmail + App Password</h3>
+                    <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                      Send straight from your Gmail or Google Workspace inbox via encrypted SMTP SSL with a strict 1,500 mails/day cap.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGmailSmtpForm({
+                        email: brand.senderEmail || user?.email || '',
+                        appPassword: '',
+                        senderName: brand.senderName || '',
+                      });
+                      setShowConnectModal('gmail_smtp');
+                    }}
+                    className="mt-6 w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition"
+                  >
+                    Connect Gmail App Password
                   </button>
                 </div>
 
@@ -1563,6 +1644,83 @@ export default function WorkspacePage() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Connect Gmail App Password Modal */}
+      {showConnectModal === 'gmail_smtp' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div>
+              <h3 className="text-base font-bold text-slate-900">Connect Gmail + Google App Password</h3>
+              <p className="text-xs text-slate-500 mt-1">
+                Credentials are verified over TLS and stored with AES-256-GCM. Hard limit: <strong>1,500 emails/day</strong>.
+              </p>
+            </div>
+
+            <form onSubmit={handleConnectGmailSmtp} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  Gmail Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  placeholder="you@gmail.com"
+                  value={gmailSmtpForm.email}
+                  onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  Google App Password (16 characters)
+                </label>
+                <input
+                  type="password"
+                  required
+                  placeholder="abcd efgh ijkl mnop"
+                  value={gmailSmtpForm.appPassword}
+                  onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, appPassword: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Google Account &rarr; Security &rarr; Enable 2-Step Verification &rarr; App passwords.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">
+                  Sender Name (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="My Brand"
+                  value={gmailSmtpForm.senderName}
+                  onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, senderName: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={connectingProvider || !gmailSmtpForm.email.trim() || !gmailSmtpForm.appPassword.trim()}
+                  className="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg transition"
+                >
+                  {connectingProvider ? 'Verifying SMTP...' : 'Verify & Connect'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowConnectModal(null)}
+                  className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

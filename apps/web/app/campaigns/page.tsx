@@ -375,6 +375,12 @@ function CampaignsContent() {
             Gmail
           </span>
         );
+      case 'gmail_smtp':
+        return (
+          <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-300 border border-indigo-900/50">
+            Gmail App SMTP
+          </span>
+        );
       case 'brevo':
         return (
           <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-blue-950/60 text-blue-300 border border-blue-900/50">

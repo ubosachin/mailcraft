@@ -1,6 +1,10 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
-import { connectToDatabase, EmailConnection } from '@mailcraft/database';
+import {
+  connectToDatabase,
+  EmailConnection,
+  reserveConnectionDailyQuota,
+} from '@mailcraft/database';
 import { createProviderFromConnection } from '@mailcraft/email-providers';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
@@ -40,6 +44,14 @@ export async function POST(
       return jsonError(
         'Email connection authentication has failed or was revoked. Please reconnect.',
         400
+      );
+    }
+
+    const quota = await reserveConnectionDailyQuota(connection._id);
+    if (!quota.allowed) {
+      return jsonError(
+        `Daily sending limit of ${quota.limit?.toLocaleString() || '1,500'} emails/day reached for this account. Quota resets at 00:00 UTC.`,
+        429
       );
     }
 
@@ -108,14 +120,20 @@ Congratulations! Your email sending channel is correctly integrated and verified
 Sent with MailCraft - Professional Promotional Email Platform.
 `.trim();
 
-    const result = await provider.sendEmail({
-      to: validated.recipientEmail,
-      from: connection.senderEmail,
-      fromName: connection.senderName,
-      subject,
-      html,
-      text,
-    });
+    await provider.connect();
+    let result;
+    try {
+      result = await provider.sendEmail({
+        to: validated.recipientEmail,
+        from: connection.senderEmail,
+        fromName: connection.senderName,
+        subject,
+        html,
+        text,
+      });
+    } finally {
+      await provider.disconnect();
+    }
 
     return jsonSuccess(
       {

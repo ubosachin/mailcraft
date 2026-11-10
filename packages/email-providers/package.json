@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "@mailcraft/database": "workspace:*",
-    "@mailcraft/shared-types": "workspace:*"
+    "@mailcraft/shared-types": "workspace:*",
+    "nodemailer": "^10.4.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.4",
+    "@types/nodemailer": "^8.0.2",
     "typescript": "^5.7.3"
   }
 }
-

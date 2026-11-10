@@ -2,6 +2,7 @@ import { decryptCredentials, IEmailConnectionDoc } from '@mailcraft/database';
 import { IEmailProvider } from './types.js';
 import { BrevoProvider } from './providers/brevo/brevo.provider.js';
 import { GmailProvider } from './providers/gmail/gmail.provider.js';
+import { GmailSmtpProvider } from './providers/gmail-smtp/gmail-smtp.provider.js';
 import { SesProvider } from './providers/ses/ses.provider.js';
 
 export function createProviderFromConnection(
@@ -33,6 +34,15 @@ export function createProviderFromConnection(
       return new GmailProvider({
         refreshToken,
         senderEmail: connection.senderEmail,
+        senderName: connection.senderName,
+      });
+    }
+
+    case 'gmail_smtp': {
+      const appPassword = (decrypted.appPassword as string) || '';
+      return new GmailSmtpProvider({
+        gmailAddress: connection.senderEmail,
+        appPassword,
         senderName: connection.senderName,
       });
     }

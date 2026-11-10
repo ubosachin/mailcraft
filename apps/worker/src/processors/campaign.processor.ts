@@ -9,6 +9,7 @@ import {
   Suppression,
   CampaignEvent,
   EmailEvent,
+  reserveConnectionDailyQuota,
 } from '@mailcraft/database';
 import {
   createProviderFromConnection,
@@ -229,6 +230,20 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
       });
 
       try {
+        const quota = await reserveConnectionDailyQuota(connection._id);
+        if (!quota.allowed) {
+          await CampaignRecipient.updateMany(
+            { campaignId: campaign._id, status: 'processing' },
+            { $set: { status: 'queued' } }
+          );
+          campaign.status = 'paused';
+          campaign.pausedAt = new Date();
+          await campaign.save();
+          await provider.disconnect();
+          console.warn(`[Worker] Daily sending quota reached for connection ${connection._id}. Paused campaign ${campaignId}.`);
+          return;
+        }
+
         const sendResult = await provider.sendEmail({
           to: recipient.email,
           from: brand.senderEmail,

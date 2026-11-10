@@ -47,6 +47,9 @@ interface ConnectionItem {
   senderName?: string;
   status: string;
   senderVerificationStatus?: string;
+  dailyQuotaLimit?: number | null;
+  dailySentCount?: number;
+  dailyRemaining?: number | null;
 }
 
 interface TemplateItem {
@@ -784,8 +787,10 @@ function CampaignWizardContent() {
                       {c.provider.slice(0, 3)}
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-sm flex items-center gap-2">
-                        {c.provider.toUpperCase()} Integration
+                      <div className="font-semibold text-white text-sm flex items-center flex-wrap gap-2">
+                        {c.provider === 'gmail_smtp'
+                          ? 'Gmail + App Password (1,500/day)'
+                          : `${c.provider.toUpperCase()} Integration`}
                         {c.status === 'connected' && (
                           <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
@@ -797,6 +802,11 @@ function CampaignWizardContent() {
                         Sender: {c.senderEmail}{' '}
                         {c.senderVerificationStatus === 'verified' && (
                           <span className="text-emerald-400 font-medium">(Verified Sender)</span>
+                        )}
+                        {c.provider === 'gmail_smtp' && (
+                          <span className="text-indigo-300 font-medium ml-1">
+                            &bull; {c.dailyRemaining ?? 1500} / {c.dailyQuotaLimit ?? 1500} remaining today
+                          </span>
                         )}
                       </p>
                     </div>
@@ -1447,7 +1457,11 @@ function CampaignWizardContent() {
                 <div>
                   <span className="text-slate-500">Sender Provider:</span>
                   <div className="text-slate-200 font-medium mt-0.5">
-                    {connections.find((c) => c.id === connectionId)?.provider.toUpperCase() || 'Not Selected'}
+                    {(() => {
+                      const p = connections.find((c) => c.id === connectionId)?.provider;
+                      if (p === 'gmail_smtp') return 'GMAIL APP PASSWORD (1,500/day)';
+                      return p ? p.toUpperCase() : 'Not Selected';
+                    })()}
                   </div>
                 </div>
                 <div>

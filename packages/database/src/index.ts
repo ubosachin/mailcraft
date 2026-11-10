@@ -21,5 +21,6 @@ export * from './models/TrackingToken.js';
 export * from './models/UnsubscribeEvent.js';
 export * from './models/WebhookEventLog.js';
 export * from './cleanup.js';
+export * from './quota.js';
 export * from './seed-templates.js';
 

@@ -9,6 +9,7 @@ import {
   Suppression,
   CampaignEvent,
   EmailEvent,
+  reserveConnectionDailyQuota,
 } from '@mailcraft/database';
 import { createProviderFromConnection, IEmailProvider } from '@mailcraft/email-providers';
 import { compileEmail } from '@mailcraft/email-renderer';
@@ -77,7 +78,14 @@ export async function dispatchTestEmailForCampaign(
 
   if (!connection || connection.status !== 'connected') {
     throw new Error(
-      'No connected email sending provider found. Connect Gmail, Brevo, or Amazon SES in Sender Accounts first.'
+      'No connected email sending provider found. Connect Gmail, Gmail App Password, Brevo, or Amazon SES in Sender Accounts first.'
+    );
+  }
+
+  const quota = await reserveConnectionDailyQuota(connection._id);
+  if (!quota.allowed) {
+    throw new Error(
+      `Daily sending limit of ${quota.limit?.toLocaleString() || '1,500'} emails/day reached for this sender account. Quota resets at 00:00 UTC.`
     );
   }
 
@@ -327,6 +335,22 @@ export async function dispatchCampaignInline(
         });
 
         try {
+          const quota = await reserveConnectionDailyQuota(connection._id);
+          if (!quota.allowed) {
+            await CampaignRecipient.updateMany(
+              { campaignId: campaign._id, status: 'processing' },
+              { $set: { status: 'queued' } }
+            );
+            campaign.status = 'paused';
+            campaign.pausedAt = new Date();
+            await campaign.save();
+            return {
+              status: 'paused',
+              accepted: campaign.stats.accepted || 0,
+              failed: campaign.stats.failed || 0,
+            };
+          }
+
           const fromEmail = brand.senderEmail || connection.senderEmail;
           const sendResult = await provider.sendEmail({
             to: recipient.email,

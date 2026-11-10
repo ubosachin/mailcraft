@@ -1,5 +1,9 @@
 import { NextRequest } from 'next/server';
-import { connectToDatabase, EmailConnection } from '@mailcraft/database';
+import {
+  connectToDatabase,
+  EmailConnection,
+  getConnectionDailyQuotaStatus,
+} from '@mailcraft/database';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
@@ -17,19 +21,25 @@ export async function GET(request: NextRequest) {
     }).sort({ updatedAt: -1 });
 
     return jsonSuccess(
-      connections.map((c) => ({
-        id: c._id.toString(),
-        provider: c.provider,
-        senderEmail: c.senderEmail,
-        senderName: c.senderName,
-        status: c.status,
-        senderVerificationStatus: c.senderVerificationStatus,
-        providerAccountStatus: c.providerAccountStatus,
-        lastVerifiedAt: c.lastVerifiedAt?.toISOString(),
-        lastError: c.lastError,
-        verifiedAt: c.verifiedAt?.toISOString(),
-        createdAt: c.createdAt.toISOString(),
-      }))
+      connections.map((c) => {
+        const quota = getConnectionDailyQuotaStatus(c);
+        return {
+          id: c._id.toString(),
+          provider: c.provider,
+          senderEmail: c.senderEmail,
+          senderName: c.senderName,
+          status: c.status,
+          senderVerificationStatus: c.senderVerificationStatus,
+          providerAccountStatus: c.providerAccountStatus,
+          dailyQuotaLimit: quota.limit,
+          dailySentCount: quota.sentToday,
+          dailyRemaining: quota.remaining,
+          lastVerifiedAt: c.lastVerifiedAt?.toISOString(),
+          lastError: c.lastError,
+          verifiedAt: c.verifiedAt?.toISOString(),
+          createdAt: c.createdAt.toISOString(),
+        };
+      })
     );
   } catch (error) {
     return handleApiError(error);
