@@ -163,14 +163,22 @@ export function DashboardHeader({
       : 'text-slate-300 hover:bg-slate-800/90 hover:text-white border border-transparent';
 
   return (
-    <header
-      className={`sticky top-0 z-40 backdrop-blur-md border-b transition-colors ${
-        isLight
-          ? 'bg-white/95 border-slate-200 text-slate-900'
-          : 'bg-slate-950/90 border-slate-800/90 text-slate-100'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-40 px-3 sm:px-5 lg:px-8 pt-2.5 sm:pt-3 pointer-events-none">
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-10 pointer-events-auto bg-slate-950/50 backdrop-blur-[2px]"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      <div
+        className={`relative z-20 pointer-events-auto max-w-7xl mx-auto px-3.5 sm:px-5 h-14 sm:h-16 flex items-center justify-between gap-3 rounded-2xl border backdrop-blur-md transition-colors ${
+          isLight
+            ? 'bg-white/95 border-slate-200/90 text-slate-900 shadow-lg shadow-slate-900/5'
+            : 'bg-slate-900/95 border-slate-800 text-slate-100 shadow-lg shadow-black/30'
+        }`}
+      >
         {/* Left: Brand + Desktop Navigation */}
         <div className="flex items-center gap-4 xl:gap-6 min-w-0">
           <Link href="/" className="group shrink-0">
@@ -186,7 +194,7 @@ export function DashboardHeader({
                   key={item.key}
                   href={item.href}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 whitespace-nowrap transition-all ${navLinkClass(
+                  className={`px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 whitespace-nowrap transition-all ${navLinkClass(
                     isActive
                   )}`}
                 >
@@ -203,7 +211,7 @@ export function DashboardHeader({
                 onClick={() => setToolsDropdownOpen((prev) => !prev)}
                 aria-expanded={toolsDropdownOpen}
                 aria-haspopup="menu"
-                className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1 whitespace-nowrap transition-all ${navLinkClass(
+                className={`px-2.5 py-1.5 rounded-xl flex items-center gap-1 whitespace-nowrap transition-all ${navLinkClass(
                   Boolean(activeToolItem)
                 )}`}
               >
@@ -218,7 +226,7 @@ export function DashboardHeader({
               {toolsDropdownOpen && (
                 <div
                   role="menu"
-                  className={`absolute left-0 mt-2 w-72 rounded-2xl border p-2 shadow-2xl z-50 ${
+                  className={`absolute left-0 mt-3 w-72 rounded-2xl border p-2 shadow-2xl z-50 ${
                     isLight
                       ? 'bg-white border-slate-200 shadow-slate-900/10'
                       : 'bg-slate-900 border-slate-800 shadow-black/60'
@@ -292,7 +300,7 @@ export function DashboardHeader({
             <button
               type="button"
               onClick={handleLogout}
-              className={`hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition ${
+              className={`hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-medium transition ${
                 isLight
                   ? 'text-slate-500 hover:text-rose-600 hover:bg-rose-50'
                   : 'text-slate-400 hover:text-rose-400 hover:bg-rose-950/40'
@@ -320,101 +328,94 @@ export function DashboardHeader({
         </div>
       </div>
 
-      {/* Mobile / Tablet Navigation Drawer + Backdrop */}
+      {/* Mobile / Tablet Curved Navigation Drawer */}
       {mobileMenuOpen && (
-        <>
-          <div
-            className="lg:hidden fixed inset-0 top-16 z-40 bg-slate-950/50 backdrop-blur-[2px]"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-hidden="true"
-          />
-          <div
-            className={`lg:hidden relative z-50 border-t shadow-2xl max-h-[calc(100vh-4rem)] overflow-y-auto px-4 py-4 space-y-4 ${
-              isLight ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'
-            }`}
-          >
-            {userBadge && (
-              <div
-                className={`pb-3 border-b ${
-                  isLight ? 'border-slate-100' : 'border-slate-800'
-                } xl:hidden`}
-              >
-                {userBadge}
-              </div>
-            )}
-
-            <div>
-              <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Workspace
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                {[...PRIMARY_NAV_ITEMS, TOOLS_NAV_ITEMS[0]].map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeNav === item.key;
-                  return (
-                    <Link
-                      key={item.key}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition ${mobileLinkClass(
-                        isActive
-                      )}`}
-                    >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+        <div
+          className={`lg:hidden relative z-20 pointer-events-auto mt-2 max-w-7xl mx-auto rounded-2xl border shadow-2xl max-h-[calc(100vh-5.5rem)] overflow-y-auto px-4 py-4 space-y-4 ${
+            isLight ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'
+          }`}
+        >
+          {userBadge && (
+            <div
+              className={`pb-3 border-b ${
+                isLight ? 'border-slate-100' : 'border-slate-800'
+              } xl:hidden`}
+            >
+              {userBadge}
             </div>
+          )}
 
-            <div>
-              <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Infrastructure &amp; Compliance
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                {TOOLS_NAV_ITEMS.slice(1).map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeNav === item.key;
-                  return (
-                    <Link
-                      key={item.key}
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      aria-current={isActive ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition ${mobileLinkClass(
-                        isActive
-                      )}`}
-                    >
-                      <Icon className="w-4 h-4 shrink-0" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
+          <div>
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Workspace
             </div>
-
-            {showLogout && (
-              <div
-                className={`pt-3 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'}`}
-              >
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold border transition ${
-                    isLight
-                      ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-200'
-                      : 'text-rose-300 bg-rose-950/40 hover:bg-rose-950/70 border-rose-900/50'
-                  }`}
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span>Log Out</span>
-                </button>
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {[...PRIMARY_NAV_ITEMS, TOOLS_NAV_ITEMS[0]].map((item) => {
+                const Icon = item.icon;
+                const isActive = activeNav === item.key;
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition ${mobileLinkClass(
+                      isActive
+                    )}`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </>
+
+          <div>
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Infrastructure &amp; Compliance
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {TOOLS_NAV_ITEMS.slice(1).map((item) => {
+                const Icon = item.icon;
+                const isActive = activeNav === item.key;
+                return (
+                  <Link
+                    key={item.key}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition ${mobileLinkClass(
+                      isActive
+                    )}`}
+                  >
+                    <Icon className="w-4 h-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {showLogout && (
+            <div
+              className={`pt-3 border-t ${isLight ? 'border-slate-200' : 'border-slate-800'}`}
+            >
+              <button
+                type="button"
+                onClick={handleLogout}
+                className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold border transition ${
+                  isLight
+                    ? 'text-rose-600 bg-rose-50 hover:bg-rose-100 border-rose-200'
+                    : 'text-rose-300 bg-rose-950/40 hover:bg-rose-950/70 border-rose-900/50'
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Log Out</span>
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </header>
   );
