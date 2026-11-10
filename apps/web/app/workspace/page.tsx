@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 import { extractApiErrorMessage, getOAuthErrorMessage } from '@/lib/oauth-helpers';
 import {
   ShieldCheck,
@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   AlertCircle,
   RefreshCw,
-  LogOut,
   Send,
   Zap,
   Users,
@@ -658,51 +657,30 @@ export default function WorkspacePage() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/" className="group">
-              <MailCraftLogo size="md" variant="light" />
-            </Link>
-
-            {user && (
-              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />
-                  {user.name || user.email}
-                </span>
-                <span className="text-xs text-slate-500 font-medium hidden md:inline">({user.email})</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/editor"
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition whitespace-nowrap"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>
-                <span className="hidden sm:inline">Email </span>Studio
-              </span>
-            </Link>
-
-            <button
-              onClick={() => {
-                if (confirm('Log out of your MailCraft account?')) {
-                  fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
-                    window.location.href = '/login';
-                  });
-                }
-              }}
-              className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
-              title="Log Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        activeNav="workspace"
+        variant="light"
+        showLogout
+        userBadge={
+          user ? (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 max-w-[200px] truncate">
+              <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+              <span className="truncate">{user.name || user.email}</span>
+            </span>
+          ) : undefined
+        }
+        rightActions={
+          <Link
+            href="/editor"
+            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition whitespace-nowrap"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>
+              <span className="hidden sm:inline">Email </span>Studio
+            </span>
+          </Link>
+        }
+      />
 
       {/* Navigation Wizard Tabs */}
       <div className="bg-white border-b border-slate-200">

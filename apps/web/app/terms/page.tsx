@@ -1,22 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { PublicNavbar } from '@/components/PublicNavbar';
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <MailCraftLogo size="sm" variant="light" />
-          </Link>
-          <Link href="/" className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Back to Home</span>
-          </Link>
-        </div>
-      </header>
+      <PublicNavbar activePage="terms" />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12 flex-1 w-full text-slate-800 leading-relaxed text-sm space-y-6">
         <div>

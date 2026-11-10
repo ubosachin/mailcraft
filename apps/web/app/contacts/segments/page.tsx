@@ -286,7 +286,7 @@ function SegmentsPageContent() {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       {/* Top Navigation */}
       <DashboardHeader
-        activeNav="contacts"
+        activeNav="segments"
         showLogout
         rightActions={
           <Link

@@ -1,32 +1,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { CheckCircle2, Zap, Send, ShieldCheck, ArrowRight } from 'lucide-react';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { PublicNavbar } from '@/components/PublicNavbar';
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Top Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <MailCraftLogo size="md" variant="light" />
-          </Link>
-
-          <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
-            <Link href="/templates" prefetch={false} className="hidden sm:inline text-slate-600 hover:text-slate-900 transition">
-              Templates
-            </Link>
-            <Link
-              href="/workspace"
-              prefetch={false}
-              className="px-3 sm:px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition whitespace-nowrap"
-            >
-              <span className="hidden sm:inline">Enter </span>Workspace
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicNavbar activePage="pricing" />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 w-full">

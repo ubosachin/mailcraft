@@ -20,7 +20,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { compileEmail, ALL_TEMPLATES, TemplateDefinition } from '@mailcraft/email-renderer';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { DashboardHeader } from '@/components/DashboardHeader';
 
 interface CategoryFilter {
   id: string;
@@ -201,38 +201,19 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
       {/* Top Navigation */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <MailCraftLogo size="md" variant="light" />
+      <DashboardHeader
+        activeNav="templates"
+        variant="light"
+        showLogout
+        rightActions={
+          <Link
+            href="/workspace"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold hover:bg-indigo-700 transition shadow-xs inline-flex items-center gap-1.5 whitespace-nowrap"
+          >
+            <span className="hidden sm:inline">Open </span>Studio <ArrowRight className="w-3.5 h-3.5" />
           </Link>
-
-          <div className="flex items-center gap-4 text-xs font-semibold">
-            <Link
-              href="/workspace"
-              className="hidden sm:inline text-slate-600 hover:text-indigo-600 transition"
-            >
-              Workspace
-            </Link>
-            <button
-              onClick={() => {
-                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
-                  window.location.href = '/login';
-                });
-              }}
-              className="text-slate-600 hover:text-rose-600 transition whitespace-nowrap"
-            >
-              Log Out
-            </button>
-            <Link
-              href="/workspace"
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shadow-xs flex items-center gap-1.5 whitespace-nowrap"
-            >
-              <span className="hidden sm:inline">Open </span>Studio <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-      </header>
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 w-full">

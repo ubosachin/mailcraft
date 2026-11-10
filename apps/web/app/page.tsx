@@ -14,10 +14,9 @@ import {
   Users,
   Eye,
   Lock,
-  Menu,
-  X,
 } from 'lucide-react';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { PublicNavbar } from '@/components/PublicNavbar';
 
 const INITIAL_TEMPLATES = [
   { name: 'Minimal Premium', category: 'Premium Brands', color: 'from-amber-600 to-amber-900', badge: 'High Conversion' },
@@ -41,7 +40,6 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
@@ -87,101 +85,7 @@ export default function HomePage() {
       </div>
 
       {/* Navigation */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <MailCraftLogo size="md" variant="light" badge="Studio" />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link href="/templates" prefetch={false} className="hover:text-indigo-600 transition">12+ Templates</Link>
-            <Link href="/pricing" className="hover:text-indigo-600 transition">Pricing & Quotas</Link>
-            <a href="#how-it-works" className="hover:text-indigo-600 transition">How it Works</a>
-            <a href="#sending" className="hover:text-indigo-600 transition">Sending Channels</a>
-            <Link href="/privacy" className="hover:text-indigo-600 transition">Privacy & Trust</Link>
-          </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  href="/campaigns"
-                  className="hidden sm:inline-block text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
-                >
-                  Campaigns
-                </Link>
-                <Link
-                  href="/workspace"
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition whitespace-nowrap"
-                >
-                  <span>Workspace</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="hidden sm:inline-block text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition whitespace-nowrap"
-                >
-                  <span>Sign up</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </>
-            )}
-
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen((prev) => !prev)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition"
-              aria-label="Toggle navigation menu"
-              aria-expanded={mobileNavOpen}
-            >
-              {mobileNavOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Drawer */}
-        {mobileNavOpen && (
-          <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-2 shadow-lg">
-            <div className="grid grid-cols-1 gap-1 text-sm font-medium text-slate-700">
-              <Link href="/templates" prefetch={false} onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
-                12+ Templates
-              </Link>
-              <Link href="/pricing" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
-                Pricing & Quotas
-              </Link>
-              <a href="#how-it-works" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
-                How it Works
-              </a>
-              <a href="#sending" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
-                Sending Channels
-              </a>
-              <Link href="/privacy" onClick={() => setMobileNavOpen(false)} className="px-3 py-2 rounded-lg hover:bg-slate-50">
-                Privacy & Trust
-              </Link>
-            </div>
-            <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-              {isAuthenticated ? (
-                <Link href="/campaigns" onClick={() => setMobileNavOpen(false)} className="w-full text-center px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm font-semibold">
-                  Go to Campaigns
-                </Link>
-              ) : (
-                <Link href="/login" onClick={() => setMobileNavOpen(false)} className="w-full text-center px-3 py-2 rounded-lg bg-slate-100 text-slate-800 text-sm font-semibold">
-                  Log in
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-      </header>
+      <PublicNavbar activePage="home" isAuthenticated={isAuthenticated} />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-gradient-to-b from-white via-indigo-50/30 to-slate-50">

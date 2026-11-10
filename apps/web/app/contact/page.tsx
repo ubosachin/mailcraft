@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { PublicNavbar } from '@/components/PublicNavbar';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -43,17 +42,7 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <MailCraftLogo size="sm" variant="light" />
-          </Link>
-          <Link href="/" className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1">
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Home</span>
-          </Link>
-        </div>
-      </header>
+      <PublicNavbar activePage="contact" />
 
       <main className="max-w-md mx-auto px-4 py-16 flex-1 w-full flex flex-col justify-center">
         <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl shadow-slate-100">
