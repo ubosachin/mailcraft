@@ -603,7 +603,7 @@ export default function WorkspacePage() {
       await fetchCampaigns();
       setStatusMessage({
         type: 'success',
-        text: `Campaign "${showSendModal.campaignName}" submitted to BullMQ queue for background sending!`,
+        text: `Campaign "${showSendModal.campaignName}" queued for campaign delivery!`,
       });
     } catch (err) {
       setStatusMessage({
@@ -1575,7 +1575,7 @@ export default function WorkspacePage() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
             <h3 className="text-lg font-bold text-slate-900">Pre-Flight Campaign Check</h3>
             <p className="text-xs text-slate-600">
-              Review your campaign pre-flight requirements before dispatching to background BullMQ queues:
+              Review your campaign pre-flight requirements before starting campaign delivery:
             </p>
 
             <div className="space-y-2 text-xs">

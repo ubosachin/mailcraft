@@ -1,5 +1,6 @@
 import React from 'react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function PrivacyPage() {
   return (
@@ -41,6 +42,7 @@ export default function PrivacyPage() {
           </p>
         </section>
       </main>
+      <PublicFooter />
     </div>
   );
 }

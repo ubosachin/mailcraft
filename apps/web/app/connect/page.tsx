@@ -500,7 +500,7 @@ function ConnectPageContent() {
   const sesConn = getConnectionForProvider('ses');
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       {/* Top Navigation */}
       <DashboardHeader
         activeNav="connect"
@@ -508,7 +508,7 @@ function ConnectPageContent() {
         rightActions={
           <Link
             href="/templates"
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-sm shadow-indigo-600/20 whitespace-nowrap"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Templates</span>
@@ -522,27 +522,27 @@ function ConnectPageContent() {
         {/* Toast Notification */}
         {notification && (
           <div
-            className={`mb-8 p-4 rounded-xl flex items-start justify-between border ${
+            className={`mb-8 p-4 rounded-xl flex items-start justify-between border shadow-sm ${
               notification.type === 'success'
-                ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-200'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : notification.type === 'error'
-                ? 'bg-rose-950/60 border-rose-500/30 text-rose-200'
-                : 'bg-indigo-950/60 border-indigo-500/30 text-indigo-200'
+                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                : 'bg-indigo-50 border-indigo-200 text-indigo-900'
             }`}
           >
             <div className="flex items-center gap-3">
               {notification.type === 'success' ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : notification.type === 'error' ? (
-                <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-indigo-400 shrink-0" />
+                <AlertCircle className="w-5 h-5 text-indigo-600 shrink-0" />
               )}
               <span className="text-sm font-medium">{notification.message}</span>
             </div>
             <button
               onClick={() => setNotification(null)}
-              className="text-slate-400 hover:text-white ml-4"
+              className="text-slate-400 hover:text-slate-700 ml-4"
             >
               <X className="w-4 h-4" />
             </button>
@@ -551,71 +551,71 @@ function ConnectPageContent() {
 
         {/* Page Header */}
         <div className="mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 mb-3">
             <ShieldCheck className="w-3.5 h-3.5" />
-            Zero-Login Infrastructure &bull; AES-256 Vault
+            Encrypted Credentials Vault &bull; AES-256-GCM
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
             Email Delivery Providers
           </h1>
-          <p className="mt-3 text-base text-slate-400 max-w-3xl leading-relaxed">
+          <p className="mt-3 text-base text-slate-600 max-w-3xl leading-relaxed">
             Connect your own sending infrastructure. MailCraft separates low-volume personal sends (Gmail)
-            from dedicated bulk delivery engines (Brevo, Amazon SES) to guarantee the highest deliverability.
-            Credentials are encrypted in session-bound storage with AES-256-GCM.
+            from dedicated bulk delivery engines (Brevo, Amazon SES) to protect sender reputation.
+            All credentials are encrypted at rest with AES-256-GCM.
           </p>
         </div>
 
         {/* Providers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
           {/* 1. Google Gmail Card */}
-          <div className="relative rounded-2xl bg-slate-900/70 border border-slate-800 p-6 flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="saas-card p-6 flex flex-col justify-between transition">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-                  <Mail className="w-6 h-6 text-red-400" />
+                <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center">
+                  <Mail className="w-6 h-6 text-rose-600" />
                 </div>
                 {gmailConn?.status === 'connected' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Connected
                   </span>
                 ) : gmailConn?.status === 'auth_failed' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                     <XCircle className="w-3.5 h-3.5" />
                     Auth Failed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                     Not Connected
                   </span>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-1">Google Gmail</h3>
-              <p className="text-xs font-medium text-indigo-400 mb-3">OAuth 2.0 &bull; Low-Volume Channel</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">Google Gmail</h3>
+              <p className="text-xs font-semibold text-indigo-600 mb-3">OAuth 2.0 &bull; Low-Volume Channel</p>
 
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 Direct inbox delivery from your verified Google account. Ideal for testing designs, sending internal
                 previews, or VIP low-volume blasts without configuring DNS records.
               </p>
 
-              <div className="space-y-2.5 mb-6 text-xs text-slate-300">
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+              <div className="space-y-2.5 mb-6 text-xs text-slate-700">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Daily Recipient Limit</span>
-                  <span className="font-semibold text-slate-200">500 / day</span>
+                  <span className="font-semibold text-slate-900">500 / day</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Authentication</span>
-                  <span className="font-semibold text-slate-200">Google OAuth 2.0 PKCE</span>
+                  <span className="font-semibold text-slate-900">Google OAuth 2.0 PKCE</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">DNS Configuration</span>
-                  <span className="font-semibold text-emerald-400">Zero DNS Required</span>
+                  <span className="font-semibold text-emerald-600">Zero DNS Required</span>
                 </div>
                 {gmailConn && (
-                  <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-500">Sender Address</span>
-                    <span className="font-mono text-indigo-300 font-medium truncate max-w-[180px]">
+                    <span className="font-mono text-indigo-600 font-semibold truncate max-w-[180px]">
                       {gmailConn.senderEmail}
                     </span>
                   </div>
@@ -623,7 +623,7 @@ function ConnectPageContent() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80">
+            <div className="pt-4 border-t border-slate-100">
               {gmailConn?.status === 'connected' ? (
                 <div className="flex flex-col gap-2">
                   <button
@@ -631,7 +631,7 @@ function ConnectPageContent() {
                       setSelectedConnection(gmailConn);
                       setActiveModal('test');
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-2 transition"
+                    className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 transition shadow-sm shadow-indigo-600/20"
                   >
                     <Send className="w-3.5 h-3.5" />
                     Send Test Email
@@ -640,7 +640,7 @@ function ConnectPageContent() {
                     <button
                       onClick={handleConnectGmail}
                       disabled={submitting}
-                      className="flex-1 py-2 px-3 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center gap-1.5 transition"
                     >
                       <RefreshCw className="w-3 h-3" />
                       Reconnect
@@ -650,7 +650,7 @@ function ConnectPageContent() {
                         setSelectedConnection(gmailConn);
                         setActiveModal('disconnect');
                       }}
-                      className="py-2 px-3 rounded-lg text-xs font-medium bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 flex items-center justify-center gap-1.5 transition"
+                      className="py-2 px-3 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center justify-center gap-1.5 transition"
                     >
                       <Trash2 className="w-3 h-3" />
                       Disconnect
@@ -661,13 +661,13 @@ function ConnectPageContent() {
                 <button
                   onClick={handleConnectGmail}
                   disabled={submitting}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-900 flex items-center justify-center gap-2 transition shadow-md shadow-white/5"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 shadow-sm flex items-center justify-center gap-2 transition"
                 >
                   {submitting ? (
                     <Loader2 className="w-4 h-4 animate-spin text-slate-900" />
                   ) : (
                     <>
-                      <Mail className="w-4 h-4 text-red-600" />
+                      <Mail className="w-4 h-4 text-rose-600" />
                       Connect with Google
                     </>
                   )}
@@ -677,61 +677,61 @@ function ConnectPageContent() {
           </div>
 
           {/* 2. Gmail App Password (SMTP) Card */}
-          <div className="relative rounded-2xl bg-slate-900/70 border border-slate-800 p-6 flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="saas-card p-6 flex flex-col justify-between transition">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                  <Key className="w-6 h-6 text-indigo-400" />
+                <div className="w-12 h-12 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                  <Key className="w-6 h-6 text-indigo-600" />
                 </div>
                 {gmailSmtpConn?.status === 'connected' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Connected
                   </span>
                 ) : gmailSmtpConn?.status === 'auth_failed' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                     <XCircle className="w-3.5 h-3.5" />
                     Auth Failed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                     Not Connected
                   </span>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-1">Gmail App Password</h3>
-              <p className="text-xs font-medium text-indigo-400 mb-3">SMTP SSL &bull; 1,500 / Day Cap</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">Gmail App Password</h3>
+              <p className="text-xs font-semibold text-indigo-600 mb-3">SMTP SSL &bull; 1,500 / Day Cap</p>
 
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 Connect your Gmail or Google Workspace inbox directly with a 16-character App Password. Strict
                 1,500 emails/day limit enforced automatically.
               </p>
 
-              <div className="space-y-2.5 mb-6 text-xs text-slate-300">
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+              <div className="space-y-2.5 mb-6 text-xs text-slate-700">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Strict Daily Limit</span>
-                  <span className="font-semibold text-indigo-300">1,500 / day</span>
+                  <span className="font-semibold text-indigo-600">1,500 / day</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Authentication</span>
-                  <span className="font-semibold text-slate-200">Google App Password</span>
+                  <span className="font-semibold text-slate-900">Google App Password</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Vault Security</span>
-                  <span className="font-semibold text-emerald-400">AES-256-GCM</span>
+                  <span className="font-semibold text-emerald-600">AES-256-GCM</span>
                 </div>
                 {gmailSmtpConn && (
                   <>
-                    <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                    <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                       <span className="text-slate-500">Sender Address</span>
-                      <span className="font-mono text-indigo-300 font-medium truncate max-w-[160px]">
+                      <span className="font-mono text-indigo-600 font-semibold truncate max-w-[160px]">
                         {gmailSmtpConn.senderEmail}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                    <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                       <span className="text-slate-500">Sent Today</span>
-                      <span className="font-mono text-slate-200 font-semibold">
+                      <span className="font-mono text-slate-900 font-semibold">
                         {gmailSmtpConn.dailySentCount ?? 0} / {gmailSmtpConn.dailyQuotaLimit ?? 1500}
                       </span>
                     </div>
@@ -740,7 +740,7 @@ function ConnectPageContent() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80">
+            <div className="pt-4 border-t border-slate-100">
               {gmailSmtpConn ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex gap-2">
@@ -749,7 +749,7 @@ function ConnectPageContent() {
                         setSelectedConnection(gmailSmtpConn);
                         setActiveModal('test');
                       }}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-1.5 transition shadow-sm shadow-indigo-600/20"
                     >
                       <Send className="w-3.5 h-3.5" />
                       Test Send
@@ -763,7 +763,7 @@ function ConnectPageContent() {
                         });
                         setActiveModal('gmail_smtp');
                       }}
-                      className="py-2 px-3 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
+                      className="py-2 px-3 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
                     >
                       Update
                     </button>
@@ -773,7 +773,7 @@ function ConnectPageContent() {
                       setSelectedConnection(gmailSmtpConn);
                       setActiveModal('disconnect');
                     }}
-                    className="w-full py-1.5 text-xs text-rose-400 hover:text-rose-300 transition text-center"
+                    className="w-full py-1.5 text-xs font-medium text-rose-600 hover:text-rose-700 transition text-center"
                   >
                     Disconnect App Password
                   </button>
@@ -781,7 +781,7 @@ function ConnectPageContent() {
               ) : (
                 <button
                   onClick={() => setActiveModal('gmail_smtp')}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-2 transition shadow-md shadow-indigo-600/20"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-2 transition shadow-sm shadow-indigo-600/20"
                 >
                   <Key className="w-4 h-4" />
                   Connect App Password
@@ -791,59 +791,59 @@ function ConnectPageContent() {
           </div>
 
           {/* 3. Brevo Card */}
-          <div className="relative rounded-2xl bg-slate-900/70 border border-slate-800 p-6 flex flex-col justify-between hover:border-slate-700 transition">
+          <div className="saas-card p-6 flex flex-col justify-between transition">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Cloud className="w-6 h-6 text-emerald-400" />
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                  <Cloud className="w-6 h-6 text-emerald-600" />
                 </div>
                 {brevoConn?.status === 'connected' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Connected
                   </span>
                 ) : brevoConn?.status === 'verification_required' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     DNS Setup Needed
                   </span>
                 ) : brevoConn?.status === 'auth_failed' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                     <XCircle className="w-3.5 h-3.5" />
                     Auth Failed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                     Not Connected
                   </span>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-1">Brevo</h3>
-              <p className="text-xs font-medium text-emerald-400 mb-3">REST API v3 &bull; Bulk Marketing Channel</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">Brevo</h3>
+              <p className="text-xs font-semibold text-emerald-600 mb-3">REST API v3 &bull; Bulk Marketing Channel</p>
 
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 High-throughput marketing email delivery platform with real-time webhooks, bounce suppression,
-                dedicated IPs and automated domain reputation tracking.
+                dedicated IPs, and automated domain reputation tracking.
               </p>
 
-              <div className="space-y-2.5 mb-6 text-xs text-slate-300">
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+              <div className="space-y-2.5 mb-6 text-xs text-slate-700">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Daily Recipient Limit</span>
-                  <span className="font-semibold text-slate-200">50,000+ / day</span>
+                  <span className="font-semibold text-slate-900">50,000+ / day</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Authentication</span>
-                  <span className="font-semibold text-slate-200">REST API Key (v3)</span>
+                  <span className="font-semibold text-slate-900">REST API Key (v3)</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">DNS Alignment</span>
-                  <span className="font-semibold text-amber-400">SPF + DKIM Recommended</span>
+                  <span className="font-semibold text-amber-600">SPF + DKIM Recommended</span>
                 </div>
                 {brevoConn && (
-                  <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-500">Sender Address</span>
-                    <span className="font-mono text-emerald-300 font-medium truncate max-w-[180px]">
+                    <span className="font-mono text-emerald-700 font-semibold truncate max-w-[180px]">
                       {brevoConn.senderEmail}
                     </span>
                   </div>
@@ -851,13 +851,13 @@ function ConnectPageContent() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80">
+            <div className="pt-4 border-t border-slate-100">
               {brevoConn ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleOpenDnsModal(brevoConn)}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center justify-center gap-1.5 transition"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
                       DNS Records
@@ -867,7 +867,7 @@ function ConnectPageContent() {
                         setSelectedConnection(brevoConn);
                         setActiveModal('test');
                       }}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-1.5 transition shadow-sm"
                     >
                       <Send className="w-3.5 h-3.5" />
                       Test Send
@@ -878,7 +878,7 @@ function ConnectPageContent() {
                       setSelectedConnection(brevoConn);
                       setActiveModal('disconnect');
                     }}
-                    className="w-full py-1.5 text-xs text-rose-400 hover:text-rose-300 transition text-center"
+                    className="w-full py-1.5 text-xs font-medium text-rose-600 hover:text-rose-700 transition text-center"
                   >
                     Disconnect Brevo
                   </button>
@@ -886,7 +886,7 @@ function ConnectPageContent() {
               ) : (
                 <button
                   onClick={() => setActiveModal('brevo')}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 transition shadow-md shadow-emerald-600/20"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-2 transition shadow-sm shadow-emerald-600/20"
                 >
                   <Key className="w-4 h-4" />
                   Configure Brevo API Key
@@ -895,60 +895,60 @@ function ConnectPageContent() {
             </div>
           </div>
 
-          {/* 3. Amazon SES Card */}
-          <div className="relative rounded-2xl bg-slate-900/70 border border-slate-800 p-6 flex flex-col justify-between hover:border-slate-700 transition">
+          {/* 4. Amazon SES Card */}
+          <div className="saas-card p-6 flex flex-col justify-between transition">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                  <Server className="w-6 h-6 text-amber-400" />
+                <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+                  <Server className="w-6 h-6 text-amber-600" />
                 </div>
                 {sesConn?.status === 'connected' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     Connected
                   </span>
                 ) : sesConn?.status === 'verification_required' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                     <AlertTriangle className="w-3.5 h-3.5" />
                     Domain Verify Needed
                   </span>
                 ) : sesConn?.status === 'auth_failed' ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                     <XCircle className="w-3.5 h-3.5" />
                     Auth Failed
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
                     Not Connected
                   </span>
                 )}
               </div>
 
-              <h3 className="text-xl font-bold text-white mb-1">Amazon SES</h3>
-              <p className="text-xs font-medium text-amber-400 mb-3">AWS SigV4 &bull; Enterprise Bulk Pipeline</p>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">Amazon SES</h3>
+              <p className="text-xs font-semibold text-amber-600 mb-3">AWS SigV4 &bull; Enterprise Bulk Pipeline</p>
 
-              <p className="text-sm text-slate-400 leading-relaxed mb-6">
+              <p className="text-sm text-slate-600 leading-relaxed mb-6">
                 Enterprise cloud email infrastructure at minimal cost ($0.10 per 1,000 emails).
                 Full ISP feedback loop integration with Easy-DKIM token automation.
               </p>
 
-              <div className="space-y-2.5 mb-6 text-xs text-slate-300">
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+              <div className="space-y-2.5 mb-6 text-xs text-slate-700">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Daily Recipient Limit</span>
-                  <span className="font-semibold text-slate-200">100,000+ / day</span>
+                  <span className="font-semibold text-slate-900">100,000+ / day</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">Authentication</span>
-                  <span className="font-semibold text-slate-200">AWS IAM Access Key (SigV4)</span>
+                  <span className="font-semibold text-slate-900">AWS IAM Access Key (SigV4)</span>
                 </div>
-                <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                   <span className="text-slate-500">DKIM Authentication</span>
-                  <span className="font-semibold text-amber-400">Easy DKIM 3x CNAME</span>
+                  <span className="font-semibold text-amber-600">Easy DKIM 3x CNAME</span>
                 </div>
                 {sesConn && (
-                  <div className="flex items-center justify-between py-1.5 border-b border-slate-800">
+                  <div className="flex items-center justify-between py-1.5 border-b border-slate-100">
                     <span className="text-slate-500">Sender Address</span>
-                    <span className="font-mono text-amber-300 font-medium truncate max-w-[180px]">
+                    <span className="font-mono text-amber-700 font-semibold truncate max-w-[180px]">
                       {sesConn.senderEmail}
                     </span>
                   </div>
@@ -956,13 +956,13 @@ function ConnectPageContent() {
               </div>
             </div>
 
-            <div className="pt-4 border-t border-slate-800/80">
+            <div className="pt-4 border-t border-slate-100">
               {sesConn ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleOpenDnsModal(sesConn)}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 flex items-center justify-center gap-1.5 transition"
                     >
                       <ShieldCheck className="w-3.5 h-3.5" />
                       DNS Records
@@ -972,7 +972,7 @@ function ConnectPageContent() {
                         setSelectedConnection(sesConn);
                         setActiveModal('test');
                       }}
-                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center gap-1.5 transition"
+                      className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center gap-1.5 transition shadow-sm"
                     >
                       <Send className="w-3.5 h-3.5" />
                       Test Send
@@ -983,7 +983,7 @@ function ConnectPageContent() {
                       setSelectedConnection(sesConn);
                       setActiveModal('disconnect');
                     }}
-                    className="w-full py-1.5 text-xs text-rose-400 hover:text-rose-300 transition text-center"
+                    className="w-full py-1.5 text-xs font-medium text-rose-600 hover:text-rose-700 transition text-center"
                   >
                     Disconnect Amazon SES
                   </button>
@@ -991,7 +991,7 @@ function ConnectPageContent() {
               ) : (
                 <button
                   onClick={() => setActiveModal('ses')}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white flex items-center justify-center gap-2 transition shadow-md shadow-amber-600/20"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white flex items-center justify-center gap-2 transition shadow-sm shadow-amber-600/20"
                 >
                   <Key className="w-4 h-4" />
                   Configure Amazon SES
@@ -1001,32 +1001,32 @@ function ConnectPageContent() {
           </div>
         </div>
 
-        {/* Deliverability Best Practices Accordion */}
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6">
-          <h3 className="text-base font-bold text-white mb-2 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-indigo-400" />
+        {/* Deliverability Best Practices */}
+        <div className="saas-card p-6">
+          <h3 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-indigo-600" />
             Deliverability Checklist for Promotional Campaigns
           </h3>
-          <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-            MailCraft automatically inserts mandatory CAN-SPAM / GDPR unsubscribe headers, but optimal inbox placement
-            requires valid DNS domain authentication.
+          <p className="text-xs text-slate-600 mb-4 leading-relaxed">
+            MailCraft automatically inserts mandatory CAN-SPAM / GDPR unsubscribe headers, while optimal inbox placement
+            relies on proper DNS domain authentication.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span className="font-semibold text-slate-200 block mb-1">1. SPF Alignment</span>
-              <p className="text-slate-400">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span className="font-semibold text-slate-900 block mb-1">1. SPF Alignment</span>
+              <p className="text-slate-600">
                 Authorizes Brevo or Amazon SES servers to send mail originating from your custom brand domain.
               </p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span className="font-semibold text-slate-200 block mb-1">2. DKIM Cryptographic Signature</span>
-              <p className="text-slate-400">
-                Cryptographically seals every email body so Gmail, Outlook and Yahoo verify it wasn&apos;t modified in transit.
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span className="font-semibold text-slate-900 block mb-1">2. DKIM Cryptographic Signature</span>
+              <p className="text-slate-600">
+                Cryptographically seals every email body so Gmail, Outlook, and Yahoo verify it wasn&apos;t modified in transit.
               </p>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800/80">
-              <span className="font-semibold text-slate-200 block mb-1">3. DMARC Policy</span>
-              <p className="text-slate-400">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+              <span className="font-semibold text-slate-900 block mb-1">3. DMARC Policy</span>
+              <p className="text-slate-600">
                 Instructs receiving mailbox providers on how to handle unauthenticated spoofing attempts.
               </p>
             </div>
@@ -1038,29 +1038,29 @@ function ConnectPageContent() {
 
       {/* Gmail App Password Modal */}
       {activeModal === 'gmail_smtp' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <Key className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <Key className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Connect Gmail App Password</h3>
-                <p className="text-xs text-slate-400">SMTP over TLS (smtp.gmail.com) &bull; Strict 1,500 emails/day limit</p>
+                <h3 className="text-lg font-bold text-slate-900">Connect Gmail App Password</h3>
+                <p className="text-xs text-slate-500">SMTP over TLS (smtp.gmail.com) &bull; Strict 1,500 emails/day limit</p>
               </div>
             </div>
 
             <form onSubmit={handleConnectGmailSmtp} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Gmail / Google Workspace Email <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Gmail / Google Workspace Email <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -1068,13 +1068,13 @@ function ConnectPageContent() {
                   placeholder="you@gmail.com"
                   value={gmailSmtpForm.gmailAddress}
                   onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, gmailAddress: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Google App Password (16 characters) <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Google App Password (16 characters) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -1082,15 +1082,15 @@ function ConnectPageContent() {
                   placeholder="abcd efgh ijkl mnop"
                   value={gmailSmtpForm.appPassword}
                   onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, appPassword: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-600 font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400 font-mono"
                 />
-                <p className="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                <p className="mt-1 text-[11px] text-slate-500 leading-relaxed">
                   Google Account &rarr; Security &rarr; Enable 2-Step Verification &rarr; App passwords. Stored encrypted with AES-256-GCM.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Sender Display Name (Optional)
                 </label>
                 <input
@@ -1098,11 +1098,11 @@ function ConnectPageContent() {
                   placeholder="Acme Marketing"
                   value={gmailSmtpForm.senderName}
                   onChange={(e) => setGmailSmtpForm({ ...gmailSmtpForm, senderName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/20 text-[11px] text-indigo-200">
+              <div className="p-3 rounded-xl bg-indigo-50 border border-indigo-200/80 text-[11px] text-indigo-800">
                 Strict Quota Guard: This sending channel is hard-capped at <strong>1,500 emails per day</strong> across campaigns and test sends.
               </div>
 
@@ -1110,14 +1110,14 @@ function ConnectPageContent() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 transition"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 transition shadow-sm"
                 >
                   {submitting ? (
                     <>
@@ -1136,29 +1136,29 @@ function ConnectPageContent() {
 
       {/* Brevo Setup Modal */}
       {activeModal === 'brevo' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <Cloud className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                <Cloud className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Connect Brevo Account</h3>
-                <p className="text-xs text-slate-400">REST API Key v3 authentication</p>
+                <h3 className="text-lg font-bold text-slate-900">Connect Brevo Account</h3>
+                <p className="text-xs text-slate-500">REST API Key v3 authentication</p>
               </div>
             </div>
 
             <form onSubmit={handleConnectBrevo} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Brevo API Key (v3) <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Brevo API Key (v3) <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -1166,7 +1166,7 @@ function ConnectPageContent() {
                   placeholder="xkeysib-..."
                   value={brevoForm.apiKey}
                   onChange={(e) => setBrevoForm({ ...brevoForm, apiKey: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none text-xs text-white placeholder-slate-600 font-mono"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400 font-mono"
                 />
                 <p className="mt-1 text-[11px] text-slate-500">
                   Generate in your Brevo Dashboard &rarr; SMTP &amp; API &rarr; API Keys.
@@ -1174,8 +1174,8 @@ function ConnectPageContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Sender Email Address <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Sender Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -1183,12 +1183,12 @@ function ConnectPageContent() {
                   placeholder="marketing@yourbrand.com"
                   value={brevoForm.senderEmail}
                   onChange={(e) => setBrevoForm({ ...brevoForm, senderEmail: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Sender Name (Optional)
                 </label>
                 <input
@@ -1196,7 +1196,7 @@ function ConnectPageContent() {
                   placeholder="Acme Promotions"
                   value={brevoForm.senderName}
                   onChange={(e) => setBrevoForm({ ...brevoForm, senderName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-emerald-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
@@ -1204,14 +1204,14 @@ function ConnectPageContent() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-2 transition"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 transition shadow-sm"
                 >
                   {submitting ? (
                     <>
@@ -1230,34 +1230,34 @@ function ConnectPageContent() {
 
       {/* Amazon SES Setup Modal */}
       {activeModal === 'ses' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <Server className="w-5 h-5 text-amber-400" />
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+                <Server className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Connect Amazon SES</h3>
-                <p className="text-xs text-slate-400">AWS IAM Credentials with ses:SendEmail permissions</p>
+                <h3 className="text-lg font-bold text-slate-900">Connect Amazon SES</h3>
+                <p className="text-xs text-slate-500">AWS IAM Credentials with ses:SendEmail permissions</p>
               </div>
             </div>
 
             <form onSubmit={handleConnectSes} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  AWS Region <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  AWS Region <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={sesForm.region}
                   onChange={(e) => setSesForm({ ...sesForm, region: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-amber-500 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none"
                 >
                   {AWS_REGIONS.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -1268,8 +1268,8 @@ function ConnectPageContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  AWS Access Key ID <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  AWS Access Key ID <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -1277,13 +1277,13 @@ function ConnectPageContent() {
                   placeholder="AKIA..."
                   value={sesForm.accessKeyId}
                   onChange={(e) => setSesForm({ ...sesForm, accessKeyId: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none text-xs text-white placeholder-slate-600 font-mono"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  AWS Secret Access Key <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  AWS Secret Access Key <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="password"
@@ -1291,13 +1291,13 @@ function ConnectPageContent() {
                   placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
                   value={sesForm.secretAccessKey}
                   onChange={(e) => setSesForm({ ...sesForm, secretAccessKey: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none text-xs text-white placeholder-slate-600 font-mono"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Sender Email Address <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Sender Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -1305,12 +1305,12 @@ function ConnectPageContent() {
                   placeholder="newsletter@brand.com"
                   value={sesForm.senderEmail}
                   onChange={(e) => setSesForm({ ...sesForm, senderEmail: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Sender Name (Optional)
                 </label>
                 <input
@@ -1318,7 +1318,7 @@ function ConnectPageContent() {
                   placeholder="Brand Updates"
                   value={sesForm.senderName}
                   onChange={(e) => setSesForm({ ...sesForm, senderName: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-amber-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
@@ -1326,14 +1326,14 @@ function ConnectPageContent() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white flex items-center gap-2 transition"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-2 transition shadow-sm"
                 >
                   {submitting ? (
                     <>
@@ -1352,22 +1352,22 @@ function ConnectPageContent() {
 
       {/* DNS Records & Verification Modal */}
       {activeModal === 'dns' && selectedConnection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">DNS Records &amp; Sender Verification</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="text-lg font-bold text-slate-900">DNS Records &amp; Sender Verification</h3>
+                <p className="text-xs text-slate-500">
                   {selectedConnection.provider.toUpperCase()} &bull; {selectedConnection.senderEmail}
                 </p>
               </div>
@@ -1375,8 +1375,8 @@ function ConnectPageContent() {
 
             {verifyingDns ? (
               <div className="py-12 flex flex-col items-center justify-center text-center">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-400 mb-3" />
-                <p className="text-sm font-semibold text-slate-200">Querying DNS Records...</p>
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-3" />
+                <p className="text-sm font-semibold text-slate-800">Querying DNS Records...</p>
                 <p className="text-xs text-slate-500">Checking SPF, DKIM and DMARC status with provider</p>
               </div>
             ) : dnsDetails ? (
@@ -1385,15 +1385,15 @@ function ConnectPageContent() {
                 <div
                   className={`p-3.5 rounded-xl border flex items-center justify-between ${
                     dnsDetails.verified
-                      ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-200'
-                      : 'bg-amber-950/40 border-amber-500/30 text-amber-200'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : 'bg-amber-50 border-amber-200 text-amber-900'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
                     {dnsDetails.verified ? (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                     ) : (
-                      <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+                      <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0" />
                     )}
                     <div>
                       <p className="text-xs font-bold">
@@ -1409,7 +1409,7 @@ function ConnectPageContent() {
                   <button
                     onClick={handleRefreshDns}
                     disabled={verifyingDns}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center gap-1.5 transition shrink-0 ml-3"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center gap-1.5 transition shrink-0 ml-3"
                   >
                     <RefreshCw className="w-3 h-3" />
                     Re-check
@@ -1419,24 +1419,24 @@ function ConnectPageContent() {
                 {/* DNS Records Table */}
                 {dnsDetails.dnsRecords && dnsDetails.dnsRecords.length > 0 ? (
                   <div>
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
+                    <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
                       Required DNS Records
                     </h4>
                     <div className="space-y-3">
                       {dnsDetails.dnsRecords.map((record, idx) => (
                         <div
                           key={idx}
-                          className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2"
+                          className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded bg-slate-800 text-indigo-400 font-mono font-bold text-[10px]">
+                            <span className="px-2 py-0.5 rounded bg-white border border-slate-200 text-indigo-700 font-mono font-bold text-[10px]">
                               {record.type}
                             </span>
                             <span
                               className={`text-[11px] font-semibold ${
                                 record.status === 'verified'
-                                  ? 'text-emerald-400'
-                                  : 'text-amber-400'
+                                  ? 'text-emerald-600'
+                                  : 'text-amber-600'
                               }`}
                             >
                               {record.status === 'verified' ? 'Verified' : 'Pending Verification'}
@@ -1445,15 +1445,15 @@ function ConnectPageContent() {
 
                           <div>
                             <span className="text-[11px] text-slate-500 block mb-0.5">Name / Host:</span>
-                            <div className="flex items-center justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg font-mono text-[11px] text-slate-300">
+                            <div className="flex items-center justify-between bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg font-mono text-[11px] text-slate-800">
                               <span className="truncate mr-2">{record.name}</span>
                               <button
                                 onClick={() => copyToClipboard(record.name, `name-${idx}`)}
-                                className="text-slate-400 hover:text-white"
+                                className="text-slate-400 hover:text-slate-800"
                                 title="Copy Name"
                               >
                                 {copiedKey === `name-${idx}` ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
                                   <Copy className="w-3.5 h-3.5" />
                                 )}
@@ -1463,15 +1463,15 @@ function ConnectPageContent() {
 
                           <div>
                             <span className="text-[11px] text-slate-500 block mb-0.5">Value / Target:</span>
-                            <div className="flex items-center justify-between bg-slate-900 px-2.5 py-1.5 rounded-lg font-mono text-[11px] text-slate-300">
+                            <div className="flex items-center justify-between bg-white border border-slate-200 px-2.5 py-1.5 rounded-lg font-mono text-[11px] text-slate-800">
                               <span className="truncate mr-2">{record.value}</span>
                               <button
                                 onClick={() => copyToClipboard(record.value, `val-${idx}`)}
-                                className="text-slate-400 hover:text-white"
+                                className="text-slate-400 hover:text-slate-800"
                                 title="Copy Value"
                               >
                                 {copiedKey === `val-${idx}` ? (
-                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                                 ) : (
                                   <Copy className="w-3.5 h-3.5" />
                                 )}
@@ -1487,18 +1487,18 @@ function ConnectPageContent() {
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     No custom DNS records needed for this provider identity.
                   </p>
                 )}
 
                 {/* Instructions */}
                 {dnsDetails.instructions && dnsDetails.instructions.length > 0 && (
-                  <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/80">
-                    <span className="text-xs font-semibold text-slate-300 block mb-1.5">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs font-semibold text-slate-800 block mb-1.5">
                       Propagation Notice
                     </span>
-                    <ul className="list-disc pl-4 space-y-1 text-slate-400 text-xs">
+                    <ul className="list-disc pl-4 space-y-1 text-slate-600 text-xs">
                       {dnsDetails.instructions.map((inst, i) => (
                         <li key={i}>{inst}</li>
                       ))}
@@ -1507,7 +1507,7 @@ function ConnectPageContent() {
                 )}
               </div>
             ) : (
-              <div className="text-center py-8 text-xs text-slate-400">
+              <div className="text-center py-8 text-xs text-slate-500">
                 Could not retrieve DNS guidance. Please ensure your provider credentials are valid.
               </div>
             )}
@@ -1515,7 +1515,7 @@ function ConnectPageContent() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white"
+                className="px-5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700"
               >
                 Close
               </button>
@@ -1526,25 +1526,25 @@ function ConnectPageContent() {
 
       {/* Test Email Modal */}
       {activeModal === 'test' && selectedConnection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => {
                 setActiveModal(null);
                 setTestResult(null);
               }}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <Send className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <Send className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Send Test Email</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="text-lg font-bold text-slate-900">Send Test Email</h3>
+                <p className="text-xs text-slate-500">
                   Via {selectedConnection.provider.toUpperCase()} ({selectedConnection.senderEmail})
                 </p>
               </div>
@@ -1554,20 +1554,20 @@ function ConnectPageContent() {
               <div
                 className={`mb-4 p-3.5 rounded-xl border text-xs ${
                   testResult.success
-                    ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-200'
-                    : 'bg-rose-950/60 border-rose-500/30 text-rose-200'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    : 'bg-rose-50 border-rose-200 text-rose-900'
                 }`}
               >
                 <div className="flex items-center gap-2 font-semibold mb-1">
                   {testResult.success ? (
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   ) : (
-                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
                   )}
                   <span>{testResult.message}</span>
                 </div>
                 {testResult.messageId && (
-                  <p className="font-mono text-[10px] text-emerald-300 opacity-90 truncate">
+                  <p className="font-mono text-[10px] text-emerald-700 truncate">
                     ID: {testResult.messageId}
                   </p>
                 )}
@@ -1576,8 +1576,8 @@ function ConnectPageContent() {
 
             <form onSubmit={handleSendTestEmail} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                  Recipient Email <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Recipient Email <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -1585,12 +1585,12 @@ function ConnectPageContent() {
                   placeholder="your-personal@email.com"
                   value={testForm.recipientEmail}
                   onChange={(e) => setTestForm({ ...testForm, recipientEmail: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Subject Line (Optional)
                 </label>
                 <input
@@ -1598,7 +1598,7 @@ function ConnectPageContent() {
                   placeholder="MailCraft Test Verification Message"
                   value={testForm.subject}
                   onChange={(e) => setTestForm({ ...testForm, subject: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-600"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
                 />
               </div>
 
@@ -1609,14 +1609,14 @@ function ConnectPageContent() {
                     setActiveModal(null);
                     setTestResult(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={testingSend}
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-2 transition"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2 transition shadow-sm"
                 >
                   {testingSend ? (
                     <>
@@ -1638,16 +1638,16 @@ function ConnectPageContent() {
 
       {/* Disconnect Confirmation Modal */}
       {activeModal === 'disconnect' && selectedConnection && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
-            <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4">
-              <Trash2 className="w-5 h-5 text-rose-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
+            <div className="w-10 h-10 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mb-4">
+              <Trash2 className="w-5 h-5 text-rose-600" />
             </div>
 
-            <h3 className="text-base font-bold text-white mb-1">
+            <h3 className="text-base font-bold text-slate-900 mb-1">
               Disconnect {selectedConnection.provider.toUpperCase()}?
             </h3>
-            <p className="text-xs text-slate-400 mb-6 leading-relaxed">
+            <p className="text-xs text-slate-600 mb-6 leading-relaxed">
               This will securely purge encrypted credentials and access tokens from your workspace vault.
               Scheduled campaigns relying on this provider will not be dispatched until reconnected.
             </p>
@@ -1659,7 +1659,7 @@ function ConnectPageContent() {
                   setActiveModal(null);
                   setSelectedConnection(null);
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
               >
                 Cancel
               </button>
@@ -1667,7 +1667,7 @@ function ConnectPageContent() {
                 type="button"
                 disabled={submitting}
                 onClick={handleDisconnect}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-1.5 transition"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 transition"
               >
                 {submitting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1687,9 +1687,9 @@ export default function ConnectPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-2" />
-          <p className="text-xs">Loading Sending Providers...</p>
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-500">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-2" />
+          <p className="text-xs font-medium">Loading Sending Providers...</p>
         </div>
       }
     >

@@ -104,7 +104,7 @@ export interface DashboardHeaderProps {
 
 export function DashboardHeader({
   activeNav,
-  variant = 'dark',
+  variant = 'light',
   rightActions,
   userBadge,
   showLogout = false,

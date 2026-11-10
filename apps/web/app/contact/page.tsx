@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -44,8 +45,8 @@ export default function ContactPage() {
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <PublicNavbar activePage="contact" />
 
-      <main className="max-w-md mx-auto px-4 py-16 flex-1 w-full flex flex-col justify-center">
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-xl shadow-slate-100">
+      <main className="max-w-lg mx-auto px-4 py-16 flex-1 w-full flex flex-col justify-center">
+        <div className="saas-card p-8">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-slate-900">Contact & Support</h1>
             <p className="text-xs text-slate-500 mt-1">Have questions or feedback? We’re here to help.</p>
@@ -123,6 +124,7 @@ export default function ContactPage() {
           )}
         </div>
       </main>
+      <PublicFooter />
     </div>
   );
 }

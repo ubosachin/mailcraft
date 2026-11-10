@@ -1,5 +1,6 @@
 import React from 'react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
 
 export default function TermsPage() {
   return (
@@ -39,6 +40,7 @@ export default function TermsPage() {
           </p>
         </section>
       </main>
+      <PublicFooter />
     </div>
   );
 }

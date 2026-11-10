@@ -190,38 +190,38 @@ function SuppressionContent() {
     switch (reason?.toLowerCase()) {
       case 'unsubscribe':
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-amber-950/70 text-amber-300 border border-amber-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
             Unsubscribed
           </span>
         );
       case 'hard_bounce':
       case 'bounce':
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-rose-950/70 text-rose-300 border border-rose-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
             Hard Bounce
           </span>
         );
       case 'complaint':
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-purple-950/70 text-purple-300 border border-purple-800 font-semibold">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
             Spam Complaint
           </span>
         );
       case 'manual':
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-sky-950/70 text-sky-300 border border-sky-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200">
             Manual
           </span>
         );
       case 'administrative':
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-indigo-950/70 text-indigo-300 border border-indigo-800">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
             Administrative
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
             {reason}
           </span>
         );
@@ -229,7 +229,7 @@ function SuppressionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       {/* Top Header */}
       <DashboardHeader
         activeNav="suppression"
@@ -238,7 +238,7 @@ function SuppressionContent() {
         rightActions={
           <button
             onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs shadow-lg shadow-indigo-600/20 transition whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm shadow-indigo-600/20 transition whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Add Suppression</span>
@@ -252,21 +252,21 @@ function SuppressionContent() {
         {/* Toast Notification */}
         {notification && (
           <div
-            className={`p-4 rounded-xl flex items-center justify-between shadow-lg border transition ${
+            className={`p-4 rounded-xl flex items-center justify-between shadow-sm border transition ${
               notification.type === 'success'
-                ? 'bg-emerald-950/80 border-emerald-800 text-emerald-200'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : notification.type === 'error'
-                ? 'bg-rose-950/80 border-rose-800 text-rose-200'
-                : 'bg-sky-950/80 border-sky-800 text-sky-200'
+                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                : 'bg-sky-50 border-sky-200 text-sky-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-400" />}
-              {notification.type === 'error' && <AlertTriangle className="w-5 h-5 text-rose-400" />}
-              {notification.type === 'info' && <Info className="w-5 h-5 text-sky-400" />}
+              {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-600" />}
+              {notification.type === 'error' && <AlertTriangle className="w-5 h-5 text-rose-600" />}
+              {notification.type === 'info' && <Info className="w-5 h-5 text-sky-600" />}
               <span className="text-sm font-medium">{notification.message}</span>
             </div>
-            <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-white">
+            <button onClick={() => setNotification(null)} className="text-slate-400 hover:text-slate-700 font-bold px-1">
               ×
             </button>
           </div>
@@ -275,11 +275,15 @@ function SuppressionContent() {
         {/* Page Title */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-              Global Suppression &amp; Compliance Guardian
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-indigo-50 border border-indigo-200/80 text-indigo-700 text-xs font-semibold mb-2">
+              <ShieldAlert className="w-3.5 h-3.5" />
+              Compliance Guardian
+            </span>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">
+              Global Suppression List
             </h1>
-            <p className="text-slate-400 mt-1 text-sm">
-              Permanent suppression lists protect sender reputation by automatically barring unsubscribes, hard bounces, and spam complaints.
+            <p className="text-slate-600 mt-1 text-sm">
+              Permanent suppression rules protect sender reputation by automatically blocking unsubscribes, hard bounces, and spam complaints.
             </p>
           </div>
 
@@ -287,9 +291,9 @@ function SuppressionContent() {
             <button
               onClick={() => fetchSuppressions()}
               disabled={loading}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold shadow-sm transition"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-indigo-600' : 'text-slate-500'}`} />
               Refresh
             </button>
           </div>
@@ -297,42 +301,42 @@ function SuppressionContent() {
 
         {/* Metric Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
-            <span className="text-xs text-slate-400 font-medium">Total Suppressions</span>
-            <div className="text-2xl font-bold text-white mt-1">{stats.total}</div>
+          <div className="saas-card p-4">
+            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Total Suppressions</span>
+            <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.total}</div>
             <span className="text-[11px] text-slate-500">Across all categories</span>
           </div>
 
-          <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
-            <span className="text-xs text-amber-400 font-medium">Unsubscribed</span>
-            <div className="text-2xl font-bold text-amber-300 mt-1">{stats.unsubscribe}</div>
+          <div className="saas-card p-4">
+            <span className="text-xs text-amber-700 font-semibold uppercase tracking-wider">Unsubscribed</span>
+            <div className="text-2xl font-extrabold text-amber-600 mt-1">{stats.unsubscribe}</div>
             <span className="text-[11px] text-slate-500">Voluntary opt-outs</span>
           </div>
 
-          <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
-            <span className="text-xs text-rose-400 font-medium">Hard Bounces</span>
-            <div className="text-2xl font-bold text-rose-300 mt-1">{stats.hard_bounce}</div>
+          <div className="saas-card p-4">
+            <span className="text-xs text-rose-700 font-semibold uppercase tracking-wider">Hard Bounces</span>
+            <div className="text-2xl font-extrabold text-rose-600 mt-1">{stats.hard_bounce}</div>
             <span className="text-[11px] text-slate-500">Invalid mailboxes</span>
           </div>
 
-          <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
-            <span className="text-xs text-purple-400 font-medium">Spam Complaints</span>
-            <div className="text-2xl font-bold text-purple-300 mt-1">{stats.complaint}</div>
-            <span className="text-[11px] text-slate-500">FBL &amp; spam button hits</span>
+          <div className="saas-card p-4">
+            <span className="text-xs text-purple-700 font-semibold uppercase tracking-wider">Spam Complaints</span>
+            <div className="text-2xl font-extrabold text-purple-600 mt-1">{stats.complaint}</div>
+            <span className="text-[11px] text-slate-500">Feedback loop reports</span>
           </div>
 
-          <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 shadow">
-            <span className="text-xs text-sky-400 font-medium">Manual / Admin</span>
-            <div className="text-2xl font-bold text-sky-300 mt-1">{stats.manual + stats.administrative}</div>
+          <div className="saas-card p-4">
+            <span className="text-xs text-sky-700 font-semibold uppercase tracking-wider">Manual / Admin</span>
+            <div className="text-2xl font-extrabold text-sky-600 mt-1">{stats.manual + stats.administrative}</div>
             <span className="text-[11px] text-slate-500">Operator designated</span>
           </div>
         </div>
 
         {/* Filter Bar */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="saas-card p-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-1 items-center gap-3 w-full">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+            <div className="relative flex-1 max-w-sm">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search suppressed address..."
@@ -341,7 +345,7 @@ function SuppressionContent() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
               />
             </div>
 
@@ -351,7 +355,7 @@ function SuppressionContent() {
                 setReasonFilter(e.target.value);
                 setPage(1);
               }}
-              className="bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-300 px-3 py-2 focus:outline-none focus:border-indigo-500"
+              className="bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 font-medium px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
             >
               <option value="all">All Reasons</option>
               <option value="unsubscribe">Unsubscribed</option>
@@ -362,31 +366,33 @@ function SuppressionContent() {
             </select>
           </div>
 
-          <div className="text-xs text-slate-400">
-            Showing <span className="font-semibold text-white">{entries.length}</span> of{' '}
-            <span className="font-semibold text-white">{totalCount}</span> entries
+          <div className="text-xs text-slate-500">
+            Showing <span className="font-semibold text-slate-900">{entries.length}</span> of{' '}
+            <span className="font-semibold text-slate-900">{totalCount}</span> entries
           </div>
         </div>
 
         {/* Suppression Table */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+        <div className="saas-card overflow-hidden">
           {loading && entries.length === 0 ? (
-            <div className="p-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-              <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-              <p className="text-sm">Querying cryptographic suppression vault...</p>
+            <div className="p-16 flex flex-col items-center justify-center gap-3 text-slate-500">
+              <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+              <p className="text-sm font-medium">Querying cryptographic suppression vault...</p>
             </div>
           ) : entries.length === 0 ? (
             <div className="p-16 text-center space-y-3">
-              <ShieldAlert className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-base font-semibold text-white">No suppressions recorded</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                No addresses match your filter. Unsubscribes and bounces will automatically be listed here.
+              <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center mx-auto text-slate-400">
+                <ShieldAlert className="w-7 h-7" />
+              </div>
+              <h3 className="text-base font-bold text-slate-900">No suppressions recorded</h3>
+              <p className="text-xs text-slate-600 max-w-sm mx-auto">
+                No addresses match your filter. Unsubscribes and bounces are automatically listed here.
               </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-slate-300">
-                <thead className="bg-slate-950/80 border-b border-slate-800 text-xs uppercase font-semibold text-slate-400">
+              <table className="w-full text-left text-sm text-slate-600">
+                <thead className="bg-slate-50/90 border-b border-slate-200 text-xs uppercase font-semibold text-slate-500">
                   <tr>
                     <th className="px-6 py-4">Masked Recipient</th>
                     <th className="px-4 py-4">Suppression Reason</th>
@@ -396,23 +402,23 @@ function SuppressionContent() {
                     <th className="px-6 py-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {entries.map((entry) => (
-                    <tr key={entry.id} className="hover:bg-slate-800/30 transition text-xs">
-                      <td className="px-6 py-4 font-mono font-medium text-white flex items-center gap-2">
-                        <Lock className="w-3.5 h-3.5 text-slate-500" />
+                    <tr key={entry.id} className="hover:bg-slate-50/80 transition text-xs">
+                      <td className="px-6 py-4 font-mono font-semibold text-slate-900 flex items-center gap-2">
+                        <Lock className="w-3.5 h-3.5 text-slate-400" />
                         {entry.emailMasked}
                       </td>
                       <td className="px-4 py-4">{getReasonBadge(entry.reason)}</td>
-                      <td className="px-4 py-4 uppercase font-semibold text-[10px] text-slate-400">
+                      <td className="px-4 py-4 uppercase font-semibold text-[10px] text-slate-500">
                         {entry.scope}
                       </td>
-                      <td className="px-4 py-4 text-slate-400">
+                      <td className="px-4 py-4 text-slate-600">
                         <div className="line-clamp-1">
                           {entry.reasonDetail || entry.notes || entry.source}
                         </div>
                       </td>
-                      <td className="px-4 py-4 text-slate-400">
+                      <td className="px-4 py-4 text-slate-500">
                         {new Date(entry.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 text-right">
@@ -422,7 +428,7 @@ function SuppressionContent() {
                             setAuditReason('');
                             setForceRemove(false);
                           }}
-                          className="px-2.5 py-1 rounded bg-slate-800 hover:bg-rose-950/80 text-slate-400 hover:text-rose-300 text-xs transition"
+                          className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-rose-50 hover:border-rose-200 text-slate-600 hover:text-rose-700 font-medium text-xs transition"
                           title="Lift suppression with audit reason"
                         >
                           Lift Suppression
@@ -437,15 +443,16 @@ function SuppressionContent() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-6 py-4 bg-slate-950/60 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
               <div>
-                Page {page} of {totalPages}
+                Page <span className="font-semibold text-slate-900">{page}</span> of{' '}
+                <span className="font-semibold text-slate-900">{totalPages}</span>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 disabled:opacity-40 hover:bg-slate-800 transition flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-medium disabled:opacity-40 hover:bg-slate-50 transition flex items-center gap-1"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Previous
@@ -453,7 +460,7 @@ function SuppressionContent() {
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 disabled:opacity-40 hover:bg-slate-800 transition flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 font-medium disabled:opacity-40 hover:bg-slate-50 transition flex items-center gap-1"
                 >
                   Next
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -466,16 +473,16 @@ function SuppressionContent() {
 
       {/* ADD SUPPRESSION MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-indigo-400" />
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <ShieldAlert className="w-4 h-4 text-indigo-600" />
                 Add Address to Suppression List
               </h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-slate-500 hover:text-white"
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg leading-none"
               >
                 ×
               </button>
@@ -483,27 +490,27 @@ function SuppressionContent() {
 
             <form onSubmit={handleAddSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold uppercase text-slate-400 mb-1">
-                  Email Address <span className="text-rose-400">*</span>
+                <label className="block font-semibold uppercase text-slate-500 mb-1.5">
+                  Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
                   placeholder="recipient@example.com"
                   value={addForm.email}
                   onChange={(e) => setAddForm({ ...addForm, email: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-semibold uppercase text-slate-400 mb-1">
+                <label className="block font-semibold uppercase text-slate-500 mb-1.5">
                   Suppression Category
                 </label>
                 <select
                   value={addForm.reason}
                   onChange={(e) => setAddForm({ ...addForm, reason: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 >
                   <option value="manual">Manual Suppression (Precautionary)</option>
                   <option value="unsubscribe">Unsubscribed (Customer Request)</option>
@@ -514,13 +521,13 @@ function SuppressionContent() {
               </div>
 
               <div>
-                <label className="block font-semibold uppercase text-slate-400 mb-1">
+                <label className="block font-semibold uppercase text-slate-500 mb-1.5">
                   Scope
                 </label>
                 <select
                   value={addForm.scope}
                   onChange={(e) => setAddForm({ ...addForm, scope: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 >
                   <option value="session">Account Workspace (Applies to your workspace)</option>
                   <option value="global">Global (Barred platform-wide)</option>
@@ -528,7 +535,7 @@ function SuppressionContent() {
               </div>
 
               <div>
-                <label className="block font-semibold uppercase text-slate-400 mb-1">
+                <label className="block font-semibold uppercase text-slate-500 mb-1.5">
                   Internal Notes &amp; Justification
                 </label>
                 <textarea
@@ -536,7 +543,7 @@ function SuppressionContent() {
                   placeholder="e.g. User requested removal via customer support ticket #1024"
                   value={addForm.notes}
                   onChange={(e) => setAddForm({ ...addForm, notes: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 />
               </div>
 
@@ -544,14 +551,14 @@ function SuppressionContent() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={addLoading}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5 shadow-sm shadow-indigo-600/20 transition"
                 >
                   {addLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldAlert className="w-3.5 h-3.5" />}
                   Add Suppression
@@ -564,27 +571,27 @@ function SuppressionContent() {
 
       {/* AUDIT REMOVE SUPPRESSION MODAL */}
       {removingItem && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
+              <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
                 Administrative Suppression Removal
               </h3>
               <button
                 onClick={() => setRemovingItem(null)}
-                className="text-slate-500 hover:text-white"
+                className="text-slate-400 hover:text-slate-700 font-bold text-lg leading-none"
               >
                 ×
               </button>
             </div>
 
-            <p className="text-xs text-slate-400">
-              Removing a suppression allows this email address ({removingItem.emailMasked}) to receive future promotional broadcasts.
+            <p className="text-xs text-slate-600">
+              Removing a suppression allows this email address (<span className="font-mono font-semibold text-slate-900">{removingItem.emailMasked}</span>) to receive future broadcasts.
             </p>
 
             {['complaint', 'hard_bounce'].includes(removingItem.reason) && (
-              <div className="p-3 rounded-lg bg-rose-950/50 border border-rose-900/60 text-xs text-rose-300 space-y-1">
+              <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 space-y-1">
                 <span className="font-bold">Strict Compliance Restriction:</span>
                 <p>
                   This address is flagged as {removingItem.reason.toUpperCase()}. Re-sending to complaint or hard-bounce addresses directly damages your sending domain reputation.
@@ -594,26 +601,26 @@ function SuppressionContent() {
 
             <form onSubmit={handleRemoveSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold uppercase text-slate-400 mb-1">
-                  Documented Audit Justification <span className="text-rose-400">*</span>
+                <label className="block font-semibold uppercase text-slate-500 mb-1.5">
+                  Documented Audit Justification <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={3}
                   placeholder="e.g., Customer submitted signed re-opt-in confirmation and confirmed mailbox is active"
                   value={auditReason}
                   onChange={(e) => setAuditReason(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                   required
                 />
               </div>
 
               {['complaint', 'hard_bounce'].includes(removingItem.reason) && (
-                <label className="flex items-center gap-2 cursor-pointer text-slate-300">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-700 font-medium">
                   <input
                     type="checkbox"
                     checked={forceRemove}
                     onChange={(e) => setForceRemove(e.target.checked)}
-                    className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0"
+                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span>Confirm override of compliance lock (Force Remove)</span>
                 </label>
@@ -623,14 +630,14 @@ function SuppressionContent() {
                 <button
                   type="button"
                   onClick={() => setRemovingItem(null)}
-                  className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={removeLoading || (['complaint', 'hard_bounce'].includes(removingItem.reason) && !forceRemove)}
-                  className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-500 disabled:opacity-50 text-white font-medium flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-semibold flex items-center gap-1.5 shadow-sm transition"
                 >
                   {removeLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
                   Confirm Removal
@@ -648,8 +655,8 @@ export default function SuppressionPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
         </div>
       }
     >

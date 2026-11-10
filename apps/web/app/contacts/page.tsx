@@ -555,7 +555,7 @@ function ContactsPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       {/* Top Header */}
       <DashboardHeader
         activeNav="contacts"
@@ -563,9 +563,9 @@ function ContactsPageContent() {
         rightActions={
           <Link
             href="/contacts/segments"
-            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm transition whitespace-nowrap"
           >
-            <Filter className="w-3.5 h-3.5 text-indigo-400" />
+            <Filter className="w-3.5 h-3.5 text-indigo-600" />
             <span className="hidden sm:inline">Segments ({segments.length})</span>
             <span className="sm:hidden">({segments.length})</span>
           </Link>
@@ -577,27 +577,27 @@ function ContactsPageContent() {
         {/* Toast Notification */}
         {notification && (
           <div
-            className={`mb-6 p-4 rounded-xl flex items-start justify-between border ${
+            className={`mb-6 p-4 rounded-xl flex items-start justify-between border shadow-sm ${
               notification.type === 'success'
-                ? 'bg-emerald-950/60 border-emerald-500/30 text-emerald-200'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : notification.type === 'error'
-                ? 'bg-rose-950/60 border-rose-500/30 text-rose-200'
-                : 'bg-indigo-950/60 border-indigo-500/30 text-indigo-200'
+                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                : 'bg-indigo-50 border-indigo-200 text-indigo-900'
             }`}
           >
             <div className="flex items-center gap-3">
               {notification.type === 'success' ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
               ) : notification.type === 'error' ? (
-                <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               ) : (
-                <AlertCircle className="w-5 h-5 text-indigo-400 shrink-0" />
+                <AlertCircle className="w-5 h-5 text-indigo-600 shrink-0" />
               )}
               <span className="text-sm font-medium">{notification.message}</span>
             </div>
             <button
               onClick={() => setNotification(null)}
-              className="text-slate-400 hover:text-white ml-4"
+              className="text-slate-400 hover:text-slate-700 ml-4"
             >
               <X className="w-4 h-4" />
             </button>
@@ -607,14 +607,14 @@ function ContactsPageContent() {
         {/* Page Hero & Actions */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 mb-2">
               <ShieldCheck className="w-3.5 h-3.5" />
               Permission-Based Contact Vault &bull; Auto Suppression Filtering
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Contacts &amp; Audience
             </h1>
-            <p className="mt-1 text-sm text-slate-400 max-w-2xl">
+            <p className="mt-1 text-sm text-slate-600 max-w-2xl">
               Manage your marketing audience, import recipients, verify consent evidence, and organize targeted segments.
             </p>
           </div>
@@ -622,16 +622,16 @@ function ContactsPageContent() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setActiveModal('add')}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition shadow-sm"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5 transition shadow-sm shadow-indigo-600/20"
             >
               <UserPlus className="w-3.5 h-3.5" />
               Add Contact
             </button>
             <button
               onClick={() => setActiveModal('paste')}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 flex items-center gap-1.5 shadow-sm transition"
             >
-              <FileText className="w-3.5 h-3.5 text-indigo-400" />
+              <FileText className="w-3.5 h-3.5 text-indigo-600" />
               Bulk Paste
             </button>
             <button
@@ -639,38 +639,38 @@ function ContactsPageContent() {
                 setUploadStep('select');
                 setActiveModal('upload');
               }}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5 transition"
+              className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 transition"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               Import CSV / XLSX
             </button>
             <button
               onClick={() => setActiveModal('tag_manager')}
-              className="px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition"
+              className="px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 flex items-center gap-1.5 shadow-sm transition"
               title="Manage Audience Tags"
             >
-              <TagIcon className="w-3.5 h-3.5 text-amber-400" />
+              <TagIcon className="w-3.5 h-3.5 text-amber-500" />
               Tags ({tags.length})
             </button>
 
             {/* Export Dropdown */}
             <div className="relative group">
-              <button className="px-3 py-2 rounded-xl text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center gap-1.5 transition">
+              <button className="px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 flex items-center gap-1.5 shadow-sm transition">
                 <Download className="w-3.5 h-3.5" />
                 Export
               </button>
-              <div className="absolute right-0 top-full mt-1.5 w-36 bg-slate-900 border border-slate-800 rounded-xl shadow-xl py-1 hidden group-hover:block z-20">
+              <div className="absolute right-0 top-full mt-1.5 w-40 bg-white border border-slate-200 rounded-xl shadow-lg py-1 hidden group-hover:block z-20">
                 <a
                   href="/api/v1/contacts/export?format=csv"
                   download
-                  className="block px-3.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 hover:text-white"
+                  className="block px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 >
                   Export as CSV
                 </a>
                 <a
                   href="/api/v1/contacts/export?format=xlsx"
                   download
-                  className="block px-3.5 py-1.5 text-xs text-slate-300 hover:bg-slate-800 hover:text-white"
+                  className="block px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 >
                   Export as Excel (.xlsx)
                 </a>
@@ -679,92 +679,92 @@ function ContactsPageContent() {
           </div>
         </div>
 
-        {/* Live MongoDB Statistics Cards */}
+        {/* Live Statistics Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80">
-            <span className="text-xs text-slate-400 font-medium block mb-1">Total Contacts</span>
+          <div className="saas-card p-4">
+            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">Total Contacts</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white tracking-tight">
+              <span className="text-2xl font-extrabold text-slate-900 tracking-tight">
                 {stats.totalContacts.toLocaleString()}
               </span>
-              <span className="text-[11px] text-slate-500 font-mono">in workspace</span>
+              <span className="text-[11px] text-slate-400 font-mono">in workspace</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-emerald-500/20 bg-emerald-950/10">
+          <div className="saas-card p-4 border-emerald-200/80">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-emerald-400 font-medium">Eligible Opt-In</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span className="text-xs text-emerald-700 font-semibold uppercase tracking-wider">Eligible Opt-In</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-emerald-300 tracking-tight">
+              <span className="text-2xl font-extrabold text-emerald-600 tracking-tight">
                 {stats.eligibleContacts.toLocaleString()}
               </span>
-              <span className="text-[11px] text-emerald-500">campaign ready</span>
+              <span className="text-[11px] text-emerald-600/80 font-medium">campaign ready</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-amber-500/20 bg-amber-950/10">
+          <div className="saas-card p-4 border-amber-200/80">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-amber-400 font-medium">Pending Consent</span>
-              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span className="text-xs text-amber-700 font-semibold uppercase tracking-wider">Pending Consent</span>
+              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-amber-300 tracking-tight">
+              <span className="text-2xl font-extrabold text-amber-600 tracking-tight">
                 {stats.pendingConsent.toLocaleString()}
               </span>
-              <span className="text-[11px] text-amber-500">unknown consent</span>
+              <span className="text-[11px] text-amber-600/80 font-medium">unknown consent</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-rose-500/20 bg-rose-950/10">
+          <div className="saas-card p-4 border-rose-200/80">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-rose-400 font-medium">Unsubscribed</span>
-              <span className="w-2 h-2 rounded-full bg-rose-400"></span>
+              <span className="text-xs text-rose-700 font-semibold uppercase tracking-wider">Unsubscribed</span>
+              <span className="w-2 h-2 rounded-full bg-rose-500"></span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-rose-300 tracking-tight">
+              <span className="text-2xl font-extrabold text-rose-600 tracking-tight">
                 {stats.unsubscribed.toLocaleString()}
               </span>
-              <span className="text-[11px] text-rose-500">opted out</span>
+              <span className="text-[11px] text-rose-600/80 font-medium">opted out</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/70 border border-slate-800/80">
-            <span className="text-xs text-slate-400 font-medium block mb-1">Suppressed</span>
+          <div className="saas-card p-4">
+            <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider block mb-1">Suppressed</span>
             <div className="flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-300 tracking-tight">
+              <span className="text-2xl font-extrabold text-slate-700 tracking-tight">
                 {stats.suppressed.toLocaleString()}
               </span>
-              <span className="text-[11px] text-slate-500">bounces &amp; spam</span>
+              <span className="text-[11px] text-slate-400">bounces &amp; spam</span>
             </div>
           </div>
         </div>
 
         {/* Filters & Search Toolbar */}
-        <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div className="saas-card p-4 mb-6 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           <div className="flex-1 relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search by name, email address, or company..."
               value={search}
               onChange={handleSearchChange}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white placeholder-slate-500"
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 placeholder-slate-400"
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-xs">
             {/* Status Filter */}
             <div className="flex items-center gap-1.5">
-              <span className="text-slate-500 font-medium">Status:</span>
+              <span className="text-slate-500 font-semibold">Status:</span>
               <select
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
                   setPage(1);
                 }}
-                className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-indigo-500"
+                className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="opted_in">Eligible (Opted In)</option>
@@ -777,14 +777,14 @@ function ContactsPageContent() {
             {/* Tag Filter */}
             {tags.length > 0 && (
               <div className="flex items-center gap-1.5">
-                <span className="text-slate-500 font-medium">Tag:</span>
+                <span className="text-slate-500 font-semibold">Tag:</span>
                 <select
                   value={tagFilter}
                   onChange={(e) => {
                     setTagFilter(e.target.value);
                     setPage(1);
                   }}
-                  className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                 >
                   <option value="all">All Tags</option>
                   {tags.map((t) => (
@@ -803,7 +803,7 @@ function ContactsPageContent() {
                 setTagFilter('all');
                 setPage(1);
               }}
-              className="text-slate-400 hover:text-white text-xs underline underline-offset-4"
+              className="text-indigo-600 hover:text-indigo-700 font-semibold text-xs underline underline-offset-4"
             >
               Reset
             </button>
@@ -812,14 +812,14 @@ function ContactsPageContent() {
 
         {/* Bulk Action Bar (when selected) */}
         {selectedIds.size > 0 && (
-          <div className="mb-4 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 flex items-center justify-between text-xs animate-in fade-in">
-            <span className="text-indigo-200 font-semibold">
+          <div className="mb-4 p-3 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-between text-xs animate-in fade-in">
+            <span className="text-indigo-900 font-semibold">
               {selectedIds.size} contact{selectedIds.size > 1 ? 's' : ''} selected
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={handleBulkDelete}
-                className="px-3 py-1.5 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 flex items-center gap-1.5 font-medium transition"
+                className="px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 font-semibold transition"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Delete Selected
@@ -829,17 +829,17 @@ function ContactsPageContent() {
         )}
 
         {/* Contacts Table */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden shadow-xl">
+        <div className="saas-card overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-900/90 border-b border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
+            <table className="w-full text-left text-xs text-slate-600">
+              <thead className="bg-slate-50/90 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
                 <tr>
                   <th className="py-3.5 px-4 w-10">
                     <input
                       type="checkbox"
                       checked={contacts.length > 0 && selectedIds.size === contacts.length}
                       onChange={toggleSelectAll}
-                      className="rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-0"
+                      className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                     />
                   </th>
                   <th className="py-3.5 px-4">Recipient</th>
@@ -851,19 +851,19 @@ function ContactsPageContent() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/80">
+              <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="py-12 text-center text-slate-400">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
+                    <td colSpan={8} className="py-12 text-center text-slate-500">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-600" />
                       Loading audience contacts...
                     </td>
                   </tr>
                 ) : contacts.length === 0 ? (
                   <tr>
                     <td colSpan={8} className="py-12 text-center">
-                      <Users className="w-10 h-10 mx-auto text-slate-600 mb-2" />
-                      <p className="text-sm font-semibold text-slate-300">No contacts found</p>
+                      <Users className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                      <p className="text-sm font-bold text-slate-900">No contacts found</p>
                       <p className="text-xs text-slate-500 mt-1">
                         Add individual recipients, paste a list, or import from CSV/XLSX.
                       </p>
@@ -873,8 +873,8 @@ function ContactsPageContent() {
                   contacts.map((contact) => (
                     <tr
                       key={contact.id}
-                      className={`hover:bg-slate-800/40 transition ${
-                        selectedIds.has(contact.id) ? 'bg-indigo-950/20' : ''
+                      className={`hover:bg-slate-50/80 transition ${
+                        selectedIds.has(contact.id) ? 'bg-indigo-50/50' : ''
                       }`}
                     >
                       <td className="py-3.5 px-4">
@@ -882,29 +882,29 @@ function ContactsPageContent() {
                           type="checkbox"
                           checked={selectedIds.has(contact.id)}
                           onChange={() => toggleSelectOne(contact.id)}
-                          className="rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-0"
+                          className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                         />
                       </td>
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-200/80 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase shrink-0">
                             {contact.name ? contact.name.charAt(0) : contact.email.charAt(0)}
                           </div>
                           <div>
                             {contact.name && (
-                              <p className="font-semibold text-white leading-tight">
+                              <p className="font-semibold text-slate-900 leading-tight">
                                 {contact.name}
                               </p>
                             )}
-                            <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-400">
+                            <div className="flex items-center gap-1.5 font-mono text-[11px] text-slate-600">
                               <span>{contact.email}</span>
                               <button
                                 onClick={() => copyToClipboard(contact.email, contact.id)}
-                                className="text-slate-500 hover:text-slate-300"
+                                className="text-slate-400 hover:text-slate-700"
                                 title="Copy email"
                               >
                                 {copiedId === contact.id ? (
-                                  <Check className="w-3 h-3 text-emerald-400" />
+                                  <Check className="w-3 h-3 text-emerald-600" />
                                 ) : (
                                   <Copy className="w-3 h-3" />
                                 )}
@@ -913,27 +913,27 @@ function ContactsPageContent() {
                           </div>
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400">
-                        {contact.company || <span className="text-slate-600">&mdash;</span>}
+                      <td className="py-3.5 px-4 text-slate-600">
+                        {contact.company || <span className="text-slate-400">&mdash;</span>}
                       </td>
                       <td className="py-3.5 px-4">
                         {contact.consentStatus === 'opted_in' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <CheckCircle2 className="w-3 h-3" />
                             Eligible (Opted In)
                           </span>
                         ) : contact.consentStatus === 'unknown' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
                             <AlertTriangle className="w-3 h-3" />
                             Pending Consent
                           </span>
                         ) : contact.consentStatus === 'unsubscribed' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
                             <XCircle className="w-3 h-3" />
                             Unsubscribed
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200">
                             Suppressed
                           </span>
                         )}
@@ -944,20 +944,20 @@ function ContactsPageContent() {
                             contact.tags.map((t, idx) => (
                               <span
                                 key={idx}
-                                className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-indigo-300 border border-slate-700"
+                                className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80"
                               >
                                 {t}
                               </span>
                             ))
                           ) : (
-                            <span className="text-slate-600">&mdash;</span>
+                            <span className="text-slate-400">&mdash;</span>
                           )}
                         </div>
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400 capitalize">
+                      <td className="py-3.5 px-4 text-slate-600 capitalize">
                         {contact.consentSource ? contact.consentSource.replace(/_/g, ' ') : 'Manual'}
                       </td>
-                      <td className="py-3.5 px-4 text-slate-400 text-[11px]">
+                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
                         {new Date(contact.createdAt).toLocaleDateString()}
                       </td>
                       <td className="py-3.5 px-4 text-right">
@@ -967,7 +967,7 @@ function ContactsPageContent() {
                               setActiveContact(contact);
                               setActiveModal('edit');
                             }}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition"
                             title="Edit Contact"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -981,7 +981,7 @@ function ContactsPageContent() {
                                 await fetchContacts();
                               }
                             }}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
                             title="Delete Contact"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -997,15 +997,16 @@ function ContactsPageContent() {
 
           {/* Pagination Footer */}
           {totalPages > 1 && (
-            <div className="p-4 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400 bg-slate-900/40">
+            <div className="p-4 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 bg-slate-50">
               <span>
-                Showing Page {page} of {totalPages} ({totalCount} total contacts)
+                Showing Page <strong className="text-slate-900">{page}</strong> of{' '}
+                <strong className="text-slate-900">{totalPages}</strong> ({totalCount} total contacts)
               </span>
               <div className="flex items-center gap-2">
                 <button
                   disabled={page <= 1}
                   onClick={() => setPage(page - 1)}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 font-medium flex items-center gap-1"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Previous
@@ -1013,7 +1014,7 @@ function ContactsPageContent() {
                 <button
                   disabled={page >= totalPages}
                   onClick={() => setPage(page + 1)}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed text-slate-300 flex items-center gap-1"
+                  className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed text-slate-700 font-medium flex items-center gap-1"
                 >
                   Next
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -1028,29 +1029,29 @@ function ContactsPageContent() {
 
       {/* 1. Add Contact Modal */}
       {activeModal === 'add' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <UserPlus className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <UserPlus className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Add Recipient Contact</h3>
-                <p className="text-xs text-slate-400">Add an individual recipient to your audience</p>
+                <h3 className="text-lg font-bold text-slate-900">Add Recipient Contact</h3>
+                <p className="text-xs text-slate-500">Add an individual recipient to your audience</p>
               </div>
             </div>
 
             <form onSubmit={handleAddContact} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Email Address <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Email Address <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -1058,58 +1059,58 @@ function ContactsPageContent() {
                   placeholder="recipient@example.com"
                   value={addForm.email}
                   onChange={(e) => setAddForm({ ...addForm, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">First Name</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">First Name</label>
                   <input
                     type="text"
                     placeholder="Jane"
                     value={addForm.firstName}
                     onChange={(e) => setAddForm({ ...addForm, firstName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Last Name</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Last Name</label>
                   <input
                     type="text"
                     placeholder="Doe"
                     value={addForm.lastName}
                     onChange={(e) => setAddForm({ ...addForm, lastName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Company</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Company</label>
                   <input
                     type="text"
                     placeholder="Acme Corp"
                     value={addForm.company}
                     onChange={(e) => setAddForm({ ...addForm, company: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Phone</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
                   <input
                     type="text"
                     placeholder="+1 555-0192"
                     value={addForm.phone}
                     onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Tags (Comma separated)
                 </label>
                 <input
@@ -1117,13 +1118,13 @@ function ContactsPageContent() {
                   placeholder="VIP, Newsletter, Retail"
                   value={addForm.tags}
                   onChange={(e) => setAddForm({ ...addForm, tags: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900"
                 />
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Marketing Consent Status
                   </label>
                   <select
@@ -1131,7 +1132,7 @@ function ContactsPageContent() {
                     onChange={(e) =>
                       setAddForm({ ...addForm, consentStatus: e.target.value as ConsentStatus })
                     }
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                   >
                     <option value="unknown">Pending Review (Unknown Consent)</option>
                     <option value="opted_in">Explicit Opt-In (Eligible for campaigns)</option>
@@ -1141,7 +1142,7 @@ function ContactsPageContent() {
 
                 {addForm.consentStatus === 'opted_in' && (
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Consent Evidence / Opt-in Notes
                     </label>
                     <input
@@ -1149,7 +1150,7 @@ function ContactsPageContent() {
                       placeholder="e.g. Website checkout checkbox agreed on 2026-11-09"
                       value={addForm.consentEvidence}
                       onChange={(e) => setAddForm({ ...addForm, consentEvidence: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                     />
                   </div>
                 )}
@@ -1159,13 +1160,13 @@ function ContactsPageContent() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition shadow-sm"
                 >
                   Save Contact
                 </button>
@@ -1177,25 +1178,25 @@ function ContactsPageContent() {
 
       {/* 2. Bulk Paste Modal */}
       {activeModal === 'paste' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => {
                 setActiveModal(null);
                 setPasteValidation(null);
               }}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <FileText className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Bulk Email Paste</h3>
-                <p className="text-xs text-slate-400">
+                <h3 className="text-lg font-bold text-slate-900">Bulk Email Paste</h3>
+                <p className="text-xs text-slate-500">
                   Paste email addresses separated by new lines, commas, or semicolons
                 </p>
               </div>
@@ -1211,30 +1212,30 @@ function ContactsPageContent() {
                     setPasteInput(e.target.value);
                     setPasteValidation(null);
                   }}
-                  className="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:outline-none text-xs text-white font-mono placeholder-slate-600 leading-relaxed"
+                  className="w-full p-3.5 rounded-xl bg-slate-50 border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:outline-none text-xs text-slate-900 font-mono placeholder-slate-400 leading-relaxed"
                 />
               </div>
 
               {/* Validation Summary Card */}
               {pasteValidation ? (
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs space-y-2.5">
-                  <span className="font-bold text-slate-200 block">Analysis Summary</span>
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5">
+                  <span className="font-bold text-slate-900 block">Analysis Summary</span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                    <div className="p-2.5 rounded-lg bg-white border border-slate-200">
                       <span className="text-slate-500 block text-[10px]">Detected</span>
-                      <span className="font-bold text-white">{pasteValidation.totalSubmitted}</span>
+                      <span className="font-bold text-slate-900">{pasteValidation.totalSubmitted}</span>
                     </div>
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                      <span className="text-emerald-400 block text-[10px]">Valid Syntax</span>
-                      <span className="font-bold text-emerald-300">{pasteValidation.validSyntaxCount}</span>
+                    <div className="p-2.5 rounded-lg bg-white border border-emerald-200">
+                      <span className="text-emerald-700 block text-[10px]">Valid Syntax</span>
+                      <span className="font-bold text-emerald-600">{pasteValidation.validSyntaxCount}</span>
                     </div>
-                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
-                      <span className="text-rose-400 block text-[10px]">Invalid Syntax</span>
-                      <span className="font-bold text-rose-300">{pasteValidation.invalidSyntaxCount}</span>
+                    <div className="p-2.5 rounded-lg bg-white border border-rose-200">
+                      <span className="text-rose-700 block text-[10px]">Invalid Syntax</span>
+                      <span className="font-bold text-rose-600">{pasteValidation.invalidSyntaxCount}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-800 text-[11px] text-slate-400">
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[11px] text-slate-500">
                     <span>Duplicates removed: {pasteValidation.duplicatesRemovedCount}</span>
                     <span>Suppressed addresses: {pasteValidation.suppressedCount}</span>
                   </div>
@@ -1245,9 +1246,9 @@ function ContactsPageContent() {
                       type="checkbox"
                       checked={pasteConsentConfirmed}
                       onChange={(e) => setPasteConsentConfirmed(e.target.checked)}
-                      className="mt-0.5 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-0"
+                      className="mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <span className="text-slate-300 text-xs leading-tight">
+                    <span className="text-slate-700 text-xs leading-tight">
                       I confirm that these recipients explicitly opted in to receive promotional marketing emails.
                     </span>
                   </label>
@@ -1256,7 +1257,7 @@ function ContactsPageContent() {
                 <button
                   onClick={handleValidatePaste}
                   disabled={validatingPaste || !pasteInput.trim()}
-                  className="w-full py-2.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 flex items-center justify-center gap-1.5 transition"
+                  className="w-full py-2.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-800 border border-slate-200 flex items-center justify-center gap-1.5 transition"
                 >
                   {validatingPaste ? (
                     <>
@@ -1276,7 +1277,7 @@ function ContactsPageContent() {
                     setActiveModal(null);
                     setPasteValidation(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition"
                 >
                   Cancel
                 </button>
@@ -1284,7 +1285,7 @@ function ContactsPageContent() {
                   <button
                     onClick={handleConfirmPaste}
                     disabled={pasteValidation.validSyntaxCount === 0}
-                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition disabled:opacity-40"
+                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition disabled:opacity-40 shadow-sm"
                   >
                     Import {pasteValidation.validSyntaxCount} Contacts
                   </button>
@@ -1297,22 +1298,22 @@ function ContactsPageContent() {
 
       {/* 3. CSV / XLSX Upload Wizard Modal */}
       {activeModal === 'upload' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center">
+                <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Import Contacts from Spreadsheet</h3>
-                <p className="text-xs text-slate-400">Upload CSV or Excel (.xlsx) audience files</p>
+                <h3 className="text-lg font-bold text-slate-900">Import Contacts from Spreadsheet</h3>
+                <p className="text-xs text-slate-500">Upload CSV or Excel (.xlsx) audience files</p>
               </div>
             </div>
 
@@ -1321,10 +1322,10 @@ function ContactsPageContent() {
               <div className="space-y-4">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-slate-800 hover:border-emerald-500/50 rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition bg-slate-950/40"
+                  className="border-2 border-dashed border-slate-300 hover:border-emerald-500 hover:bg-emerald-50/30 rounded-2xl p-10 flex flex-col items-center justify-center text-center cursor-pointer transition bg-slate-50/80"
                 >
-                  <Upload className="w-10 h-10 text-slate-500 mb-3" />
-                  <p className="text-sm font-semibold text-slate-200">
+                  <Upload className="w-10 h-10 text-slate-400 mb-3" />
+                  <p className="text-sm font-bold text-slate-800">
                     Click to select CSV or XLSX file
                   </p>
                   <p className="text-xs text-slate-500 mt-1">Supports UTF-8 CSV, .xlsx up to 10MB</p>
@@ -1338,8 +1339,8 @@ function ContactsPageContent() {
                 </div>
 
                 {uploadingFile && (
-                  <div className="p-4 rounded-xl bg-slate-950 text-center flex items-center justify-center gap-2 text-xs text-slate-300">
-                    <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+                  <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center flex items-center justify-center gap-2 text-xs text-slate-700 font-medium">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
                     Parsing spreadsheet and inspecting worksheets...
                   </div>
                 )}
@@ -1349,24 +1350,24 @@ function ContactsPageContent() {
             {/* Wizard Step 2: Column Mapping */}
             {uploadStep === 'mapping' && previewResult && (
               <div className="space-y-4">
-                <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs">
-                  <p className="font-semibold text-slate-200">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                  <p className="font-bold text-slate-900">
                     Map Columns for &ldquo;{previewResult.originalFilename}&rdquo;
                   </p>
-                  <p className="text-slate-400 mt-0.5">
+                  <p className="text-slate-600 mt-0.5">
                     Match spreadsheet columns to MailCraft contact fields.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 text-xs">
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1">
-                      Email Address <span className="text-rose-400">*</span>
+                    <label className="block text-slate-700 font-semibold mb-1">
+                      Email Address <span className="text-rose-500">*</span>
                     </label>
                     <select
                       value={columnMapping.email || ''}
                       onChange={(e) => setColumnMapping({ ...columnMapping, email: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">(Select Column)</option>
                       {previewResult.availableColumns.map((col) => (
@@ -1378,11 +1379,11 @@ function ContactsPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1">Full Name</label>
+                    <label className="block text-slate-700 font-semibold mb-1">Full Name</label>
                     <select
                       value={columnMapping.name || ''}
                       onChange={(e) => setColumnMapping({ ...columnMapping, name: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">(None)</option>
                       {previewResult.availableColumns.map((col) => (
@@ -1394,11 +1395,11 @@ function ContactsPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1">Company</label>
+                    <label className="block text-slate-700 font-semibold mb-1">Company</label>
                     <select
                       value={columnMapping.company || ''}
                       onChange={(e) => setColumnMapping({ ...columnMapping, company: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">(None)</option>
                       {previewResult.availableColumns.map((col) => (
@@ -1410,11 +1411,11 @@ function ContactsPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-slate-400 font-medium mb-1">Phone</label>
+                    <label className="block text-slate-700 font-semibold mb-1">Phone</label>
                     <select
                       value={columnMapping.phone || ''}
                       onChange={(e) => setColumnMapping({ ...columnMapping, phone: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-white"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">(None)</option>
                       {previewResult.availableColumns.map((col) => (
@@ -1429,14 +1430,14 @@ function ContactsPageContent() {
                 <div className="pt-4 flex justify-between">
                   <button
                     onClick={() => setUploadStep('select')}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
                   >
                     Back
                   </button>
                   <button
                     onClick={handleUpdateMapping}
                     disabled={!columnMapping.email}
-                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition"
+                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white transition shadow-sm"
                   >
                     Continue to Preview
                   </button>
@@ -1448,29 +1449,29 @@ function ContactsPageContent() {
             {uploadStep === 'preview' && previewResult && (
               <div className="space-y-4">
                 {/* Stats Breakdown */}
-                <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                   <div>
                     <span className="text-slate-500 block text-[10px]">Total Rows</span>
-                    <span className="font-bold text-white text-base">{previewResult.totalRows}</span>
+                    <span className="font-extrabold text-slate-900 text-base">{previewResult.totalRows}</span>
                   </div>
                   <div>
-                    <span className="text-emerald-400 block text-[10px]">Valid Syntax</span>
-                    <span className="font-bold text-emerald-300 text-base">{previewResult.validRows}</span>
+                    <span className="text-emerald-700 block text-[10px]">Valid Syntax</span>
+                    <span className="font-extrabold text-emerald-600 text-base">{previewResult.validRows}</span>
                   </div>
                   <div>
-                    <span className="text-amber-400 block text-[10px]">Duplicates In File</span>
-                    <span className="font-bold text-amber-300 text-base">{previewResult.duplicateRows}</span>
+                    <span className="text-amber-700 block text-[10px]">Duplicates In File</span>
+                    <span className="font-extrabold text-amber-600 text-base">{previewResult.duplicateRows}</span>
                   </div>
                   <div>
-                    <span className="text-rose-400 block text-[10px]">Suppressed</span>
-                    <span className="font-bold text-rose-300 text-base">{previewResult.suppressedRows}</span>
+                    <span className="text-rose-700 block text-[10px]">Suppressed</span>
+                    <span className="font-extrabold text-rose-600 text-base">{previewResult.suppressedRows}</span>
                   </div>
                 </div>
 
                 {/* Sample Rows Preview */}
-                <div className="border border-slate-800 rounded-xl overflow-auto max-h-52">
-                  <table className="w-full text-left text-[11px] text-slate-300">
-                    <thead className="bg-slate-950 text-slate-400 uppercase font-semibold">
+                <div className="border border-slate-200 rounded-xl overflow-auto max-h-52">
+                  <table className="w-full text-left text-[11px] text-slate-600">
+                    <thead className="bg-slate-50 text-slate-500 uppercase font-semibold border-b border-slate-200">
                       <tr>
                         <th className="p-2">#</th>
                         <th className="p-2">Email</th>
@@ -1478,20 +1479,20 @@ function ContactsPageContent() {
                         <th className="p-2">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/80">
+                    <tbody className="divide-y divide-slate-100">
                       {previewResult.previewRows.slice(0, 10).map((row, idx) => (
-                        <tr key={idx} className="hover:bg-slate-800/30">
-                          <td className="p-2 text-slate-500">{row.rowNumber}</td>
-                          <td className="p-2 font-mono text-white">{row.email}</td>
+                        <tr key={idx} className="hover:bg-slate-50/80">
+                          <td className="p-2 text-slate-400">{row.rowNumber}</td>
+                          <td className="p-2 font-mono text-slate-900 font-medium">{row.email}</td>
                           <td className="p-2">{row.name || '\u2014'}</td>
                           <td className="p-2">
                             <span
                               className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
                                 row.status === 'valid'
-                                  ? 'bg-emerald-500/10 text-emerald-400'
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                   : row.status === 'existing'
-                                  ? 'bg-indigo-500/10 text-indigo-400'
-                                  : 'bg-rose-500/10 text-rose-400'
+                                  ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                                  : 'bg-rose-50 text-rose-700 border border-rose-200'
                               }`}
                             >
                               {row.status}
@@ -1504,15 +1505,15 @@ function ContactsPageContent() {
                 </div>
 
                 {/* Consent Gate */}
-                <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-3">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
                   <label className="flex items-start gap-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={uploadConsentConfirmed}
                       onChange={(e) => setUploadConsentConfirmed(e.target.checked)}
-                      className="mt-0.5 rounded border-slate-700 bg-slate-900 text-emerald-600 focus:ring-0"
+                      className="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                     />
-                    <span className="text-xs text-slate-300 leading-relaxed">
+                    <span className="text-xs text-slate-700 leading-relaxed">
                       I confirm that these recipients explicitly opted in to receive promotional emails from our brand.
                     </span>
                   </label>
@@ -1521,21 +1522,21 @@ function ContactsPageContent() {
                     placeholder="Optional consent source notes (e.g. In-store signups, checkout form)"
                     value={uploadConsentEvidence}
                     onChange={(e) => setUploadConsentEvidence(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white"
+                    className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 text-xs text-slate-900"
                   />
                 </div>
 
                 <div className="pt-2 flex justify-between">
                   <button
                     onClick={() => setUploadStep('mapping')}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
                   >
                     Back to Mapping
                   </button>
                   <button
                     onClick={handleConfirmImport}
                     disabled={confirmingImport}
-                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-2 transition"
+                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-2 transition shadow-sm"
                   >
                     {confirmingImport ? (
                       <>
@@ -1553,24 +1554,24 @@ function ContactsPageContent() {
             {/* Wizard Step 4: Complete */}
             {uploadStep === 'complete' && previewResult && (
               <div className="py-8 text-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h4 className="text-base font-bold text-white">Import Successfully Completed</h4>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                <h4 className="text-base font-bold text-slate-900">Import Successfully Completed</h4>
+                <p className="text-xs text-slate-600 max-w-sm mx-auto">
                   Your audience has been updated. Eligible contacts are now ready for campaign selection.
                 </p>
                 <div className="flex justify-center gap-3 pt-2">
                   <a
                     href={`/api/v1/contacts/imports/${previewResult.importId}/report?format=csv`}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 flex items-center gap-1.5"
                   >
                     <Download className="w-3.5 h-3.5" />
                     Download Error Report
                   </a>
                   <button
                     onClick={() => setActiveModal(null)}
-                    className="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white"
+                    className="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white"
                   >
                     Done
                   </button>
@@ -1583,61 +1584,61 @@ function ContactsPageContent() {
 
       {/* 4. Edit Contact Drawer / Modal */}
       {activeModal === 'edit' && activeContact && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => {
                 setActiveModal(null);
                 setActiveContact(null);
               }}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                <Edit2 className="w-5 h-5 text-indigo-400" />
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-center">
+                <Edit2 className="w-5 h-5 text-indigo-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Edit Recipient</h3>
-                <p className="text-xs text-slate-400 font-mono">{activeContact.email}</p>
+                <h3 className="text-lg font-bold text-slate-900">Edit Recipient</h3>
+                <p className="text-xs text-slate-500 font-mono">{activeContact.email}</p>
               </div>
             </div>
 
             <form onSubmit={handleUpdateContact} className="space-y-3.5">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
                 <input
                   type="text"
                   value={activeContact.name || ''}
                   onChange={(e) => setActiveContact({ ...activeContact, name: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Company</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Company</label>
                 <input
                   type="text"
                   value={activeContact.company || ''}
                   onChange={(e) => setActiveContact({ ...activeContact, company: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Phone</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
                 <input
                   type="text"
                   value={activeContact.phone || ''}
                   onChange={(e) => setActiveContact({ ...activeContact, phone: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Consent Status</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Consent Status</label>
                 <select
                   value={activeContact.consentStatus}
                   onChange={(e) =>
@@ -1646,7 +1647,7 @@ function ContactsPageContent() {
                       consentStatus: e.target.value as ConsentStatus,
                     })
                   }
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 >
                   <option value="opted_in">Eligible (Opted In)</option>
                   <option value="unknown">Pending Consent (Unknown)</option>
@@ -1656,14 +1657,14 @@ function ContactsPageContent() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Consent Evidence</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Consent Evidence</label>
                 <input
                   type="text"
                   value={activeContact.consentEvidence || ''}
                   onChange={(e) =>
                     setActiveContact({ ...activeContact, consentEvidence: e.target.value })
                   }
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
@@ -1674,13 +1675,13 @@ function ContactsPageContent() {
                     setActiveModal(null);
                     setActiveContact(null);
                   }}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white"
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                 >
                   Save Changes
                 </button>
@@ -1692,22 +1693,22 @@ function ContactsPageContent() {
 
       {/* 5. Tag Manager Modal */}
       {activeModal === 'tag_manager' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl">
             <button
               onClick={() => setActiveModal(null)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                <TagIcon className="w-5 h-5 text-amber-400" />
+              <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+                <TagIcon className="w-5 h-5 text-amber-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Audience Tags</h3>
-                <p className="text-xs text-slate-400">Organize and label your recipients</p>
+                <h3 className="text-lg font-bold text-slate-900">Audience Tags</h3>
+                <p className="text-xs text-slate-500">Organize and label your recipients</p>
               </div>
             </div>
 
@@ -1717,11 +1718,11 @@ function ContactsPageContent() {
                 placeholder="New tag name (e.g. VIP, BlackFriday)"
                 value={newTagName}
                 onChange={(e) => setNewTagName(e.target.value)}
-                className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white"
+                className="flex-1 px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-indigo-500"
               />
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
               >
                 Add Tag
               </button>
@@ -1729,21 +1730,21 @@ function ContactsPageContent() {
 
             <div className="space-y-2 max-h-56 overflow-y-auto">
               {tags.length === 0 ? (
-                <p className="text-center py-6 text-xs text-slate-500">No tags created yet</p>
+                <p className="text-center py-6 text-xs text-slate-400">No tags created yet</p>
               ) : (
                 tags.map((t) => (
                   <div
                     key={t.id || t._id || t.name}
-                    className="p-2.5 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between text-xs"
+                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs"
                   >
-                    <span className="font-semibold text-white">{t.name}</span>
+                    <span className="font-semibold text-slate-900">{t.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-slate-400 text-[11px] font-mono">
+                      <span className="text-slate-500 text-[11px] font-mono">
                         {t.contactCount || 0} contacts
                       </span>
                       <button
                         onClick={() => handleDeleteTag(t.id || t._id || '')}
-                        className="text-slate-500 hover:text-rose-400 p-1"
+                        className="text-slate-400 hover:text-rose-600 p-1 transition"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1756,7 +1757,7 @@ function ContactsPageContent() {
             <div className="mt-4 flex justify-end">
               <button
                 onClick={() => setActiveModal(null)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-white hover:bg-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition"
               >
                 Close
               </button>
@@ -1772,9 +1773,9 @@ export default function ContactsPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500 mb-2" />
-          <p className="text-xs">Loading Audience &amp; Recipients...</p>
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center text-slate-500">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-600 mb-2" />
+          <p className="text-xs font-medium">Loading Audience &amp; Recipients...</p>
         </div>
       }
     >

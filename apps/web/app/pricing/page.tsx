@@ -1,149 +1,251 @@
 import React from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Zap, Send, ShieldCheck, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Zap, Send, ShieldCheck, Key, ArrowRight } from 'lucide-react';
 import { PublicNavbar } from '@/components/PublicNavbar';
+import { PublicFooter } from '@/components/PublicFooter';
+
+const FEATURE_ROWS = [
+  { feature: 'Visual Drag-and-Drop Email Studio', studio: 'Included', channels: 'All Channels' },
+  { feature: '12+ Mobile-Responsive Themes', studio: 'Included', channels: 'All Channels' },
+  { feature: 'AES-256-GCM Credential Vault', studio: 'Included', channels: 'All Channels' },
+  { feature: 'OTP & Domain SPF/DKIM Verification', studio: 'Included', channels: 'All Channels' },
+  { feature: 'CSV / Excel Deduplication & Suppression', studio: 'Included', channels: 'All Channels' },
+  { feature: 'Real-Time Click, Bounce & Unsubscribe Analytics', studio: 'Included', channels: 'All Channels' },
+];
 
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Top Header */}
       <PublicNavbar activePage="pricing" />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 flex-1 w-full">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">Transparent Economics</span>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-            Free Studio. Pay Only For What You Send.
+      {/* Header */}
+      <section className="pt-14 pb-12 bg-saas-grid border-b border-slate-200/80">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-indigo-200 text-indigo-700 text-xs font-semibold shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Transparent Economics &bull; Zero Platform Markup
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-950 tracking-tight mt-4">
+            Free Studio. Connect Any Sending Channel.
           </h1>
-          <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-            MailCraft charges zero platform fees to create, customize, and manage email campaigns. You connect your own sending provider account directly, retaining full ownership of your sender reputation and provider billing.
+          <p className="text-base text-slate-600 mt-4 leading-relaxed max-w-2xl mx-auto">
+            MailCraft charges $0 platform fees for designing, managing audiences, and analytics. You
+            plug in your own Gmail, Brevo, or Amazon SES account directly with full reputation ownership.
           </p>
         </div>
+      </section>
 
-        {/* Pricing Comparison Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Card 1: MailCraft Studio */}
-          <div className="bg-white rounded-2xl border-2 border-indigo-600 p-8 shadow-lg relative flex flex-col justify-between">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-[11px] font-bold rounded-full uppercase tracking-wider">
-              MailCraft Platform
-            </span>
-
+      {/* Main Cards */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex-1 w-full space-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
+          {/* Card 1: Starter Studio */}
+          <div className="bg-gradient-to-br from-indigo-50/90 via-white to-white rounded-2xl border-2 border-indigo-500 p-7 shadow-xl shadow-indigo-500/10 relative flex flex-col justify-between">
             <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Workspace Access</span>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">Starter Studio</h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-4xl font-extrabold text-slate-900">$0</span>
-                <span className="text-xs text-slate-500">/ forever</span>
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-indigo-100 text-indigo-700 border border-indigo-200 text-[10px] font-bold uppercase tracking-wider mb-4">
+                Included For Everyone
+              </span>
+              <h3 className="text-2xl font-extrabold text-slate-950">MailCraft Studio</h3>
+              <div className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-4xl font-black text-slate-950 tabular-nums">$0</span>
+                <span className="text-xs text-slate-500 font-medium">/ forever</span>
               </div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                Design unlimited emails, use all 12 templates, upload logos, configure brand colors, and clean recipient lists.
+                Complete campaign studio, contact hygiene, visual builder, and tracking analytics.
               </p>
 
               <ul className="mt-6 space-y-3 text-xs text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Free Gmail ID signup, zero credit card required</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>All 12 production templates included</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Drag-and-drop block editor</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Deduplication & suppression engine</span>
-                </li>
+                {[
+                  'All 12+ responsive studio templates',
+                  'Visual drag-and-drop block editor',
+                  'Unlimited saved brand profiles',
+                  'Deduplication & global suppression list',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
             <Link
               href="/signup"
-              className="mt-8 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg text-center transition"
+              className="mt-8 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl text-center transition inline-flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20"
             >
-              Sign Up Free Now →
+              <span>Start Free Now</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Card 2: Google Gmail Channel */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between">
+          {/* Card 2: Gmail App Password (1,500/day) */}
+          <div className="saas-card p-7 flex flex-col justify-between border-emerald-200/90 ring-1 ring-emerald-500/10">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center font-bold mb-3">
-                <Send className="w-5 h-5" />
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                  <Key className="w-5 h-5" />
+                </div>
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold uppercase">
+                  Popular
+                </span>
               </div>
-              <span className="text-xs font-bold text-rose-600 uppercase tracking-wider">Personal / Low-Volume</span>
-              <h3 className="text-xl font-bold text-slate-900 mt-1">Google OAuth (Gmail)</h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-slate-900">Included</span>
-                <span className="text-xs text-slate-500">with Google account</span>
+              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
+                App Password SMTP
+              </span>
+              <h3 className="text-xl font-bold text-slate-950 mt-1">Gmail App Password</h3>
+              <div className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-slate-950 tabular-nums">1,500</span>
+                <span className="text-xs text-slate-500">emails / day</span>
               </div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                Send from your existing Google Workspace or personal Gmail without DNS records.
+                Send straight from Gmail or Google Workspace via encrypted TLS SMTP with strict daily enforcement.
               </p>
 
               <ul className="mt-6 space-y-3 text-xs text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Up to 500 emails/day (personal)</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Hard 1,500 emails/day protection</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Up to 2,000/day (Google Workspace)</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Zero DNS records required</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Direct inbox delivery from your address</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Encrypted AES-256-GCM credential vault</span>
                 </li>
               </ul>
             </div>
 
-            <p className="mt-8 text-[11px] text-slate-400 text-center">
-              Subject to Google daily sending quotas.
-            </p>
+            <Link
+              href="/connect"
+              prefetch={false}
+              className="mt-8 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold text-xs rounded-xl text-center transition"
+            >
+              Connect App Password &rarr;
+            </Link>
           </div>
 
-          {/* Card 3: Brevo & Amazon SES */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col justify-between">
+          {/* Card 3: Google OAuth */}
+          <div className="saas-card p-7 flex flex-col justify-between">
             <div>
-              <div className="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold mb-3">
-                <Zap className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100 mb-4">
+                <Send className="w-5 h-5" />
               </div>
-              <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Bulk Campaigns</span>
-              <h3 className="text-xl font-bold text-slate-900 mt-1">Brevo & Amazon SES</h3>
-              <div className="mt-4 flex items-baseline gap-1">
-                <span className="text-3xl font-extrabold text-slate-900">Direct</span>
-                <span className="text-xs text-slate-500">provider rates</span>
+              <span className="text-[11px] font-bold text-rose-600 uppercase tracking-wider">
+                Personal Outreach
+              </span>
+              <h3 className="text-xl font-bold text-slate-950 mt-1">Google OAuth (Gmail)</h3>
+              <div className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-slate-950 tabular-nums">500</span>
+                <span className="text-xs text-slate-500">emails / day</span>
               </div>
               <p className="text-xs text-slate-600 mt-3 leading-relaxed">
-                Connect your Brevo API key or Amazon SES credentials to dispatch thousands of promotional blasts.
+                One-click OAuth 2.0 PKCE connection for personal previews and small subscriber updates.
               </p>
 
               <ul className="mt-6 space-y-3 text-xs text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Brevo: Free tier (300/day), then ~$25/mo</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Up to 500/day personal, 2,000 Workspace</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>SES: Pay-as-you-go (~$0.10 per 1,000)</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>OAuth 2.0 PKCE (S256) verified flow</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Asynchronous BullMQ worker queues</span>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Direct Gmail inbox origin</span>
                 </li>
               </ul>
             </div>
 
-            <p className="mt-8 text-[11px] text-slate-400 text-center">
-              Billed directly by your chosen email provider.
-            </p>
+            <Link
+              href="/connect"
+              prefetch={false}
+              className="mt-8 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold text-xs rounded-xl text-center transition"
+            >
+              Authorize Gmail OAuth &rarr;
+            </Link>
+          </div>
+
+          {/* Card 4: Brevo & SES */}
+          <div className="saas-card p-7 flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center border border-indigo-100 mb-4">
+                <Zap className="w-5 h-5" />
+              </div>
+              <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-wider">
+                Enterprise Scale
+              </span>
+              <h3 className="text-xl font-bold text-slate-950 mt-1">Brevo &amp; Amazon SES</h3>
+              <div className="mt-3 flex items-baseline gap-1.5">
+                <span className="text-3xl font-extrabold text-slate-950 tabular-nums">100K+</span>
+                <span className="text-xs text-slate-500">emails / day</span>
+              </div>
+              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+                High-throughput promotional broadcasts with full SPF, DKIM, DMARC, and webhook bounce telemetry.
+              </p>
+
+              <ul className="mt-6 space-y-3 text-xs text-slate-700">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Brevo free tier (300/day) or paid plans</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>AWS SES pay-as-you-go (~$0.10 / 1,000)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span>Easy-DKIM CNAME &amp; delivery webhooks</span>
+                </li>
+              </ul>
+            </div>
+
+            <Link
+              href="/connect"
+              prefetch={false}
+              className="mt-8 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold text-xs rounded-xl text-center transition"
+            >
+              Connect Bulk Provider &rarr;
+            </Link>
+          </div>
+        </div>
+
+        {/* Comparison Matrix */}
+        <div className="saas-card overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold text-slate-950">Included Across Every Workspace</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Zero feature gating — every user gets full compliance, security, and analytics tools.
+              </p>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-6 py-3.5">Capability</th>
+                  <th className="px-6 py-3.5">Starter Studio ($0)</th>
+                  <th className="px-6 py-3.5">Delivery Support</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {FEATURE_ROWS.map((row) => (
+                  <tr key={row.feature} className="hover:bg-slate-50/70">
+                    <td className="px-6 py-3.5 font-medium text-slate-800">{row.feature}</td>
+                    <td className="px-6 py-3.5 font-semibold text-emerald-700">{row.studio}</td>
+                    <td className="px-6 py-3.5 text-slate-600">{row.channels}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
+
+      <PublicFooter />
     </div>
   );
 }
-

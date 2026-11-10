@@ -489,7 +489,7 @@ function CampaignWizardContent() {
 
         const data = await res.json();
         if (data.success) {
-          showNotification('Campaign launched successfully! Background workers active.', 'success');
+          showNotification('Campaign launched successfully! Delivery started.', 'success');
           router.push(`/campaigns/${campaignId}`);
         } else {
           showNotification(data.message || 'Failed to launch campaign', 'error');
@@ -517,29 +517,29 @@ function CampaignWizardContent() {
 
   if (loadingInitial) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-3 text-slate-400">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-        <p className="text-sm">Loading campaign draft...</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center gap-3 text-slate-500">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <p className="text-sm font-medium">Loading campaign draft...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-16 py-2 sm:py-0 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
+      {/* Curved Frosted Top Header */}
+      <div className="sticky top-0 z-40 px-3 sm:px-6 lg:px-8 pt-3 pointer-events-none">
+        <header className="pointer-events-auto max-w-7xl mx-auto rounded-2xl bg-white/90 backdrop-blur-xl border border-slate-200/80 shadow-lg shadow-slate-900/5 px-4 sm:px-5 min-h-14 py-2 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-5 min-w-0">
             <Link
               href="/campaigns"
-              className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition shrink-0"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition shrink-0"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Campaigns</span>
             </Link>
-            <div className="h-4 w-px bg-slate-800" />
+            <div className="h-4 w-px bg-slate-200" />
             <div className="min-w-0">
-              <span className="font-semibold text-white text-sm truncate block sm:inline">
+              <span className="font-bold text-slate-900 text-sm truncate block sm:inline">
                 {campaignName || 'New Campaign Wizard'}
               </span>
               <span className="text-xs text-slate-500 sm:ml-2 block sm:inline">
@@ -553,22 +553,22 @@ function CampaignWizardContent() {
               <button
                 onClick={() => saveCampaignDraft()}
                 disabled={saving}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 transition"
               >
                 {saving ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 ) : (
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                  <Check className="w-3.5 h-3.5 text-emerald-600" />
                 )}
                 Save Draft
               </button>
             )}
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       {/* Stepper Progress Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 py-3 overflow-x-auto">
+      <div className="mt-3 bg-white border-y border-slate-200 py-3.5 overflow-x-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between min-w-[700px]">
           {steps.map((s) => {
             const isCompleted = s.number < currentStep;
@@ -584,21 +584,21 @@ function CampaignWizardContent() {
                   }
                 }}
                 disabled={!campaignId && s.number > currentStep}
-                className={`flex items-center gap-2 text-xs font-medium transition ${
+                className={`flex items-center gap-2 text-xs font-semibold transition ${
                   isCurrent
-                    ? 'text-indigo-400'
+                    ? 'text-indigo-600'
                     : isCompleted
-                    ? 'text-slate-300 hover:text-white'
-                    : 'text-slate-600 cursor-not-allowed'
+                    ? 'text-slate-700 hover:text-slate-950'
+                    : 'text-slate-400 cursor-not-allowed'
                 }`}
               >
                 <div
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold transition ${
                     isCurrent
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                      ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                       : isCompleted
-                      ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                      : 'bg-slate-800 text-slate-500 border border-slate-700'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : 'bg-slate-100 text-slate-500 border border-slate-200'
                   }`}
                 >
                   {isCompleted ? <Check className="w-3 h-3" /> : s.number}
@@ -615,23 +615,23 @@ function CampaignWizardContent() {
         {/* Notification Banner */}
         {notification && (
           <div
-            className={`p-4 rounded-xl flex items-center justify-between shadow-lg border transition ${
+            className={`p-4 rounded-xl flex items-center justify-between shadow-sm border transition ${
               notification.type === 'success'
-                ? 'bg-emerald-950/80 border-emerald-800 text-emerald-200'
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 : notification.type === 'error'
-                ? 'bg-rose-950/80 border-rose-800 text-rose-200'
-                : 'bg-sky-950/80 border-sky-800 text-sky-200'
+                ? 'bg-rose-50 border-rose-200 text-rose-900'
+                : 'bg-sky-50 border-sky-200 text-sky-900'
             }`}
           >
             <div className="flex items-center gap-3">
-              {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-400" />}
-              {notification.type === 'error' && <AlertTriangle className="w-5 h-5 text-rose-400" />}
-              {notification.type === 'info' && <Info className="w-5 h-5 text-sky-400" />}
+              {notification.type === 'success' && <CheckCircle className="w-5 h-5 text-emerald-600" />}
+              {notification.type === 'error' && <AlertTriangle className="w-5 h-5 text-rose-600" />}
+              {notification.type === 'info' && <Info className="w-5 h-5 text-sky-600" />}
               <span className="text-sm font-medium">{notification.message}</span>
             </div>
             <button
               onClick={() => setNotification(null)}
-              className="text-slate-400 hover:text-white p-1"
+              className="text-slate-400 hover:text-slate-700 p-1 font-bold"
             >
               ×
             </button>
@@ -640,33 +640,33 @@ function CampaignWizardContent() {
 
         {/* STEP 1: CAMPAIGN INFO */}
         {currentStep === 1 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <FileText className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-indigo-600" />
                 Step 1: Campaign Information
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Name your campaign and select which verified brand profile will represent this dispatch.
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-1.5">
-                  Campaign Name <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">
+                  Campaign Name <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
                   placeholder="e.g., Summer Flash Sale 2026"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-1.5">
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">
                   Internal Description (Optional)
                 </label>
                 <textarea
@@ -674,20 +674,20 @@ function CampaignWizardContent() {
                   placeholder="Objective, notes, target promo codes or campaign context..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">
-                  Brand Profile <span className="text-rose-400">*</span>
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-2">
+                  Brand Profile <span className="text-rose-500">*</span>
                 </label>
                 {brands.length === 0 ? (
-                  <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-900/60 text-amber-200 text-sm space-y-2">
-                    <p>No brand profile found for your workspace.</p>
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-sm space-y-2">
+                    <p className="font-medium">No brand profile found for your workspace.</p>
                     <Link
                       href="/workspace"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:underline"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 hover:underline"
                     >
                       <Building className="w-3.5 h-3.5" />
                       Configure Brand Profile in Workspace &rarr;
@@ -701,28 +701,28 @@ function CampaignWizardContent() {
                         onClick={() => setBrandId(b.id)}
                         className={`p-4 rounded-xl border cursor-pointer transition flex items-start gap-3 ${
                           brandId === b.id
-                            ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                            : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                            ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                            : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        <div className="w-10 h-10 rounded-lg bg-indigo-900/50 border border-indigo-700/50 flex items-center justify-center text-indigo-300 font-bold shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 font-bold shrink-0">
                           {b.brandName.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-white text-sm truncate">
+                          <div className="font-bold text-slate-900 text-sm truncate">
                             {b.brandName}
                           </div>
-                          <div className="text-xs text-slate-400 truncate mt-0.5">
+                          <div className="text-xs text-slate-600 truncate mt-0.5">
                             {b.senderName} &lt;{b.senderEmail}&gt;
                           </div>
                           {b.website && (
-                            <div className="text-[11px] text-indigo-400 truncate mt-1">
+                            <div className="text-[11px] text-indigo-600 font-medium truncate mt-1">
                               {b.website}
                             </div>
                           )}
                         </div>
                         {brandId === b.id && (
-                          <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-indigo-600 shrink-0" />
                         )}
                       </div>
                     ))}
@@ -735,36 +735,36 @@ function CampaignWizardContent() {
 
         {/* STEP 2: EMAIL PROVIDER SELECTION */}
         {currentStep === 2 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Server className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Server className="w-5 h-5 text-indigo-600" />
                 Step 2: Choose Sending Provider
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Select an authenticated sending infrastructure to dispatch your marketing emails.
               </p>
             </div>
 
             <div className="space-y-4">
               {connections.length === 0 && (
-                <div className="p-6 rounded-xl bg-slate-950/60 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="p-6 rounded-xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-amber-950/50 border border-amber-500/30 flex items-center justify-center shrink-0">
-                      <AlertTriangle className="w-5 h-5 text-amber-400" />
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center shrink-0">
+                      <AlertTriangle className="w-5 h-5 text-amber-600" />
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-sm">
+                      <div className="font-bold text-slate-900 text-sm">
                         No Email Sending Providers Connected
                       </div>
-                      <p className="text-xs text-slate-400 mt-1">
+                      <p className="text-xs text-slate-600 mt-1">
                         You must connect and verify at least one email provider (Gmail, Brevo, or Amazon SES) to launch campaigns.
                       </p>
                     </div>
                   </div>
                   <Link
                     href="/connect"
-                    className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition"
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shrink-0 transition shadow-sm"
                   >
                     Connect Provider
                   </Link>
@@ -778,33 +778,33 @@ function CampaignWizardContent() {
                   onClick={() => setConnectionId(c.id)}
                   className={`p-4 rounded-xl border cursor-pointer transition flex items-start justify-between gap-4 ${
                     connectionId === c.id
-                      ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                      : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-950 border border-indigo-800 flex items-center justify-center text-indigo-300 shrink-0 font-bold uppercase text-xs">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-700 shrink-0 font-bold uppercase text-xs">
                       {c.provider.slice(0, 3)}
                     </div>
                     <div>
-                      <div className="font-semibold text-white text-sm flex items-center flex-wrap gap-2">
+                      <div className="font-bold text-slate-900 text-sm flex items-center flex-wrap gap-2">
                         {c.provider === 'gmail_smtp'
                           ? 'Gmail + App Password (1,500/day)'
                           : `${c.provider.toUpperCase()} Integration`}
                         {c.status === 'connected' && (
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             Connected
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        Sender: {c.senderEmail}{' '}
+                      <p className="text-xs text-slate-600 mt-0.5">
+                        Sender: <span className="font-mono font-medium text-slate-800">{c.senderEmail}</span>{' '}
                         {c.senderVerificationStatus === 'verified' && (
-                          <span className="text-emerald-400 font-medium">(Verified Sender)</span>
+                          <span className="text-emerald-600 font-semibold">(Verified Sender)</span>
                         )}
                         {c.provider === 'gmail_smtp' && (
-                          <span className="text-indigo-300 font-medium ml-1">
+                          <span className="text-indigo-600 font-semibold ml-1">
                             &bull; {c.dailyRemaining ?? 1500} / {c.dailyQuotaLimit ?? 1500} remaining today
                           </span>
                         )}
@@ -812,17 +812,17 @@ function CampaignWizardContent() {
                     </div>
                   </div>
                   {connectionId === c.id && (
-                    <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0 mt-1" />
+                    <CheckCircle className="w-5 h-5 text-indigo-600 shrink-0 mt-1" />
                   )}
                 </div>
               ))}
 
-              <div className="pt-2 flex justify-between items-center text-xs text-slate-400">
+              <div className="pt-2 flex justify-between items-center text-xs text-slate-500">
                 <span>Want to connect Gmail, Brevo, or AWS SES?</span>
                 <Link
                   href="/connect"
                   target="_blank"
-                  className="text-indigo-400 hover:underline flex items-center gap-1"
+                  className="text-indigo-600 font-semibold hover:underline flex items-center gap-1"
                 >
                   Manage Sender Accounts <ExternalLink className="w-3 h-3" />
                 </Link>
@@ -833,34 +833,34 @@ function CampaignWizardContent() {
 
         {/* STEP 3: AUDIENCE & CONTACT SELECTION */}
         {currentStep === 3 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Users className="w-5 h-5 text-indigo-600" />
                 Step 3: Audience &amp; Opt-in Contacts
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Select your target recipient list. In accordance with strict anti-spam compliance, only opted-in recipients will be reached.
               </p>
             </div>
 
             {/* Audience Stats Badge */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-950 border border-slate-800 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
               <div>
-                <div className="text-xs text-slate-400">Total Contacts</div>
-                <div className="text-xl font-bold text-white mt-1">
+                <div className="text-xs text-slate-500 font-semibold">Total Contacts</div>
+                <div className="text-xl font-extrabold text-slate-900 mt-1">
                   {contactStats.totalContacts}
                 </div>
               </div>
-              <div className="border-x border-slate-800">
-                <div className="text-xs text-emerald-400 font-medium">Eligible (Opted-in)</div>
-                <div className="text-xl font-bold text-emerald-300 mt-1">
+              <div className="sm:border-x border-slate-200">
+                <div className="text-xs text-emerald-700 font-semibold">Eligible (Opted-in)</div>
+                <div className="text-xl font-extrabold text-emerald-600 mt-1">
                   {contactStats.eligibleContacts}
                 </div>
               </div>
               <div>
-                <div className="text-xs text-rose-400">Suppressed Excluded</div>
-                <div className="text-xl font-bold text-rose-300 mt-1">
+                <div className="text-xs text-rose-700 font-semibold">Suppressed Excluded</div>
+                <div className="text-xl font-extrabold text-rose-600 mt-1">
                   {contactStats.suppressed}
                 </div>
               </div>
@@ -868,7 +868,7 @@ function CampaignWizardContent() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-2">
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-2">
                   Audience Targeting Mode
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -876,12 +876,12 @@ function CampaignWizardContent() {
                     onClick={() => setAudienceType('all_eligible')}
                     className={`p-4 rounded-xl border cursor-pointer transition ${
                       audienceType === 'all_eligible'
-                        ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                        ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                        : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-white text-sm">All Eligible Contacts</div>
-                    <div className="text-xs text-slate-400 mt-1">
+                    <div className="font-bold text-slate-900 text-sm">All Eligible Contacts</div>
+                    <div className="text-xs text-slate-600 mt-1">
                       Every contact marked opted-in ({contactStats.eligibleContacts} recipients)
                     </div>
                   </div>
@@ -890,12 +890,12 @@ function CampaignWizardContent() {
                     onClick={() => setAudienceType('segment')}
                     className={`p-4 rounded-xl border cursor-pointer transition ${
                       audienceType === 'segment'
-                        ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                        ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                        : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-white text-sm">Saved Segment</div>
-                    <div className="text-xs text-slate-400 mt-1">
+                    <div className="font-bold text-slate-900 text-sm">Saved Segment</div>
+                    <div className="text-xs text-slate-600 mt-1">
                       Filter by saved criteria ({segments.length} segments available)
                     </div>
                   </div>
@@ -904,12 +904,12 @@ function CampaignWizardContent() {
                     onClick={() => setAudienceType('tag')}
                     className={`p-4 rounded-xl border cursor-pointer transition ${
                       audienceType === 'tag'
-                        ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                        : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                        ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                        : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                     }`}
                   >
-                    <div className="font-semibold text-white text-sm">Filter by Tag</div>
-                    <div className="text-xs text-slate-400 mt-1">
+                    <div className="font-bold text-slate-900 text-sm">Filter by Tag</div>
+                    <div className="text-xs text-slate-600 mt-1">
                       Target specific tag group ({tags.length} tags available)
                     </div>
                   </div>
@@ -919,13 +919,13 @@ function CampaignWizardContent() {
               {/* Segment Dropdown */}
               {audienceType === 'segment' && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold uppercase text-slate-400">
+                  <label className="block text-xs font-semibold uppercase text-slate-600">
                     Choose Segment
                   </label>
                   {segments.length === 0 ? (
                     <p className="text-xs text-slate-500">
                       No segments saved yet.{' '}
-                      <Link href="/contacts" className="text-indigo-400 hover:underline">
+                      <Link href="/contacts" className="text-indigo-600 font-semibold hover:underline">
                         Create segments in Contacts
                       </Link>
                     </p>
@@ -933,7 +933,7 @@ function CampaignWizardContent() {
                     <select
                       value={selectedSegmentId}
                       onChange={(e) => setSelectedSegmentId(e.target.value)}
-                      className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-indigo-500"
                     >
                       <option value="">-- Select a Segment --</option>
                       {segments.map((s) => (
@@ -949,13 +949,13 @@ function CampaignWizardContent() {
               {/* Tag Dropdown */}
               {audienceType === 'tag' && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold uppercase text-slate-400">
+                  <label className="block text-xs font-semibold uppercase text-slate-600">
                     Choose Tag
                   </label>
                   {tags.length === 0 ? (
                     <p className="text-xs text-slate-500">
                       No tags available.{' '}
-                      <Link href="/contacts" className="text-indigo-400 hover:underline">
+                      <Link href="/contacts" className="text-indigo-600 font-semibold hover:underline">
                         Add tags in Contacts
                       </Link>
                     </p>
@@ -963,7 +963,7 @@ function CampaignWizardContent() {
                     <select
                       value={selectedTag}
                       onChange={(e) => setSelectedTag(e.target.value)}
-                      className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-indigo-500"
                     >
                       <option value="">-- Select a Tag --</option>
                       {tags.map((t) => (
@@ -976,8 +976,8 @@ function CampaignWizardContent() {
                 </div>
               )}
 
-              <div className="p-3 rounded-lg bg-indigo-950/30 border border-indigo-900/40 flex items-center gap-2.5 text-xs text-indigo-300">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-indigo-400" />
+              <div className="p-3.5 rounded-xl bg-indigo-50 border border-indigo-200/80 flex items-center gap-2.5 text-xs text-indigo-800">
+                <ShieldCheck className="w-4 h-4 shrink-0 text-indigo-600" />
                 <span>
                   Anti-spam guarantee: Contacts who unsubscribed or are on your suppression list are automatically purged in real time during sending.
                 </span>
@@ -988,13 +988,13 @@ function CampaignWizardContent() {
 
         {/* STEP 4: TEMPLATE SELECTION */}
         {currentStep === 4 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="w-5 h-5 text-indigo-600" />
                 Step 4: Select Email Template
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Choose a responsive email design from MailCraft&apos;s library of production templates.
               </p>
             </div>
@@ -1010,26 +1010,26 @@ function CampaignWizardContent() {
                   }}
                   className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
                     templateId === tmpl._id
-                      ? 'bg-indigo-950/60 border-indigo-500 ring-2 ring-indigo-500/30'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      ? 'bg-indigo-50/70 border-indigo-500 ring-2 ring-indigo-500/20'
+                      : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-800 text-slate-400">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
                         {tmpl.category}
                       </span>
                       {templateId === tmpl._id && (
-                        <CheckCircle className="w-4 h-4 text-indigo-400" />
+                        <CheckCircle className="w-4 h-4 text-indigo-600" />
                       )}
                     </div>
-                    <div className="font-semibold text-white text-sm">{tmpl.name}</div>
-                    <p className="text-xs text-slate-400 line-clamp-2 mt-1">
+                    <div className="font-bold text-slate-900 text-sm">{tmpl.name}</div>
+                    <p className="text-xs text-slate-600 line-clamp-2 mt-1">
                       {tmpl.description}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-indigo-400 font-medium">
+                  <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-indigo-600 font-semibold">
                     <span>{templateId === tmpl._id ? 'Selected' : 'Use this template'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
@@ -1041,13 +1041,13 @@ function CampaignWizardContent() {
 
         {/* STEP 5: SUBJECT & CONTENT */}
         {currentStep === 5 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <SlidersHorizontal className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <SlidersHorizontal className="w-5 h-5 text-indigo-600" />
                 Step 5: Subject Line &amp; Personalization
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Configure your subject, preview preheader, and dynamic personalization tokens.
               </p>
             </div>
@@ -1055,39 +1055,39 @@ function CampaignWizardContent() {
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-semibold uppercase text-slate-400">
-                    Subject Line <span className="text-rose-400">*</span>
+                  <label className="text-xs font-semibold uppercase text-slate-600">
+                    Subject Line <span className="text-rose-500">*</span>
                   </label>
-                  <span className="text-xs text-slate-500">{subject.length} / 200 chars</span>
+                  <span className="text-xs text-slate-400">{subject.length} / 200 chars</span>
                 </div>
                 <input
                   type="text"
                   placeholder="e.g., Exclusive 20% Discount for you, {{first_name}}!"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                 />
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-1.5">
-                  <label className="text-xs font-semibold uppercase text-slate-400">
+                  <label className="text-xs font-semibold uppercase text-slate-600">
                     Preheader / Preview Text
                   </label>
-                  <span className="text-xs text-slate-500">{preheader.length} / 200 chars</span>
+                  <span className="text-xs text-slate-400">{preheader.length} / 200 chars</span>
                 </div>
                 <input
                   type="text"
                   placeholder="e.g., Don't miss out on this weekend's flash sale. Valid until Sunday."
                   value={preheader}
                   onChange={(e) => setPreheader(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                 />
               </div>
 
               {/* Personalization variable helpers */}
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2">
-                <div className="text-xs font-semibold uppercase text-slate-400">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+                <div className="text-xs font-semibold uppercase text-slate-600">
                   Insert Personalization Token
                 </div>
                 <div className="flex flex-wrap gap-2 pt-1">
@@ -1103,7 +1103,7 @@ function CampaignWizardContent() {
                       key={token}
                       type="button"
                       onClick={() => setSubject((s) => s + ' ' + token)}
-                      className="px-2.5 py-1 rounded bg-slate-900 border border-slate-700 hover:border-indigo-500 text-xs font-mono text-indigo-300 transition"
+                      className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-indigo-400 text-xs font-mono font-medium text-indigo-700 transition shadow-2xs"
                     >
                       {token}
                     </button>
@@ -1113,17 +1113,17 @@ function CampaignWizardContent() {
 
               {/* Link to visual editor */}
               {campaignId && (
-                <div className="p-4 rounded-xl bg-indigo-950/30 border border-indigo-900/40 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-200 flex items-center justify-between gap-3 flex-wrap">
                   <div>
-                    <div className="font-semibold text-sm text-white">Visual Drag-and-Drop Editor</div>
-                    <div className="text-xs text-slate-400 mt-0.5">
+                    <div className="font-bold text-sm text-slate-900">Visual Drag-and-Drop Editor</div>
+                    <div className="text-xs text-slate-600 mt-0.5">
                       Need custom block styling, images, buttons, or spacers?
                     </div>
                   </div>
                   <Link
                     href={`/editor/${campaignId}`}
                     target="_blank"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold transition shadow-sm"
                   >
                     Open Editor <ExternalLink className="w-3.5 h-3.5" />
                   </Link>
@@ -1135,26 +1135,26 @@ function CampaignWizardContent() {
 
         {/* STEP 6: PREVIEW */}
         {currentStep === 6 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
-            <div className="flex items-center justify-between">
+          <div className="saas-card p-6 md:p-8 space-y-6">
+            <div className="flex items-center justify-between flex-wrap gap-3">
               <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-indigo-400" />
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-indigo-600" />
                   Step 6: Email Preview
                 </h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-slate-600 mt-1">
                   Preview how your marketing email will appear across mobile and desktop inboxes.
                 </p>
               </div>
 
               {/* Device Toggle */}
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
                 <button
                   onClick={() => setPreviewDevice('desktop')}
-                  className={`p-1.5 rounded text-xs flex items-center gap-1 transition ${
+                  className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition ${
                     previewDevice === 'desktop'
-                      ? 'bg-indigo-600 text-white font-medium'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-indigo-700 font-semibold shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Monitor className="w-4 h-4" />
@@ -1162,10 +1162,10 @@ function CampaignWizardContent() {
                 </button>
                 <button
                   onClick={() => setPreviewDevice('mobile')}
-                  className={`p-1.5 rounded text-xs flex items-center gap-1 transition ${
+                  className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition ${
                     previewDevice === 'mobile'
-                      ? 'bg-indigo-600 text-white font-medium'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-white text-indigo-700 font-semibold shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <Smartphone className="w-4 h-4" />
@@ -1175,32 +1175,32 @@ function CampaignWizardContent() {
             </div>
 
             {/* Email Inbox Header Simulation */}
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-1 text-xs">
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-1 text-xs">
               <div>
                 <span className="text-slate-500 font-semibold">From:</span>{' '}
-                <span className="text-slate-200">
+                <span className="text-slate-800">
                   {brands.find((b) => b.id === brandId)?.senderName || 'Brand'}{' '}
                   &lt;{brands.find((b) => b.id === brandId)?.senderEmail || 'sender@mailcraft.io'}&gt;
                 </span>
               </div>
               <div>
                 <span className="text-slate-500 font-semibold">Subject:</span>{' '}
-                <span className="text-white font-medium">
+                <span className="text-slate-900 font-semibold">
                   {subject.replace(/{{first_name}}/g, 'Alex').replace(/{{brand_name}}/g, 'MailCraft')}
                 </span>
               </div>
               {preheader && (
                 <div>
                   <span className="text-slate-500 font-semibold">Preheader:</span>{' '}
-                  <span className="text-slate-400">{preheader}</span>
+                  <span className="text-slate-600">{preheader}</span>
                 </div>
               )}
             </div>
 
             {/* Rendered View Frame */}
-            <div className="flex justify-center bg-slate-950/80 border border-slate-800 rounded-xl p-4 overflow-hidden">
+            <div className="flex justify-center bg-slate-100 border border-slate-200 rounded-xl p-4 overflow-hidden">
               <div
-                className={`bg-white text-slate-900 rounded-lg shadow-2xl transition-all duration-300 p-6 overflow-y-auto max-h-[600px] ${
+                className={`bg-white text-slate-900 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 p-6 overflow-y-auto max-h-[600px] ${
                   previewDevice === 'mobile' ? 'w-full max-w-[375px]' : 'w-full max-w-[600px]'
                 }`}
               >
@@ -1240,34 +1240,34 @@ function CampaignWizardContent() {
 
         {/* STEP 7: TEST EMAIL */}
         {currentStep === 7 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Send className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Send className="w-5 h-5 text-indigo-600" />
                 Step 7: Send Real Test Email
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Dispatch an actual test email to your inbox to inspect rendering, subject line, and deliverability before broadcasting.
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold uppercase text-slate-400 mb-1.5">
+                <label className="block text-xs font-semibold uppercase text-slate-600 mb-1.5">
                   Test Recipient Email
                 </label>
-                <div className="flex gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <input
                     type="email"
                     placeholder="your-email@example.com"
                     value={testEmailAddress}
                     onChange={(e) => setTestEmailAddress(e.target.value)}
-                    className="flex-1 px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition"
+                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition"
                   />
                   <button
                     onClick={handleSendTestEmail}
                     disabled={testSending || !testEmailAddress}
-                    className="px-5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-medium text-sm transition flex items-center gap-2"
+                    className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-sm transition flex items-center justify-center gap-2 shadow-sm"
                   >
                     {testSending ? (
                       <>
@@ -1288,17 +1288,17 @@ function CampaignWizardContent() {
                 <div
                   className={`p-4 rounded-xl border text-sm flex items-start gap-3 ${
                     testEmailResult.success
-                      ? 'bg-emerald-950/60 border-emerald-800 text-emerald-200'
-                      : 'bg-rose-950/60 border-rose-800 text-rose-200'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border-rose-200 text-rose-900'
                   }`}
                 >
                   {testEmailResult.success ? (
-                    <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   ) : (
-                    <AlertTriangle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                    <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
                   )}
                   <div>
-                    <div className="font-semibold">
+                    <div className="font-bold">
                       {testEmailResult.success ? 'Test Email Dispatched' : 'Dispatch Failed'}
                     </div>
                     <div className="text-xs mt-0.5 opacity-90">{testEmailResult.message}</div>
@@ -1306,8 +1306,8 @@ function CampaignWizardContent() {
                 </div>
               )}
 
-              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-400">
-                <span className="font-semibold text-slate-300">Note:</span> Test emails do not alter your campaign recipient statistics or contact opt-in consent records.
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                <span className="font-semibold text-slate-900">Note:</span> Test emails do not alter your campaign recipient statistics or contact opt-in consent records.
               </div>
             </div>
           </div>
@@ -1315,14 +1315,14 @@ function CampaignWizardContent() {
 
         {/* STEP 8: READINESS VALIDATION */}
         {currentStep === 8 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
-            <div className="flex items-center justify-between">
+          <div className="saas-card p-6 md:p-8 space-y-6">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-indigo-600" />
                   Step 8: 20-Rule Readiness Audit
                 </h2>
-                <p className="text-sm text-slate-400 mt-1">
+                <p className="text-sm text-slate-600 mt-1">
                   MailCraft&apos;s pre-flight validation engine evaluates delivery compliance, brand alignment, and technical integrity.
                 </p>
               </div>
@@ -1330,17 +1330,17 @@ function CampaignWizardContent() {
               <button
                 onClick={runValidation}
                 disabled={validating}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium border border-slate-700 transition"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold border border-slate-200 shadow-xs transition"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${validating ? 'animate-spin text-indigo-400' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${validating ? 'animate-spin text-indigo-600' : 'text-slate-500'}`} />
                 Re-check
               </button>
             </div>
 
             {validating ? (
-              <div className="p-12 flex flex-col items-center justify-center gap-3 text-slate-400">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
-                <p className="text-sm">Auditing campaign rules against production delivery standards...</p>
+              <div className="p-12 flex flex-col items-center justify-center gap-3 text-slate-500">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <p className="text-sm font-medium">Auditing campaign rules against production delivery standards...</p>
               </div>
             ) : validationResult ? (
               <div className="space-y-4">
@@ -1348,17 +1348,17 @@ function CampaignWizardContent() {
                 <div
                   className={`p-4 rounded-xl border flex items-center gap-3 ${
                     validationResult.valid
-                      ? 'bg-emerald-950/60 border-emerald-800 text-emerald-200'
-                      : 'bg-rose-950/60 border-rose-800 text-rose-200'
+                      ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      : 'bg-rose-50 border-rose-200 text-rose-900'
                   }`}
                 >
                   {validationResult.valid ? (
-                    <CheckCircle className="w-6 h-6 text-emerald-400 shrink-0" />
+                    <CheckCircle className="w-6 h-6 text-emerald-600 shrink-0" />
                   ) : (
-                    <AlertTriangle className="w-6 h-6 text-rose-400 shrink-0" />
+                    <AlertTriangle className="w-6 h-6 text-rose-600 shrink-0" />
                   )}
                   <div>
-                    <div className="font-semibold text-sm">
+                    <div className="font-bold text-sm">
                       {validationResult.valid
                         ? 'Ready for Launch! All critical validation gates passed.'
                         : 'Action Required: Blocking issues detected before launch.'}
@@ -1373,15 +1373,15 @@ function CampaignWizardContent() {
                 {/* Errors list */}
                 {validationResult.errors.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs font-bold uppercase tracking-wider text-rose-400">
+                    <div className="text-xs font-bold uppercase tracking-wider text-rose-700">
                       Blocking Errors
                     </div>
                     {validationResult.errors.map((err, i) => (
                       <div
                         key={i}
-                        className="p-3 rounded-lg bg-rose-950/30 border border-rose-900/50 flex items-start gap-2.5 text-xs text-rose-300"
+                        className="p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2.5 text-xs text-rose-900"
                       >
-                        <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+                        <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
                         <div>
                           <span className="font-bold">Rule {err.ruleNumber} ({err.code}):</span>{' '}
                           {err.message}
@@ -1394,15 +1394,15 @@ function CampaignWizardContent() {
                 {/* Warnings list */}
                 {validationResult.warnings.length > 0 && (
                   <div className="space-y-2">
-                    <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
+                    <div className="text-xs font-bold uppercase tracking-wider text-amber-700">
                       Warnings &amp; Recommendations
                     </div>
                     {validationResult.warnings.map((warn, i) => (
                       <div
                         key={i}
-                        className="p-3 rounded-lg bg-amber-950/30 border border-amber-900/50 flex items-start gap-2.5 text-xs text-amber-300"
+                        className="p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900"
                       >
-                        <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400 mt-0.5" />
+                        <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
                         <div>
                           <span className="font-bold">Rule {warn.ruleNumber}:</span> {warn.message}
                         </div>
@@ -1413,8 +1413,8 @@ function CampaignWizardContent() {
 
                 {/* Passed rules summary */}
                 {validationResult.valid && validationResult.errors.length === 0 && (
-                  <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-400 flex items-center gap-2">
-                    <Check className="w-4 h-4 text-emerald-400" />
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 flex items-center gap-2">
+                    <Check className="w-4 h-4 text-emerald-600" />
                     <span>CAN-SPAM / GDPR mandatory unsubscribe tokens &amp; physical postal addresses verified.</span>
                   </div>
                 )}
@@ -1429,34 +1429,34 @@ function CampaignWizardContent() {
 
         {/* STEP 9: CONFIRM & LAUNCH */}
         {currentStep === 9 && (
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 md:p-8 space-y-6 shadow-xl">
+          <div className="saas-card p-6 md:p-8 space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Send className="w-5 h-5 text-indigo-400" />
+              <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                <Send className="w-5 h-5 text-indigo-600" />
                 Step 9: Launch &amp; Scheduling
               </h2>
-              <p className="text-sm text-slate-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1">
                 Final confirmation before putting your promotional email campaign into production.
               </p>
             </div>
 
             {/* Campaign Summary Card */}
-            <div className="p-5 rounded-xl bg-slate-950 border border-slate-800 space-y-3">
-              <div className="font-semibold text-white text-base">{campaignName}</div>
+            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div className="font-bold text-slate-900 text-base">{campaignName}</div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                 <div>
-                  <span className="text-slate-500">Subject:</span>
-                  <div className="text-slate-200 font-medium truncate mt-0.5">{subject}</div>
+                  <span className="text-slate-400 font-semibold">Subject:</span>
+                  <div className="text-slate-900 font-medium truncate mt-0.5">{subject}</div>
                 </div>
                 <div>
-                  <span className="text-slate-500">Brand Profile:</span>
-                  <div className="text-slate-200 font-medium truncate mt-0.5">
+                  <span className="text-slate-400 font-semibold">Brand Profile:</span>
+                  <div className="text-slate-900 font-medium truncate mt-0.5">
                     {brands.find((b) => b.id === brandId)?.brandName || 'Brand'}
                   </div>
                 </div>
                 <div>
-                  <span className="text-slate-500">Sender Provider:</span>
-                  <div className="text-slate-200 font-medium mt-0.5">
+                  <span className="text-slate-400 font-semibold">Sender Provider:</span>
+                  <div className="text-slate-900 font-semibold mt-0.5">
                     {(() => {
                       const p = connections.find((c) => c.id === connectionId)?.provider;
                       if (p === 'gmail_smtp') return 'GMAIL APP PASSWORD (1,500/day)';
@@ -1465,8 +1465,8 @@ function CampaignWizardContent() {
                   </div>
                 </div>
                 <div>
-                  <span className="text-slate-500">Eligible Audience:</span>
-                  <div className="text-emerald-400 font-bold mt-0.5">
+                  <span className="text-slate-400 font-semibold">Eligible Audience:</span>
+                  <div className="text-emerald-600 font-bold mt-0.5">
                     {contactStats.eligibleContacts} recipients
                   </div>
                 </div>
@@ -1475,7 +1475,7 @@ function CampaignWizardContent() {
 
             {/* Launch Options */}
             <div className="space-y-4">
-              <label className="block text-xs font-semibold uppercase text-slate-400">
+              <label className="block text-xs font-semibold uppercase text-slate-600">
                 Delivery Schedule
               </label>
 
@@ -1484,49 +1484,49 @@ function CampaignWizardContent() {
                   onClick={() => setLaunchMode('now')}
                   className={`p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
                     launchMode === 'now'
-                      ? 'bg-indigo-950/50 border-indigo-500'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                      : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Send className="w-5 h-5 text-indigo-400" />
+                    <Send className="w-5 h-5 text-indigo-600" />
                     <div>
-                      <div className="font-semibold text-white text-sm">Send Immediately</div>
-                      <div className="text-xs text-slate-400">Queue to BullMQ workers right now</div>
+                      <div className="font-bold text-slate-900 text-sm">Send Immediately</div>
+                      <div className="text-xs text-slate-600">Dispatch through selected channel right now</div>
                     </div>
                   </div>
-                  {launchMode === 'now' && <CheckCircle className="w-5 h-5 text-indigo-400" />}
+                  {launchMode === 'now' && <CheckCircle className="w-5 h-5 text-indigo-600" />}
                 </div>
 
                 <div
                   onClick={() => setLaunchMode('schedule')}
                   className={`p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
                     launchMode === 'schedule'
-                      ? 'bg-indigo-950/50 border-indigo-500'
-                      : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
+                      ? 'bg-indigo-50/70 border-indigo-500 ring-1 ring-indigo-500/20'
+                      : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-amber-400" />
+                    <Clock className="w-5 h-5 text-amber-600" />
                     <div>
-                      <div className="font-semibold text-white text-sm">Schedule for Later</div>
-                      <div className="text-xs text-slate-400">Specify future dispatch timestamp</div>
+                      <div className="font-bold text-slate-900 text-sm">Schedule for Later</div>
+                      <div className="text-xs text-slate-600">Specify future dispatch timestamp</div>
                     </div>
                   </div>
-                  {launchMode === 'schedule' && <CheckCircle className="w-5 h-5 text-indigo-400" />}
+                  {launchMode === 'schedule' && <CheckCircle className="w-5 h-5 text-indigo-600" />}
                 </div>
               </div>
 
               {launchMode === 'schedule' && (
                 <div className="space-y-2 pt-2">
-                  <label className="block text-xs font-semibold uppercase text-slate-400">
+                  <label className="block text-xs font-semibold uppercase text-slate-600">
                     Execution Date &amp; Time (UTC)
                   </label>
                   <input
                     type="datetime-local"
                     value={scheduledDateTime}
                     onChange={(e) => setScheduledDateTime(e.target.value)}
-                    className="w-full px-4 py-2 bg-slate-950 border border-slate-800 rounded-lg text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
               )}
@@ -1535,7 +1535,7 @@ function CampaignWizardContent() {
                 <button
                   onClick={handleLaunchCampaign}
                   disabled={launching || (validationResult !== null && !validationResult.valid)}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-semibold text-base shadow-xl shadow-indigo-600/30 transition transform active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-semibold text-base shadow-lg shadow-indigo-600/25 transition transform active:scale-[0.99] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {launching ? (
                     <>
@@ -1564,7 +1564,7 @@ function CampaignWizardContent() {
           <button
             onClick={handlePrevStep}
             disabled={currentStep === 1 || saving}
-            className="px-5 py-2.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 disabled:opacity-40 text-sm font-medium transition flex items-center gap-2"
+            className="px-5 py-2.5 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 text-sm font-semibold shadow-xs transition flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             Previous
@@ -1574,7 +1574,7 @@ function CampaignWizardContent() {
             <button
               onClick={handleNextStep}
               disabled={saving}
-              className="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm transition flex items-center gap-2 shadow-lg shadow-indigo-600/20"
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition flex items-center gap-2 shadow-sm shadow-indigo-600/20"
             >
               {saving ? (
                 <>
@@ -1599,8 +1599,8 @@ export default function CampaignWizardPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
         </div>
       }
     >
