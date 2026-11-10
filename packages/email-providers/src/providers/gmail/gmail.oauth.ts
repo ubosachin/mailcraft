@@ -28,10 +28,20 @@ export class GmailOAuthClient {
   }) {
     this.clientId = options?.clientId || process.env.GOOGLE_CLIENT_ID || '';
     this.clientSecret = options?.clientSecret || process.env.GOOGLE_CLIENT_SECRET || '';
+    const defaultAppUrl = (
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : '') ||
+      (process.env.NODE_ENV === 'production'
+        ? 'https://web-tawny-three-j5f5132mxd.vercel.app'
+        : 'http://localhost:3000')
+    ).replace(/\/+$/, '');
+
     this.redirectUri =
       options?.redirectUri ||
       process.env.GOOGLE_REDIRECT_URI ||
-      'http://localhost:3000/api/v1/connections/gmail/callback';
+      `${defaultAppUrl}/api/v1/connections/gmail/callback`;
   }
 
   /**

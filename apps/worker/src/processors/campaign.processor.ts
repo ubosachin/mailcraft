@@ -93,7 +93,15 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
     blocks: [],
   };
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = (
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : '') ||
+    (process.env.NODE_ENV === 'production'
+      ? 'https://web-tawny-three-j5f5132mxd.vercel.app'
+      : 'http://localhost:3000')
+  ).replace(/\/+$/, '');
 
   // Process recipients in chunks
   let hasMore = true;

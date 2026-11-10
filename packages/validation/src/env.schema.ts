@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
+  NEXT_PUBLIC_APP_URL: z.string().url().default('https://web-tawny-three-j5f5132mxd.vercel.app'),
   API_BASE_URL: z.string().url().optional(),
   MONGODB_URI: z
     .string()
@@ -10,6 +10,7 @@ export const envSchema = z.object({
     .refine((val) => val.startsWith('mongodb://') || val.startsWith('mongodb+srv://'), {
       message: 'MONGODB_URI must start with mongodb:// or mongodb+srv://',
     }),
+  MONGODB_MAX_POOL_SIZE: z.string().optional(),
   REDIS_URL: z
     .string()
     .min(1, 'REDIS_URL is required')
@@ -21,14 +22,18 @@ export const envSchema = z.object({
     .min(64, 'ENCRYPTION_KEY must be 64 hex characters (32 bytes)')
     .max(64, 'ENCRYPTION_KEY must be 64 hex characters (32 bytes)')
     .regex(/^[0-9a-fA-F]{64}$/, 'ENCRYPTION_KEY must be a valid 64-character hex string'),
+  ENCRYPTION_KEY_VERSION: z.string().optional(),
   APP_SECRET: z.string().min(32, 'APP_SECRET must be at least 32 characters for security'),
 
-  // Optional Providers
+  // Optional Providers & Platform Webhooks
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GOOGLE_REDIRECT_URI: z.string().optional(),
 
   BREVO_API_KEY: z.string().optional(),
+  SYSTEM_BREVO_API_KEY: z.string().optional(),
+  SYSTEM_SENDER_EMAIL: z.string().optional(),
+  BREVO_WEBHOOK_SECRET: z.string().optional(),
 
   AWS_REGION: z.string().optional(),
   AWS_ACCESS_KEY_ID: z.string().optional(),
@@ -60,7 +65,15 @@ export function validateEnvironment(env: Record<string, string | undefined>): {
   errors?: string[];
   status: ProviderConfigurationStatus;
 } {
-  const result = envSchema.safeParse(env);
+  const normalizedEnv = {
+    ...env,
+    NEXT_PUBLIC_APP_URL:
+      env.NEXT_PUBLIC_APP_URL ||
+      (env.NODE_ENV === 'production'
+        ? 'https://web-tawny-three-j5f5132mxd.vercel.app'
+        : 'http://localhost:3000'),
+  };
+  const result = envSchema.safeParse(normalizedEnv);
 
   const status: ProviderConfigurationStatus = {
     database: env.MONGODB_URI ? 'connected' : 'unconfigured',

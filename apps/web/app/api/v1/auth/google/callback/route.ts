@@ -11,11 +11,12 @@ import {
   createAuthenticatedSession,
   setSessionCookie,
 } from '@/lib/session';
+import { getAppUrl } from '@/lib/url';
 
 const OAUTH_NONCE_COOKIE = 'mailcraft_oauth_nonce';
 
 export async function GET(request: NextRequest) {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = getAppUrl(request);
 
   try {
     const searchParams = request.nextUrl.searchParams;

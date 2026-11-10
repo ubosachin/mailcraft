@@ -7,6 +7,7 @@ import {
 import { GmailOAuthClient } from '@mailcraft/email-providers';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+import { getAppUrl } from '@/lib/url';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     const state = searchParams.get('state');
     const errorParam = searchParams.get('error');
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = getAppUrl(request);
 
     if (errorParam) {
       return NextResponse.redirect(`${appUrl}/connect?error=${encodeURIComponent(errorParam)}`);
@@ -30,7 +31,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${appUrl}/connect?error=authentication_required`);
     }
 
-    const client = new GmailOAuthClient();
+    const client = new GmailOAuthClient({
+      redirectUri: process.env.GOOGLE_REDIRECT_URI || `${appUrl}/api/v1/connections/gmail/callback`,
+    });
     const isValidState = client.validateState(state, session._id.toString());
     if (!isValidState) {
       return NextResponse.redirect(`${appUrl}/connect?error=invalid_or_expired_oauth_state`);

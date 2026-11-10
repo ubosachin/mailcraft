@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getAllowedOrigins } from './lib/url';
 
 const PROTECTED_PAGE_PREFIXES = [
   '/workspace',
@@ -13,7 +14,10 @@ const PROTECTED_PAGE_PREFIXES = [
 ];
 
 export function middleware(request: NextRequest) {
-  const origin = request.headers.get('origin') || '*';
+  const requestOrigin = request.headers.get('origin');
+  const allowedOrigins = getAllowedOrigins(request);
+  const corsOrigin =
+    requestOrigin && allowedOrigins.has(requestOrigin) ? requestOrigin : null;
   const pathname = request.nextUrl.pathname;
   const isApi = pathname.startsWith('/api/');
 
@@ -34,16 +38,20 @@ export function middleware(request: NextRequest) {
 
   // Handle CORS preflight OPTIONS requests for API
   if (isApi && request.method === 'OPTIONS') {
+    const preflightHeaders: Record<string, string> = {
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers':
+        'Content-Type, Authorization, X-Requested-With, X-Session-Id, X-Campaign-Id',
+      'Access-Control-Max-Age': '86400',
+      Vary: 'Origin',
+    };
+    if (corsOrigin) {
+      preflightHeaders['Access-Control-Allow-Origin'] = corsOrigin;
+      preflightHeaders['Access-Control-Allow-Credentials'] = 'true';
+    }
     return new NextResponse(null, {
       status: 204,
-      headers: {
-        'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-        'Access-Control-Allow-Headers':
-          'Content-Type, Authorization, X-Requested-With, X-Session-Id, X-Campaign-Id',
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Max-Age': '86400',
-      },
+      headers: preflightHeaders,
     });
   }
 
@@ -73,14 +81,17 @@ export function middleware(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', csp);
 
-  // CORS headers on API responses
+  // CORS headers on API responses for trusted origins only
   if (isApi) {
-    response.headers.set('Access-Control-Allow-Origin', origin);
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
-    response.headers.set(
-      'Access-Control-Allow-Methods',
-      'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-    );
+    response.headers.set('Vary', 'Origin');
+    if (corsOrigin) {
+      response.headers.set('Access-Control-Allow-Origin', corsOrigin);
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+      response.headers.set(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+      );
+    }
   }
 
   return response;

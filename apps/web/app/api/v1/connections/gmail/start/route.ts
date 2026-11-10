@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GmailOAuthClient } from '@mailcraft/email-providers';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+import { getAppUrl } from '@/lib/url';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,7 +11,10 @@ export async function GET(request: NextRequest) {
       return jsonError('Authentication required', 401);
     }
 
-    const client = new GmailOAuthClient();
+    const appUrl = getAppUrl(request);
+    const client = new GmailOAuthClient({
+      redirectUri: process.env.GOOGLE_REDIRECT_URI || `${appUrl}/api/v1/connections/gmail/callback`,
+    });
     const state = client.generateState(session._id.toString());
     const url = client.buildAuthorizationUrl(state);
 
