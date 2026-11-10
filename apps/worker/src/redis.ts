@@ -7,9 +7,9 @@ export function getRedisConnectionOptions(): ConnectionOptions {
   return {
     host: parsed.hostname || '127.0.0.1',
     port: Number(parsed.port) || 6379,
-    password: parsed.password || undefined,
-    username: parsed.username || undefined,
+    password: parsed.password ? decodeURIComponent(parsed.password) : undefined,
+    username: parsed.username ? decodeURIComponent(parsed.username) : undefined,
+    tls: parsed.protocol === 'rediss:' ? {} : undefined,
     maxRetriesPerRequest: null, // Required by BullMQ
   };
 }
-

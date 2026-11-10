@@ -9,10 +9,19 @@ import {
   createAuthenticatedSession,
   setSessionCookie,
 } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const rateLimit = await checkRateLimit(`auth_login:${ip}`, 'SESSION_CREATE');
+    if (!rateLimit.success) {
+      return jsonError('Too many login attempts. Please wait a few minutes and try again.', 429, {
+        retryAfter: Math.ceil(rateLimit.resetMs / 1000),
+      });
+    }
+
     await connectToDatabase();
 
     const body = await request.json();

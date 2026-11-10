@@ -5,6 +5,7 @@ export * from './password.js';
 export * from './models/User.js';
 export * from './models/UserSession.js';
 export * from './models/Brand.js';
+export * from './models/ContactInquiry.js';
 export * from './models/EmailConnection.js';
 export * from './models/Contact.js';
 export * from './models/ContactImport.js';

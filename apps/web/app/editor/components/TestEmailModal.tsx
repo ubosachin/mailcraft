@@ -50,7 +50,8 @@ export function TestEmailModal({
 
       setStatus('success');
       setResultMessage(
-        `Test broadcast successfully queued! Dispatched to ${recipient}. (Job ID: ${data.data?.jobId || 'N/A'})`
+        data.data?.message ||
+          `Test email sent to ${recipient}. (ID: ${data.data?.messageId || data.data?.jobId || 'N/A'})`
       );
     } catch (err: unknown) {
       setStatus('error');

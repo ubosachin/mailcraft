@@ -13,9 +13,9 @@ export const envSchema = z.object({
   MONGODB_MAX_POOL_SIZE: z.string().optional(),
   REDIS_URL: z
     .string()
-    .min(1, 'REDIS_URL is required')
-    .refine((val) => val.startsWith('redis://') || val.startsWith('rediss://'), {
-      message: 'REDIS_URL must start with redis:// or rediss://',
+    .optional()
+    .refine((val) => !val || val.startsWith('redis://') || val.startsWith('rediss://'), {
+      message: 'REDIS_URL must start with redis:// or rediss:// when provided',
     }),
   ENCRYPTION_KEY: z
     .string()
@@ -67,6 +67,7 @@ export function validateEnvironment(env: Record<string, string | undefined>): {
 } {
   const normalizedEnv = {
     ...env,
+    REDIS_URL: env.REDIS_URL?.trim() || undefined,
     NEXT_PUBLIC_APP_URL:
       env.NEXT_PUBLIC_APP_URL ||
       (env.NODE_ENV === 'production'

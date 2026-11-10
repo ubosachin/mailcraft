@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const oauthNonce = crypto.randomBytes(16).toString('hex');
     const state = `auth_${client.generateState(oauthNonce)}`;
     const { codeVerifier, codeChallenge } = client.generatePkcePair();
-    const url = client.buildAuthorizationUrl(state, codeChallenge);
+    const url = client.buildAuthorizationUrl(state, codeChallenge, { scopeType: 'auth' });
 
     const response = wantsJson
       ? jsonSuccess({ url, state })

@@ -411,12 +411,16 @@ function CampaignWizardContent() {
       if (data.success) {
         setTestEmailResult({
           success: true,
-          message: `Test email successfully queued to ${testEmailAddress}. Check your inbox!`,
+          message:
+            data.data?.message ||
+            `Test email sent successfully to ${testEmailAddress}. Check your inbox!`,
         });
       } else {
         setTestEmailResult({
           success: false,
-          message: data.message || 'Failed to dispatch test email',
+          message:
+            (typeof data.error === 'string' ? data.error : data.message) ||
+            'Failed to dispatch test email',
         });
       }
     } catch {

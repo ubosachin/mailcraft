@@ -11,12 +11,15 @@ import {
 } from '@mailcraft/database';
 import { compileEmail } from '@mailcraft/email-renderer';
 import { IEditorSchema } from '@mailcraft/shared-types';
-import { enqueueCampaignJob } from '@/lib/queue';
+import { triggerCampaignDispatch } from '@/lib/campaign-dispatcher';
+import { getAppUrl } from '@/lib/url';
 import { resolveAuthSession } from '@/lib/session';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 import { applySegmentFilters } from '@/lib/contact-service';
 import { validateCampaignReadiness } from '@/lib/campaign-validator';
+
+export const maxDuration = 60;
 
 export async function POST(
   request: NextRequest,
@@ -139,6 +142,8 @@ export async function POST(
       blocks: [],
     };
 
+    const appUrl = getAppUrl(request);
+
     const compiled = compileEmail({
       schema: editorSchema,
       brand: {
@@ -150,7 +155,7 @@ export async function POST(
       },
       recipient: {
         email: 'preview@mailcraft.local',
-        unsubscribeUrl: 'https://example.com/unsubscribe/preview',
+        unsubscribeUrl: `${appUrl}/unsubscribe/preview`,
       },
     });
 
@@ -206,16 +211,17 @@ export async function POST(
     }
     await campaign.save();
 
-    // Dispatch to BullMQ Queue
-    const job = await enqueueCampaignJob(campaign._id.toString());
+    // Dispatch via active BullMQ worker if online, or Next.js serverless background execution
+    const dispatch = await triggerCampaignDispatch(campaign._id.toString(), appUrl);
 
     return jsonSuccess({
       campaignId: campaign._id.toString(),
-      jobId: job.id,
+      jobId: dispatch.jobId,
+      dispatchMode: dispatch.mode,
       status: 'queued',
       recipientCount: totalQueued,
       snapshotAt: campaign.snapshot.snapshotAt,
-      message: `Campaign successfully queued for background delivery to ${totalQueued} recipients`,
+      message: `Campaign dispatch started for ${totalQueued} recipients`,
     });
   } catch (error) {
     return handleApiError(error);

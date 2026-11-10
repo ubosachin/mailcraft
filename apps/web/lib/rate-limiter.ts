@@ -35,9 +35,19 @@ function getRedisClient(): Redis | null {
   if (redisFailed) return null;
   if (redisClient) return redisClient;
 
+  const url = process.env.REDIS_URL?.trim();
+  if (
+    !url ||
+    (process.env.NODE_ENV === 'production' &&
+      (url.includes('127.0.0.1') || url.includes('localhost')))
+  ) {
+    redisFailed = true;
+    return null;
+  }
+
   try {
-    const url = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
     redisClient = new Redis(url, {
+      tls: url.startsWith('rediss://') ? {} : undefined,
       maxRetriesPerRequest: 1,
       connectTimeout: 2000,
       enableOfflineQueue: false,

@@ -2,17 +2,43 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Send, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setErrorMsg('');
+    setSubmitting(true);
+
+    try {
+      const res = await fetch('/api/v1/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), message: message.trim() }),
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(
+          (typeof json.error === 'string' ? json.error : json.message) ||
+            'Failed to submit inquiry. Please try again.'
+        );
+      }
+
+      setSubmitted(true);
+      setMessage('');
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Unable to send message right now.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -43,7 +69,8 @@ export default function ContactPage() {
               </div>
               <h3 className="text-base font-bold text-slate-900">Message Received</h3>
               <p className="text-xs text-slate-600">
-                Thank you for reaching out. Our engineering team reviews all incoming inquiries promptly.
+                Thank you for reaching out. Your message has been logged and our team will reply to{' '}
+                <span className="font-semibold text-slate-800">{email}</span>.
               </p>
               <button
                 onClick={() => setSubmitted(false)}
@@ -54,6 +81,13 @@ export default function ContactPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              {errorMsg && (
+                <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 uppercase mb-1">Your Email</label>
                 <input
@@ -71,6 +105,7 @@ export default function ContactPage() {
                 <textarea
                   rows={4}
                   required
+                  minLength={5}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us about your campaign needs, provider integration questions, or feedback..."
@@ -80,10 +115,20 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-1.5"
+                disabled={submitting}
+                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold rounded-lg shadow-sm transition flex items-center justify-center gap-1.5"
               >
-                <Send className="w-3.5 h-3.5" />
-                <span>Submit Message</span>
+                {submitting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Sending...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Submit Message</span>
+                  </>
+                )}
               </button>
             </form>
           )}
@@ -92,4 +137,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

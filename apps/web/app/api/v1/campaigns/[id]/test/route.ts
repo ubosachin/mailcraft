@@ -1,10 +1,13 @@
 import { NextRequest } from 'next/server';
 import { sendTestEmailSchema } from '@mailcraft/validation';
 import { connectToDatabase, Campaign } from '@mailcraft/database';
-import { enqueueTestEmailJob } from '@/lib/queue';
 import { resolveAuthSession } from '@/lib/session';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+import { dispatchTestEmailForCampaign } from '@/lib/campaign-dispatcher';
+import { getAppUrl } from '@/lib/url';
+
+export const maxDuration = 30;
 
 export async function POST(
   request: NextRequest,
@@ -34,15 +37,21 @@ export async function POST(
       return jsonError('Campaign not found', 404);
     }
 
-    const job = await enqueueTestEmailJob(campaign._id.toString(), testEmail);
+    const result = await dispatchTestEmailForCampaign(
+      campaign._id.toString(),
+      testEmail,
+      getAppUrl(request)
+    );
 
     return jsonSuccess({
-      jobId: job.id,
+      jobId: result.messageId,
+      messageId: result.messageId,
+      provider: result.provider,
+      senderEmail: result.senderEmail,
       testEmail,
-      message: `Test email job queued to ${testEmail}`,
+      message: `Test email sent successfully to ${testEmail} via ${result.provider.toUpperCase()}`,
     });
   } catch (error) {
     return handleApiError(error);
   }
 }
-

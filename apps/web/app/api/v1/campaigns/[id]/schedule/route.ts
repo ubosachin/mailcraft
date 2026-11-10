@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { scheduleCampaignSchema } from '@mailcraft/validation';
 import { connectToDatabase, Campaign } from '@mailcraft/database';
-import { enqueueCampaignJob } from '@/lib/queue';
+import { enqueueCampaignJob, hasActiveCampaignWorker } from '@/lib/queue';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
@@ -42,15 +42,22 @@ export async function POST(
     campaign.scheduledAt = scheduledDate;
     await campaign.save();
 
-    // Enqueue delayed BullMQ job
-    const job = await enqueueCampaignJob(campaign._id.toString(), {
-      delayMs,
-      jobId: `sched_${campaign._id}_${scheduledDate.getTime()}`,
-    });
+    let jobId: string | undefined;
+    if (await hasActiveCampaignWorker()) {
+      try {
+        const job = await enqueueCampaignJob(campaign._id.toString(), {
+          delayMs,
+          jobId: `sched_${campaign._id}_${scheduledDate.getTime()}`,
+        });
+        jobId = job.id ? String(job.id) : undefined;
+      } catch (err) {
+        console.warn('[Schedule] Queue enqueue failed; saved schedule in DB for cron pickup:', err);
+      }
+    }
 
     return jsonSuccess({
       campaignId: campaign._id.toString(),
-      jobId: job.id,
+      jobId: jobId || `db_sched_${campaign._id}`,
       status: 'scheduled',
       scheduledAt: scheduledDate.toISOString(),
       timezone: validated.timezone,

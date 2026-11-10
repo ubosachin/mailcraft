@@ -114,20 +114,34 @@ export class GmailOAuthClient {
   }
 
   /**
-   * Builds the official Google OAuth 2.0 authorization URL with narrow gmail.send scope and optional PKCE.
+   * Builds the official Google OAuth 2.0 authorization URL.
+   * - `gmail_send` (default): requests Gmail send permission + offline refresh token for sending campaigns.
+   * - `auth`: requests standard `openid email profile` scopes only for customer sign-in/signup.
    */
-  buildAuthorizationUrl(state: string, codeChallenge?: string): string {
+  buildAuthorizationUrl(
+    state: string,
+    codeChallenge?: string,
+    options?: { scopeType?: 'auth' | 'gmail_send'; prompt?: string }
+  ): string {
     this.assertConfigured();
+
+    const scopeType = options?.scopeType || 'gmail_send';
+    const isAuthOnly = scopeType === 'auth';
 
     const params = new URLSearchParams({
       client_id: this.clientId.trim(),
       redirect_uri: this.redirectUri,
       response_type: 'code',
-      scope: 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email',
-      access_type: 'offline',
-      prompt: 'consent', // Ensures refresh_token is returned
+      scope: isAuthOnly
+        ? 'openid email profile'
+        : 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email',
+      prompt: options?.prompt || (isAuthOnly ? 'select_account' : 'consent'),
       state,
     });
+
+    if (!isAuthOnly) {
+      params.set('access_type', 'offline');
+    }
 
     if (codeChallenge) {
       params.set('code_challenge', codeChallenge);

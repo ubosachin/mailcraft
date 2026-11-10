@@ -106,50 +106,53 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Auto-save Gmail sending connection (preserving previous refresh token if Google omits one)
-    const existingConnection = await EmailConnection.findOne({
-      sessionId: sessionDoc._id,
-      provider: 'gmail',
-    });
-
-    let finalRefreshToken = tokens.refreshToken;
-    if (!finalRefreshToken && existingConnection) {
-      try {
-        const prev = decryptCredentials<{ refreshToken?: string }>(
-          existingConnection.encryptedCredentials
-        );
-        finalRefreshToken = prev.refreshToken;
-      } catch {
-        // Ignore decryption failures on stale records
-      }
-    }
-
-    if (finalRefreshToken) {
-      const encrypted = encryptCredentials({
-        accessToken: tokens.accessToken,
-        refreshToken: finalRefreshToken,
-        expiryDate: Date.now() + tokens.expiresIn * 1000,
-        scope: tokens.scope,
+    // Auto-save Gmail sending connection ONLY when the granted OAuth token includes gmail.send scope
+    const hasGmailSendScope = Boolean(tokens.scope?.includes('gmail.send'));
+    if (hasGmailSendScope) {
+      const existingConnection = await EmailConnection.findOne({
+        sessionId: sessionDoc._id,
+        provider: 'gmail',
       });
 
-      await EmailConnection.findOneAndUpdate(
-        { sessionId: sessionDoc._id, provider: 'gmail' },
-        {
-          $set: {
-            senderEmail: normalizedEmail,
-            senderName: user.name || undefined,
-            encryptedCredentials: encrypted,
-            credentialVersion: 1,
-            status: 'connected',
-            senderVerificationStatus: 'verified',
-            providerAccountStatus: 'active',
-            verifiedAt: new Date(),
-            lastVerifiedAt: new Date(),
-            lastError: null,
+      let finalRefreshToken = tokens.refreshToken;
+      if (!finalRefreshToken && existingConnection) {
+        try {
+          const prev = decryptCredentials<{ refreshToken?: string }>(
+            existingConnection.encryptedCredentials
+          );
+          finalRefreshToken = prev.refreshToken;
+        } catch {
+          // Ignore decryption failures on stale records
+        }
+      }
+
+      if (finalRefreshToken) {
+        const encrypted = encryptCredentials({
+          accessToken: tokens.accessToken,
+          refreshToken: finalRefreshToken,
+          expiryDate: Date.now() + tokens.expiresIn * 1000,
+          scope: tokens.scope,
+        });
+
+        await EmailConnection.findOneAndUpdate(
+          { sessionId: sessionDoc._id, provider: 'gmail' },
+          {
+            $set: {
+              senderEmail: normalizedEmail,
+              senderName: user.name || undefined,
+              encryptedCredentials: encrypted,
+              credentialVersion: 1,
+              status: 'connected',
+              senderVerificationStatus: 'verified',
+              providerAccountStatus: 'active',
+              verifiedAt: new Date(),
+              lastVerifiedAt: new Date(),
+              lastError: null,
+            },
           },
-        },
-        { upsert: true, new: true }
-      );
+          { upsert: true, new: true }
+        );
+      }
     }
 
     const response = NextResponse.redirect(`${appUrl}/workspace?auth=success`);

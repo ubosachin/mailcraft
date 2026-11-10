@@ -1,8 +1,11 @@
 import { NextRequest } from 'next/server';
 import { connectToDatabase, Campaign } from '@mailcraft/database';
-import { enqueueCampaignJob } from '@/lib/queue';
+import { triggerCampaignDispatch } from '@/lib/campaign-dispatcher';
+import { getAppUrl } from '@/lib/url';
 import { resolveAuthSession } from '@/lib/session';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
+
+export const maxDuration = 60;
 
 export async function POST(
   request: NextRequest,
@@ -25,11 +28,14 @@ export async function POST(
     campaign.status = 'queued';
     await campaign.save();
 
-    await enqueueCampaignJob(campaign._id.toString());
+    const dispatch = await triggerCampaignDispatch(campaign._id.toString(), getAppUrl(request));
 
-    return jsonSuccess({ status: 'queued' }, 200, 'Campaign delivery resumed');
+    return jsonSuccess(
+      { status: 'queued', jobId: dispatch.jobId, dispatchMode: dispatch.mode },
+      200,
+      'Campaign delivery resumed'
+    );
   } catch (error) {
     return handleApiError(error);
   }
 }
-

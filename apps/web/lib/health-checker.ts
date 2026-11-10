@@ -1,7 +1,7 @@
 import { connectToDatabase } from '@mailcraft/database';
 import Redis from 'ioredis';
 import mongoose from 'mongoose';
-import { getCampaignQueue, getTestEmailQueue } from './queue';
+import { getCampaignQueue, getTestEmailQueue, isRedisConfigured } from './queue';
 
 export interface HealthCheckResult {
   status: 'healthy' | 'degraded' | 'unhealthy';
@@ -68,36 +68,45 @@ export async function checkReadiness(): Promise<{
     };
   }
 
-  // 2. Check Redis
+  // 2. Check Redis (optional in serverless inline mode)
+  const redisConfigured = isRedisConfigured();
   const redisStart = Date.now();
-  try {
-    const url = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
-    const redis = new Redis(url, {
-      maxRetriesPerRequest: 1,
-      connectTimeout: 2000,
-      lazyConnect: true,
-    });
-    await redis.connect();
-    const ping = await redis.ping();
-    await redis.quit();
-
-    if (ping === 'PONG') {
-      redisOk = true;
-      checks.redis = {
-        status: 'connected',
-        latencyMs: Date.now() - redisStart,
-      };
-    } else {
-      checks.redis = { status: 'unexpected_response' };
-    }
-  } catch (err) {
+  if (!redisConfigured) {
     checks.redis = {
-      status: 'disconnected',
-      error: err instanceof Error ? err.message : String(err),
+      status: 'not_configured',
+      mode: 'serverless_inline',
     };
+  } else {
+    try {
+      const url = process.env.REDIS_URL!.trim();
+      const redis = new Redis(url, {
+        tls: url.startsWith('rediss://') ? {} : undefined,
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2500,
+        lazyConnect: true,
+      });
+      await redis.connect();
+      const ping = await redis.ping();
+      await redis.quit();
+
+      if (ping === 'PONG') {
+        redisOk = true;
+        checks.redis = {
+          status: 'connected',
+          latencyMs: Date.now() - redisStart,
+        };
+      } else {
+        checks.redis = { status: 'unexpected_response' };
+      }
+    } catch (err) {
+      checks.redis = {
+        status: 'disconnected',
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
   }
 
-  const ready = mongoOk && redisOk;
+  const ready = mongoOk && (redisConfigured ? redisOk : true);
   return {
     ready,
     status: ready ? 'ready' : 'not_ready',
@@ -106,6 +115,16 @@ export async function checkReadiness(): Promise<{
 }
 
 export async function getQueueMetrics() {
+  if (!isRedisConfigured()) {
+    return {
+      configured: false,
+      mode: 'serverless_inline',
+      campaigns: {},
+      testEmails: {},
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   const campQueue = getCampaignQueue();
   const testQueue = getTestEmailQueue();
 
@@ -115,6 +134,8 @@ export async function getQueueMetrics() {
   ]);
 
   return {
+    configured: true,
+    mode: 'redis_bullmq',
     campaigns: campCounts,
     testEmails: testCounts,
     timestamp: new Date().toISOString(),
