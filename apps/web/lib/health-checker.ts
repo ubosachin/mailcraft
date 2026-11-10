@@ -50,9 +50,10 @@ export async function checkReadiness(): Promise<{
   // 1. Check MongoDB
   const mongoStart = Date.now();
   try {
-    await connectToDatabase();
-    if (mongoose.connection?.db) {
-      await mongoose.connection.db.admin().ping();
+    const dbConn = await connectToDatabase();
+    const activeDb = dbConn.connection?.db || mongoose.connection?.db;
+    if (activeDb) {
+      await activeDb.admin().ping();
       mongoOk = true;
       checks.mongodb = {
         status: 'connected',

@@ -202,10 +202,33 @@ export default function WorkspacePage() {
           }
         }
 
-        const authRes = await fetch('/api/v1/auth/me', {
-          cache: 'no-store',
-          credentials: 'same-origin',
-        });
+        let authRes: Response | null = null;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          try {
+            const candidate = await fetch('/api/v1/auth/me', {
+              cache: 'no-store',
+              credentials: 'same-origin',
+            });
+            authRes = candidate;
+            if (candidate.ok || candidate.status === 401 || candidate.status < 500) {
+              break;
+            }
+          } catch (err) {
+            if (attempt === 1) throw err;
+          }
+          if (attempt === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 600));
+          }
+        }
+
+        if (!authRes) {
+          setStatusMessage({
+            type: 'error',
+            text: 'Unable to reach server to verify session. Please refresh and try again.',
+          });
+          setLoading(false);
+          return;
+        }
 
         if (authRes.status === 401) {
           window.location.assign('/login?redirect=/workspace');
@@ -213,9 +236,18 @@ export default function WorkspacePage() {
         }
 
         if (!authRes.ok) {
+          let detail = 'Unable to reach server to verify session. Please refresh and try again.';
+          try {
+            const errJson = await authRes.json();
+            if (typeof errJson?.error === 'string' && errJson.error.trim()) {
+              detail = `Session check error: ${errJson.error}`;
+            }
+          } catch {
+            // Keep generic fallback message if non-JSON response
+          }
           setStatusMessage({
             type: 'error',
-            text: 'Unable to reach server to verify session. Please refresh and try again.',
+            text: detail,
           });
           setLoading(false);
           return;
