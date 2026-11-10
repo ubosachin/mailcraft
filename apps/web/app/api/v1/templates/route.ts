@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
-import { connectToDatabase, Template, seedTemplates } from '@mailcraft/database';
+import { connectToDatabase, Template } from '@mailcraft/database';
+import { TEMPLATE_CATALOG } from '@mailcraft/email-renderer';
 import { resolveAuthSession } from '@/lib/session';
+import { syncTemplateCatalogIfNeeded } from '@/lib/templates';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function GET(request: NextRequest) {
@@ -17,14 +19,13 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search') || searchParams.get('q') || '';
     const sort = searchParams.get('sort') || 'featured';
 
-    let count = await Template.countDocuments({ isActive: true });
-    if (count === 0) {
-      console.log('[Templates API] Collection empty, executing automatic seed...');
-      await seedTemplates();
-      count = await Template.countDocuments({ isActive: true });
-    }
+    await syncTemplateCatalogIfNeeded();
 
-    const query: Record<string, unknown> = { isActive: true };
+    const catalogSlugs = TEMPLATE_CATALOG.map((t) => t.slug);
+    const query: Record<string, unknown> = {
+      isActive: true,
+      slug: { $in: catalogSlugs },
+    };
 
     if (category && category !== 'all') {
       const normCat = category.toLowerCase().trim();
@@ -46,19 +47,22 @@ export async function GET(request: NextRequest) {
       query.$or = [{ name: regex }, { description: regex }, { slug: regex }, { category: regex }];
     }
 
-    let sortOptions: Record<string, 1 | -1> = { createdAt: 1 };
+    let sortOptions: Record<string, 1 | -1> = { version: -1, createdAt: 1 };
     if (sort === 'name') {
       sortOptions = { name: 1 };
     } else if (sort === 'newest') {
-      sortOptions = { createdAt: -1 };
+      sortOptions = { version: -1, createdAt: -1 };
     } else if (sort === 'popular' || sort === 'featured') {
-      sortOptions = { isPremium: 1, createdAt: 1 };
+      sortOptions = { version: -1, isPremium: -1, createdAt: 1 };
     }
 
     const templates = await Template.find(query).sort(sortOptions);
 
-    // Get category counts across all active templates for filter badges
-    const allActive = await Template.find({ isActive: true }).select('category');
+    // Get category counts across all active catalog templates for filter badges
+    const allActive = await Template.find({
+      isActive: true,
+      slug: { $in: catalogSlugs },
+    }).select('category');
     const categoryCounts: Record<string, number> = { all: allActive.length };
     for (const item of allActive) {
       const cat = item.category;

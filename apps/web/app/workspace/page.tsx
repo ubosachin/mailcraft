@@ -30,6 +30,8 @@ import {
   Key,
 } from 'lucide-react';
 import { TEMPLATE_CATALOG } from '@mailcraft/email-renderer';
+import { ScaledEmailThumb } from '@/components/ScaledEmailThumb';
+import { compileTemplatePreview } from '@/lib/template-preview';
 
 interface BrandState {
   id?: string;
@@ -1414,48 +1416,69 @@ export default function WorkspacePage() {
         {/* TAB 4: TEMPLATES */}
         {activeTab === 'templates' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-bold text-slate-900">Email Studio Themes</h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Select any of the 12 production templates to customize in the visual editor.
+                  Select any of the {TEMPLATE_CATALOG.length} studio templates to customize in the visual editor.
                 </p>
               </div>
-              <Link
-                href="/editor"
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition flex items-center gap-1.5"
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Open Visual Editor</span>
-              </Link>
+              <div className="flex items-center gap-2.5">
+                <Link
+                  href="/templates"
+                  className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold text-xs rounded-xl transition inline-flex items-center gap-1.5"
+                >
+                  <Eye className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Full Template Gallery</span>
+                </Link>
+                <Link
+                  href="/editor"
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Open Visual Editor</span>
+                </Link>
+              </div>
             </div>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {TEMPLATE_CATALOG.map((tpl) => (
-                <div
-                  key={tpl.slug}
-                  className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm hover:border-indigo-400 transition flex flex-col justify-between"
-                >
-                  <div className="h-32 bg-slate-100 overflow-hidden relative">
-                    <img src={tpl.thumbnail} alt={tpl.name} className="w-full h-full object-cover" />
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-900/80 text-white">
-                      {tpl.category}
-                    </span>
-                  </div>
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{tpl.name}</h4>
-                      <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{tpl.description}</p>
+              {TEMPLATE_CATALOG.map((tpl) => {
+                const liveHtml = compileTemplatePreview(tpl, brand);
+                return (
+                  <div
+                    key={tpl.slug}
+                    className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:border-indigo-400 hover:shadow-md transition flex flex-col justify-between group"
+                  >
+                    <div className="h-44 bg-slate-100 overflow-hidden relative border-b border-slate-100">
+                      <ScaledEmailThumb html={liveHtml} title={`${tpl.name} studio preview`} />
+                      <div className="absolute top-2 left-2 flex items-center gap-1">
+                        {tpl.version >= 2 && (
+                          <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-indigo-600 text-white shadow-xs">
+                            NEW
+                          </span>
+                        )}
+                      </div>
+                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-900/80 text-white uppercase">
+                        {tpl.category.replace('_', ' ')}
+                      </span>
                     </div>
-                    <Link
-                      href="/editor"
-                      className="mt-4 w-full py-1.5 px-3 bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-lg text-center text-xs font-semibold transition"
-                    >
-                      Customize in Studio →
-                    </Link>
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-sm group-hover:text-indigo-600 transition">
+                          {tpl.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mt-1 line-clamp-2">{tpl.description}</p>
+                      </div>
+                      <Link
+                        href={`/editor?template=${tpl.slug}`}
+                        className="mt-4 w-full py-2 px-3 bg-slate-50 hover:bg-indigo-600 hover:text-white border border-slate-200 hover:border-indigo-600 rounded-xl text-center text-xs font-semibold transition"
+                      >
+                        Customize in Studio →
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

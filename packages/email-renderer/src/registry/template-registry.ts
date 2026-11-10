@@ -1,4 +1,13 @@
 import { TemplateDefinition } from '../types/template.types.js';
+import { obsidianChangelogTemplate } from '../templates/obsidian-changelog.js';
+import { bentoDigestTemplate } from '../templates/bento-digest.js';
+import { founderWelcomeTemplate } from '../templates/founder-welcome.js';
+import { nordicCommerceTemplate } from '../templates/nordic-commerce.js';
+import { keynoteInviteTemplate } from '../templates/keynote-invite.js';
+import { cobaltFlashDropTemplate } from '../templates/cobalt-flash-drop.js';
+import { atelierLookbookTemplate } from '../templates/atelier-lookbook.js';
+import { roasteryReserveTemplate } from '../templates/roastery-reserve.js';
+import { luminaGalaTemplate } from '../templates/lumina-gala.js';
 import { minimalPremiumTemplate } from '../templates/minimal-premium.js';
 import { colorfulSaleTemplate } from '../templates/colorful-sale.js';
 import { luxuryBrandTemplate } from '../templates/luxury-brand.js';
@@ -13,6 +22,15 @@ import { welcomeOfferTemplate } from '../templates/welcome-offer.js';
 import { productLaunchTemplate } from '../templates/product-launch.js';
 
 export const ALL_TEMPLATES: TemplateDefinition[] = [
+  obsidianChangelogTemplate,
+  bentoDigestTemplate,
+  founderWelcomeTemplate,
+  nordicCommerceTemplate,
+  keynoteInviteTemplate,
+  cobaltFlashDropTemplate,
+  atelierLookbookTemplate,
+  roasteryReserveTemplate,
+  luminaGalaTemplate,
   minimalPremiumTemplate,
   colorfulSaleTemplate,
   luxuryBrandTemplate,

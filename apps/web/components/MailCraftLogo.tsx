@@ -52,7 +52,7 @@ export function MailCraftIcon({ className = 'w-9 h-9' }: { className?: string })
           <stop offset="100%" stopColor="#10B981" />
         </linearGradient>
         <clipPath id={clipId}>
-          <rect x="13" y="22" width="38" height="25" rx="5.5" />
+          <rect x="13" y="22" width="38" height="25" rx="7.5" />
         </clipPath>
         <mask id={maskId}>
           <rect width="64" height="64" fill="white" />
@@ -63,22 +63,22 @@ export function MailCraftIcon({ className = 'w-9 h-9' }: { className?: string })
         </mask>
       </defs>
 
-      <rect x="2" y="2" width="60" height="60" rx="16" fill={`url(#${bgId})`} />
-      <rect x="2.5" y="2.5" width="59" height="59" rx="15.5" stroke={`url(#${shineId})`} strokeWidth="1" />
+      <rect x="2" y="2" width="60" height="60" rx="24" fill={`url(#${bgId})`} />
+      <rect x="2.5" y="2.5" width="59" height="59" rx="23.5" stroke={`url(#${shineId})`} strokeWidth="1" />
 
       <g mask={`url(#${maskId})`}>
-        <rect x="13" y="22" width="38" height="25" rx="5.5" fill={`url(#${envId})`} />
+        <rect x="13" y="22" width="38" height="25" rx="7.5" fill={`url(#${envId})`} />
         <g clipPath={`url(#${clipId})`}>
-          <path d="M13 47 L32 35.5 L51 47 Z" fill="#C7D2FE" fillOpacity="0.48" />
+          <path d="M13 47 Q32 33 51 47 Z" fill="#C7D2FE" fillOpacity="0.48" />
           <path
-            d="M12 23.5 L32 37 L52 23.5"
+            d="M12 24.5 Q32 39.5 52 24.5"
             stroke="#4F46E5"
-            strokeWidth="3.6"
+            strokeWidth="3.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
           <path
-            d="M15.5 44.5 L24.5 37 M48.5 44.5 L39.5 37"
+            d="M16 44 Q20.5 40 24.5 36.5 M48 44 Q43.5 40 39.5 36.5"
             stroke="#818CF8"
             strokeWidth="2"
             strokeLinecap="round"
