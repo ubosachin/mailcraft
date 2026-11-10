@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  Mail,
   Undo2,
   Redo2,
   Monitor,
@@ -17,6 +16,7 @@ import {
   Loader2,
   ChevronLeft,
 } from 'lucide-react';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 import { SaveStatus } from '../hooks/useAutosave';
 
 interface EditorTopNavProps {
@@ -68,14 +68,7 @@ export function EditorTopNav({
 
         <div className="h-4 w-px bg-slate-200" />
 
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-            M
-          </div>
-          <span className="font-bold text-slate-900 tracking-tight hidden md:inline text-sm">
-            MailCraft
-          </span>
-        </div>
+        <MailCraftLogo size="sm" variant="light" />
 
         <div className="h-4 w-px bg-slate-200 hidden sm:block" />
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { Mail, CheckCircle2, Zap, Send, ShieldCheck, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Zap, Send, ShieldCheck, ArrowRight } from 'lucide-react';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 export default function PricingPage() {
   return (
@@ -8,13 +9,8 @@ export default function PricingPage() {
       {/* Top Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200">
-              <Mail className="w-5 h-5" />
-            </div>
-            <span className="text-lg font-black tracking-tight text-slate-900">
-              Mail<span className="text-indigo-600">Craft</span>
-            </span>
+          <Link href="/" className="group">
+            <MailCraftLogo size="md" variant="light" />
           </Link>
 
           <div className="flex items-center gap-4 text-xs font-semibold">

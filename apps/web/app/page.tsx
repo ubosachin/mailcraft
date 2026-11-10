@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Mail,
   Zap,
   ShieldCheck,
   Send,
@@ -16,6 +15,7 @@ import {
   Eye,
   Lock,
 } from 'lucide-react';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 const INITIAL_TEMPLATES = [
   { name: 'Minimal Premium', category: 'Premium Brands', color: 'from-amber-600 to-amber-900', badge: 'High Conversion' },
@@ -74,15 +74,9 @@ export default function HomePage() {
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-              <Mail className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-xl font-black tracking-tight text-slate-900">Mail<span className="text-indigo-600">Craft</span></span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">Studio</span>
-            </div>
-          </div>
+          <Link href="/" className="group">
+            <MailCraftLogo size="md" variant="light" badge="Studio" />
+          </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
             <Link href="/templates" className="hover:text-indigo-600 transition">12+ Templates</Link>
@@ -433,10 +427,7 @@ export default function HomePage() {
       <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-indigo-600 flex items-center justify-center text-white">
-              <Mail className="w-3.5 h-3.5" />
-            </div>
-            <span className="font-bold text-slate-200">MailCraft</span>
+            <MailCraftLogo size="xs" variant="footer" />
             <span className="text-slate-500">· Promotional email marketing platform</span>
           </div>
 

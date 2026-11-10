@@ -13,6 +13,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 function SignupForm() {
   const router = useRouter();
@@ -112,13 +113,8 @@ function SignupForm() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       {/* Top Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mb-6">
-        <Link href="/" className="inline-flex items-center gap-2 mb-4 group">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 group-hover:scale-105 transition">
-            <Mail className="w-5 h-5" />
-          </div>
-          <span className="text-2xl font-black tracking-tight text-slate-900">
-            Mail<span className="text-indigo-600">Craft</span>
-          </span>
+        <Link href="/" className="inline-flex items-center mb-4 group">
+          <MailCraftLogo size="lg" variant="light" />
         </Link>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
           Create your MailCraft account

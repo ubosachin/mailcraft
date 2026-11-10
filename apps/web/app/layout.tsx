@@ -10,6 +10,19 @@ export const metadata: Metadata = {
   description:
     'Design stunning promotional emails, customize brand colors, connect your Gmail or bulk sending account, and launch high-converting campaigns.',
   keywords: ['email marketing', 'promotional email builder', 'gmail marketing', 'brevo bulk email'],
+  icons: {
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    title: 'MailCraft',
+  },
   openGraph: {
     type: 'website',
     url: appUrl,
@@ -17,6 +30,7 @@ export const metadata: Metadata = {
     title: 'MailCraft – Promotional Email Marketing Platform',
     description:
       'Design stunning promotional emails, customize brand colors, connect your Gmail or bulk sending account, and launch high-converting campaigns.',
+    images: [{ url: '/web-app-manifest-512x512.png', width: 512, height: 512, alt: 'MailCraft Logo' }],
   },
 };
 

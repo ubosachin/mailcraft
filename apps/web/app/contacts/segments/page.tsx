@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 import {
   Users,
   Filter,
@@ -287,11 +288,8 @@ function SegmentsPageContent() {
       <header className="border-b border-slate-800 bg-slate-900/50 backdrop-blur sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white">
-              <span className="p-1.5 rounded-lg bg-indigo-600 text-white">
-                <Users className="w-5 h-5" />
-              </span>
-              <span>MailCraft</span>
+            <Link href="/" className="group">
+              <MailCraftLogo size="sm" variant="dark" />
             </Link>
             <nav className="hidden md:flex items-center gap-4 text-sm font-medium">
               <Link

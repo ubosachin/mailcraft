@@ -1,17 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
-import { Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
-              <Mail className="w-4 h-4" />
-            </div>
-            <span className="font-bold text-slate-900">MailCraft</span>
+          <Link href="/" className="group">
+            <MailCraftLogo size="sm" variant="light" />
           </Link>
           <Link href="/" className="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1">
             <ArrowLeft className="w-3.5 h-3.5" />
