@@ -45,6 +45,34 @@ export class GmailOAuthClient {
   }
 
   /**
+   * Returns true when both GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are configured.
+   */
+  isConfigured(): boolean {
+    return Boolean(this.clientId.trim() && this.clientSecret.trim());
+  }
+
+  /**
+   * Ensures Google OAuth client credentials are present before starting or completing OAuth flows.
+   */
+  assertConfigured(): void {
+    if (!this.isConfigured()) {
+      throw new AuthenticationFailedError(
+        'gmail',
+        'Google OAuth credentials (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET) are not configured on the server.'
+      );
+    }
+  }
+
+  /**
+   * Generates an RFC 7636 PKCE verifier and S256 challenge pair.
+   */
+  generatePkcePair(): { codeVerifier: string; codeChallenge: string } {
+    const codeVerifier = crypto.randomBytes(32).toString('base64url');
+    const codeChallenge = crypto.createHash('sha256').update(codeVerifier).digest('base64url');
+    return { codeVerifier, codeChallenge };
+  }
+
+  /**
    * Generates cryptographically secure signed state bound to user session to prevent CSRF.
    */
   generateState(sessionId: string): string {
@@ -86,11 +114,13 @@ export class GmailOAuthClient {
   }
 
   /**
-   * Builds the official Google OAuth 2.0 authorization URL with narrow gmail.send scope.
+   * Builds the official Google OAuth 2.0 authorization URL with narrow gmail.send scope and optional PKCE.
    */
-  buildAuthorizationUrl(state: string): string {
+  buildAuthorizationUrl(state: string, codeChallenge?: string): string {
+    this.assertConfigured();
+
     const params = new URLSearchParams({
-      client_id: this.clientId,
+      client_id: this.clientId.trim(),
       redirect_uri: this.redirectUri,
       response_type: 'code',
       scope: 'https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email',
@@ -99,30 +129,36 @@ export class GmailOAuthClient {
       state,
     });
 
+    if (codeChallenge) {
+      params.set('code_challenge', codeChallenge);
+      params.set('code_challenge_method', 'S256');
+    }
+
     return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   }
 
   /**
-   * Exchanges authorization code for access & refresh tokens.
+   * Exchanges authorization code (and PKCE code_verifier when used) for access & refresh tokens.
    */
-  async exchangeCode(code: string): Promise<GoogleOAuthTokens> {
-    if (!this.clientId || !this.clientSecret) {
-      throw new AuthenticationFailedError(
-        'gmail',
-        'Google OAuth credentials (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET) are not configured.'
-      );
+  async exchangeCode(code: string, codeVerifier?: string): Promise<GoogleOAuthTokens> {
+    this.assertConfigured();
+
+    const bodyParams = new URLSearchParams({
+      client_id: this.clientId.trim(),
+      client_secret: this.clientSecret.trim(),
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: this.redirectUri,
+    });
+
+    if (codeVerifier) {
+      bodyParams.set('code_verifier', codeVerifier);
     }
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        code,
-        grant_type: 'authorization_code',
-        redirect_uri: this.redirectUri,
-      }),
+      body: bodyParams,
     });
 
     if (!res.ok) {
@@ -183,19 +219,14 @@ export class GmailOAuthClient {
    * Refreshes access token using the stored refresh token.
    */
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
-    if (!this.clientId || !this.clientSecret) {
-      throw new AuthenticationFailedError(
-        'gmail',
-        'Google OAuth credentials are not configured on the server.'
-      );
-    }
+    this.assertConfigured();
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
+        client_id: this.clientId.trim(),
+        client_secret: this.clientSecret.trim(),
         refresh_token: refreshToken,
         grant_type: 'refresh_token',
       }),

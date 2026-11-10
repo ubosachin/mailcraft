@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { extractApiErrorMessage, getOAuthErrorMessage } from '@/lib/oauth-helpers';
 import {
   ShieldCheck,
   Sparkles,
@@ -157,6 +158,43 @@ export default function WorkspacePage() {
   useEffect(() => {
     async function initWorkspace() {
       try {
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search);
+          const tabParam = params.get('tab');
+          const statusParam = params.get('status');
+          const providerParam = params.get('provider');
+          const authParam = params.get('auth');
+          const errorParam = params.get('error');
+
+          if (
+            tabParam === 'brand' ||
+            tabParam === 'sending' ||
+            tabParam === 'recipients' ||
+            tabParam === 'templates' ||
+            tabParam === 'campaigns'
+          ) {
+            setActiveTab(tabParam);
+          }
+
+          if (statusParam === 'connected' && providerParam === 'gmail') {
+            setActiveTab('sending');
+            setStatusMessage({
+              type: 'success',
+              text: 'Google Gmail sending account connected and tokens encrypted with AES-256-GCM!',
+            });
+          } else if (authParam === 'success') {
+            setStatusMessage({
+              type: 'success',
+              text: 'Signed in with Google successfully!',
+            });
+          } else if (errorParam) {
+            setStatusMessage({
+              type: 'error',
+              text: getOAuthErrorMessage(errorParam),
+            });
+          }
+        }
+
         const authRes = await fetch('/api/v1/auth/me', {
           cache: 'no-store',
           credentials: 'same-origin',
@@ -367,6 +405,29 @@ export default function WorkspacePage() {
   };
 
   // --- CONNECTION ACTIONS ---
+  const handleConnectGmail = async () => {
+    setConnectingProvider(true);
+    setStatusMessage(null);
+    try {
+      const res = await fetch('/api/v1/connections/gmail/start?format=json&returnTo=/workspace', {
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+      });
+      const json = await res.json();
+      if (res.ok && json.success && json.data?.url) {
+        window.location.assign(json.data.url);
+        return;
+      }
+      throw new Error(extractApiErrorMessage(json, 'Could not initiate Google OAuth flow.'));
+    } catch (err) {
+      setStatusMessage({
+        type: 'error',
+        text: err instanceof Error ? err.message : 'Network error initiating Google OAuth.',
+      });
+      setConnectingProvider(false);
+    }
+  };
+
   const handleConnectBrevo = async (e: React.FormEvent) => {
     e.preventDefault();
     setConnectingProvider(true);
@@ -1010,15 +1071,25 @@ export default function WorkspacePage() {
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
-                      alert(
-                        'Google OAuth 2.0 PKCE: Configured for Google Cloud Console project. Tokens are stored encrypted with AES-256-GCM.'
-                      )
-                    }
-                    className="mt-6 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition flex items-center justify-center gap-1.5"
+                    onClick={handleConnectGmail}
+                    disabled={connectingProvider}
+                    className="mt-6 w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 disabled:opacity-60 text-slate-800 font-semibold rounded-lg text-xs transition flex items-center justify-center gap-1.5"
                   >
-                    <span>Connect Google OAuth</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    {connectingProvider ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Redirecting to Google...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>
+                          {connections.some((c) => c.provider === 'gmail' && c.status === 'connected')
+                            ? 'Reconnect Google OAuth'
+                            : 'Connect Google OAuth'}
+                        </span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

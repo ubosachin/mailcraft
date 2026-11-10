@@ -161,7 +161,7 @@ export async function revokeSessionToken(
   await session.save();
 }
 
-function shouldUseSecureCookie(request?: NextRequest): boolean {
+export function shouldUseSecureCookie(request?: NextRequest): boolean {
   if (request) {
     const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
     if (forwardedProto) {

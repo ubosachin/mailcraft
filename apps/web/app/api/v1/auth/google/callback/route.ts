@@ -5,6 +5,7 @@ import {
   Brand,
   EmailConnection,
   encryptCredentials,
+  decryptCredentials,
 } from '@mailcraft/database';
 import { GmailOAuthClient } from '@mailcraft/email-providers';
 import {
@@ -12,11 +13,20 @@ import {
   setSessionCookie,
 } from '@/lib/session';
 import { getAppUrl } from '@/lib/url';
-
-const OAUTH_NONCE_COOKIE = 'mailcraft_oauth_nonce';
+import {
+  GOOGLE_AUTH_NONCE_COOKIE,
+  GOOGLE_AUTH_PKCE_COOKIE,
+  clearOAuthFlowCookies,
+} from '@/lib/oauth-cookies';
 
 export async function GET(request: NextRequest) {
   const appUrl = getAppUrl(request);
+
+  const redirectWithError = (errorCode: string) => {
+    const res = NextResponse.redirect(`${appUrl}/login?error=${encodeURIComponent(errorCode)}`);
+    clearOAuthFlowCookies(res, request, [GOOGLE_AUTH_NONCE_COOKIE, GOOGLE_AUTH_PKCE_COOKIE]);
+    return res;
+  };
 
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -25,16 +35,16 @@ export async function GET(request: NextRequest) {
     const errorParam = searchParams.get('error');
 
     if (errorParam) {
-      return NextResponse.redirect(`${appUrl}/login?error=${encodeURIComponent(errorParam)}`);
+      return redirectWithError(errorParam);
     }
 
     if (!code || !state) {
-      return NextResponse.redirect(`${appUrl}/login?error=missing_oauth_code`);
+      return redirectWithError('missing_oauth_code');
     }
 
-    const oauthNonce = request.cookies.get(OAUTH_NONCE_COOKIE)?.value;
+    const oauthNonce = request.cookies.get(GOOGLE_AUTH_NONCE_COOKIE)?.value;
     if (!oauthNonce) {
-      return NextResponse.redirect(`${appUrl}/login?error=invalid_oauth_state`);
+      return redirectWithError('invalid_oauth_state');
     }
 
     const rawState = state.replace(/^auth_/, '');
@@ -42,13 +52,18 @@ export async function GET(request: NextRequest) {
       redirectUri: `${appUrl}/api/v1/auth/google/callback`,
     });
 
-    const isValidState = client.validateState(rawState, oauthNonce);
-    if (!isValidState) {
-      return NextResponse.redirect(`${appUrl}/login?error=invalid_oauth_state`);
+    if (!client.isConfigured()) {
+      return redirectWithError('google_oauth_not_configured');
     }
 
-    // Exchange OAuth code
-    const tokens = await client.exchangeCode(code);
+    const isValidState = client.validateState(rawState, oauthNonce);
+    if (!isValidState) {
+      return redirectWithError('invalid_oauth_state');
+    }
+
+    // Exchange OAuth code using PKCE verifier when present
+    const codeVerifier = request.cookies.get(GOOGLE_AUTH_PKCE_COOKIE)?.value;
+    const tokens = await client.exchangeCode(code, codeVerifier);
     const userInfo = await client.getUserInfo(tokens.accessToken);
 
     await connectToDatabase();
@@ -91,11 +106,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Also auto-save Gmail sending connection so user is sending-ready immediately
-    if (tokens.refreshToken) {
+    // Auto-save Gmail sending connection (preserving previous refresh token if Google omits one)
+    const existingConnection = await EmailConnection.findOne({
+      sessionId: sessionDoc._id,
+      provider: 'gmail',
+    });
+
+    let finalRefreshToken = tokens.refreshToken;
+    if (!finalRefreshToken && existingConnection) {
+      try {
+        const prev = decryptCredentials<{ refreshToken?: string }>(
+          existingConnection.encryptedCredentials
+        );
+        finalRefreshToken = prev.refreshToken;
+      } catch {
+        // Ignore decryption failures on stale records
+      }
+    }
+
+    if (finalRefreshToken) {
       const encrypted = encryptCredentials({
         accessToken: tokens.accessToken,
-        refreshToken: tokens.refreshToken,
+        refreshToken: finalRefreshToken,
         expiryDate: Date.now() + tokens.expiresIn * 1000,
         scope: tokens.scope,
       });
@@ -103,13 +135,18 @@ export async function GET(request: NextRequest) {
       await EmailConnection.findOneAndUpdate(
         { sessionId: sessionDoc._id, provider: 'gmail' },
         {
-          sessionId: sessionDoc._id,
-          provider: 'gmail',
-          senderEmail: normalizedEmail,
-          status: 'connected',
-          encryptedCredentials: encrypted,
-          verifiedAt: new Date(),
-          dailyQuota: 500,
+          $set: {
+            senderEmail: normalizedEmail,
+            senderName: user.name || undefined,
+            encryptedCredentials: encrypted,
+            credentialVersion: 1,
+            status: 'connected',
+            senderVerificationStatus: 'verified',
+            providerAccountStatus: 'active',
+            verifiedAt: new Date(),
+            lastVerifiedAt: new Date(),
+            lastError: null,
+          },
         },
         { upsert: true, new: true }
       );
@@ -117,10 +154,11 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(`${appUrl}/workspace?auth=success`);
     setSessionCookie(response, sessionToken, sessionDoc.expiresAt, request);
-    response.cookies.delete(OAUTH_NONCE_COOKIE);
+    clearOAuthFlowCookies(response, request, [GOOGLE_AUTH_NONCE_COOKIE, GOOGLE_AUTH_PKCE_COOKIE]);
 
     return response;
-  } catch {
-    return NextResponse.redirect(`${appUrl}/login?error=oauth_exchange_failed`);
+  } catch (error) {
+    console.error('[Google OAuth Auth Callback Error]:', error);
+    return redirectWithError('oauth_exchange_failed');
   }
 }

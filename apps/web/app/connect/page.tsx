@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { extractApiErrorMessage, getOAuthErrorMessage } from '@/lib/oauth-helpers';
 import {
   Mail,
   CheckCircle2,
@@ -159,7 +160,7 @@ function ConnectPageContent() {
     } else if (errorParam) {
       setNotification({
         type: 'error',
-        message: `Failed to connect sending provider: ${errorParam}`,
+        message: getOAuthErrorMessage(errorParam),
       });
     }
   }, [searchParams, fetchConnections]);
@@ -176,6 +177,7 @@ function ConnectPageContent() {
       setSubmitting(true);
       const res = await fetch('/api/v1/connections/gmail/start?format=json', {
         headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
       });
       const json = await res.json();
       if (json.success && json.data?.url) {
@@ -183,7 +185,7 @@ function ConnectPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Could not initiate Google OAuth flow.',
+          message: extractApiErrorMessage(json, 'Could not initiate Google OAuth flow.'),
         });
       }
     } catch {

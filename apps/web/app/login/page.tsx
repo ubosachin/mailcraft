@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
+import { getOAuthErrorMessage } from '@/lib/oauth-helpers';
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -28,13 +29,7 @@ function LoginForm() {
   useEffect(() => {
     const errorParam = searchParams.get('error');
     if (errorParam) {
-      if (errorParam === 'invalid_oauth_state') {
-        setErrorMsg('Google login session expired. Please try again.');
-      } else if (errorParam === 'oauth_exchange_failed') {
-        setErrorMsg('Google sign-in encountered an error. Please try again.');
-      } else {
-        setErrorMsg(`Login failed: ${errorParam}`);
-      }
+      setErrorMsg(getOAuthErrorMessage(errorParam));
       return;
     }
 
