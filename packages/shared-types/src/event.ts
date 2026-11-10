@@ -76,7 +76,7 @@ export interface IUnsubscribeEvent {
 
 export interface IWebhookEventLog {
   _id: string;
-  provider: 'brevo' | 'ses' | 'mock' | 'generic';
+  provider: 'brevo' | 'ses' | 'generic';
   eventId?: string;
   signatureValid: boolean;
   rawHeaders?: Record<string, string>;

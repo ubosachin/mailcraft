@@ -161,7 +161,7 @@ export async function POST(
       preheader: campaign.preheader,
       senderName: brand.senderName,
       senderEmail: brand.senderEmail,
-      provider: campaign.provider || 'mock',
+      provider: campaign.provider || 'unassigned',
       renderedHtml: compiled.html,
       renderedText: compiled.text,
       editorData: campaign.editorData,

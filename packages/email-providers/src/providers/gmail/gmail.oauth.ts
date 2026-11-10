@@ -97,13 +97,10 @@ export class GmailOAuthClient {
    */
   async exchangeCode(code: string): Promise<GoogleOAuthTokens> {
     if (!this.clientId || !this.clientSecret) {
-      // In offline / mock mode when Google Cloud credentials are not configured in dev
-      return {
-        accessToken: 'mock_gmail_access_token_' + Date.now(),
-        refreshToken: 'mock_gmail_refresh_token_' + Date.now(),
-        expiresIn: 3600,
-        tokenType: 'Bearer',
-      };
+      throw new AuthenticationFailedError(
+        'gmail',
+        'Google OAuth credentials (GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET) are not configured.'
+      );
     }
 
     const res = await fetch('https://oauth2.googleapis.com/token', {
@@ -147,25 +144,17 @@ export class GmailOAuthClient {
    * Fetches the user profile info to identify the verified Gmail sender address.
    */
   async getUserInfo(accessToken: string): Promise<GoogleUserInfo> {
-    if (accessToken.startsWith('mock_')) {
-      return {
-        email: 'developer.testing@gmail.com',
-        verifiedEmail: true,
-        name: 'Developer Test',
-      };
-    }
-
-    const res = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+    const profileRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    if (!res.ok) {
+    if (!profileRes.ok) {
       throw new AuthenticationFailedError('gmail', 'Failed to retrieve user profile from Google');
     }
 
-    const data = (await res.json()) as {
+    const data = (await profileRes.json()) as {
       email: string;
       verified_email?: boolean;
       name?: string;
@@ -184,11 +173,11 @@ export class GmailOAuthClient {
    * Refreshes access token using the stored refresh token.
    */
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
-    if (refreshToken.startsWith('mock_') || !this.clientId) {
-      return {
-        accessToken: 'mock_gmail_access_token_' + Date.now(),
-        expiresIn: 3600,
-      };
+    if (!this.clientId || !this.clientSecret) {
+      throw new AuthenticationFailedError(
+        'gmail',
+        'Google OAuth credentials are not configured on the server.'
+      );
     }
 
     const res = await fetch('https://oauth2.googleapis.com/token', {

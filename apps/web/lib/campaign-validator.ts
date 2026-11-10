@@ -123,10 +123,9 @@ export async function validateCampaignReadiness(
       });
     }
   } else {
-    // If no provider selected, warn or check mock
-    warnings.push({
-      code: 'DEFAULT_PROVIDER',
-      message: 'No external sending provider selected; local delivery will be used.',
+    errors.push({
+      code: 'PROVIDER_REQUIRED',
+      message: 'You must select an active email sending provider (Gmail, Brevo, or Amazon SES) to launch a campaign.',
     });
   }
 

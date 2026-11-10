@@ -36,7 +36,7 @@ export async function GET(
       preheader: campaign.preheader,
       templateId: campaign.templateId?.toString(),
       connectionId: campaign.connectionId?.toString(),
-      provider: campaign.provider || 'mock',
+      provider: campaign.provider || 'unassigned',
       editorData: campaign.editorData,
       renderedHtml: campaign.renderedHtml,
       renderedText: campaign.renderedText,

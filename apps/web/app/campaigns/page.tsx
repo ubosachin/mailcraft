@@ -398,7 +398,7 @@ function CampaignsContent() {
       default:
         return (
           <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
-            Sandbox/Mock
+            Not Connected
           </span>
         );
     }

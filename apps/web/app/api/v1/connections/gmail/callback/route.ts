@@ -48,8 +48,6 @@ export async function GET(request: NextRequest) {
       provider: 'gmail',
     });
 
-    const refreshToken = tokens.refreshToken || (existing ? undefined : 'mock_gmail_refresh_token_dev');
-    
     // Decrypt existing to preserve refresh token if Google didn't re-issue it
     let finalRefreshToken = tokens.refreshToken;
     if (!finalRefreshToken && existing) {
@@ -58,12 +56,12 @@ export async function GET(request: NextRequest) {
         const prev = decryptCredentials<{ refreshToken?: string }>(existing.encryptedCredentials);
         finalRefreshToken = prev.refreshToken;
       } catch {
-        // fallback
+        // Ignore decryption failure and redirect below if no refresh token exists
       }
     }
 
     if (!finalRefreshToken) {
-      finalRefreshToken = 'mock_gmail_refresh_token_fallback';
+      return NextResponse.redirect(`${appUrl}/connect?error=missing_refresh_token`);
     }
 
     const encryptedCredentials = encryptCredentials({

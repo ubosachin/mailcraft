@@ -43,30 +43,11 @@ export class SesProvider implements IEmailProvider {
     this.client = new AmazonSesClient(creds);
   }
 
-  private isMock(): boolean {
-    return (
-      this.accessKeyId.toLowerCase().includes('mock') ||
-      this.accessKeyId === 'AKIA_MOCK_TEST_KEY_123' ||
-      this.secretAccessKey.toLowerCase().includes('mock')
-    );
-  }
-
   async connect(): Promise<void> {
-    if (this.isMock()) return;
     await this.client.getAccount();
   }
 
   async verifyConnection(): Promise<ConnectionVerificationResult> {
-    if (this.isMock()) {
-      return {
-        valid: true,
-        provider: 'ses',
-        senderEmail: this.defaultSenderEmail,
-        accountStatus: 'production',
-        dailyQuotaRemaining: 50000,
-      };
-    }
-
     try {
       const account = await this.client.getAccount();
       const quota = account.sendQuota;
@@ -91,42 +72,6 @@ export class SesProvider implements IEmailProvider {
   async verifySender(requestedSender?: string): Promise<SenderVerificationResult> {
     const emailToVerify = (requestedSender || this.defaultSenderEmail).toLowerCase().trim();
     const domain = emailToVerify.split('@')[1] || '';
-
-    if (this.isMock()) {
-      return {
-        verified: true,
-        senderEmail: emailToVerify,
-        domain,
-        domainVerified: true,
-        spfStatus: 'verified',
-        dkimStatus: 'verified',
-        dmarcStatus: 'verified',
-        dnsRecords: [
-          {
-            type: 'TXT',
-            name: domain,
-            value: `v=spf1 include:amazonses.com ~all`,
-            status: 'verified',
-            description: 'SPF Authorization for Amazon SES',
-          },
-          {
-            type: 'CNAME',
-            name: `token1._domainkey.${domain}`,
-            value: `token1.dkim.amazonses.com`,
-            status: 'verified',
-            description: 'Amazon SES DKIM Token 1',
-          },
-          {
-            type: 'CNAME',
-            name: `token2._domainkey.${domain}`,
-            value: `token2.dkim.amazonses.com`,
-            status: 'verified',
-            description: 'Amazon SES DKIM Token 2',
-          },
-        ],
-        instructions: ['Amazon SES verified sending identity and active DKIM signatures.'],
-      };
-    }
 
     try {
       // First check domain identity
@@ -188,15 +133,6 @@ export class SesProvider implements IEmailProvider {
   }
 
   async sendEmail(payload: SendEmailPayload): Promise<SendEmailResult> {
-    if (this.isMock()) {
-      return {
-        messageId: `<ses-mock-${Date.now()}@email.amazonses.com>`,
-        accepted: true,
-        provider: 'ses',
-        rawResponse: { simulated: true, to: payload.to },
-      };
-    }
-
     const res = await this.client.sendEmail({
       to: payload.to,
       from: payload.from || this.defaultSenderEmail,

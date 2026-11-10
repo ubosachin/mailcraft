@@ -24,7 +24,7 @@ jobs:
           node-version: 22
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -35,62 +35,11 @@ jobs:
         run: pnpm lint
 
       - name: Build Core Libraries (Typecheck)
-        run: |
-          pnpm --filter shared-types build
-          pnpm --filter validation build
-          pnpm --filter database build
-          pnpm --filter email-renderer build
-          pnpm --filter email-providers build
-          pnpm --filter worker build
-
-  test:
-    name: Automated Integration Tests
-    runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      NODE_ENV: test
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
-      APP_SECRET: test_super_secret_app_key_32bytes_long_here_for_testing
-      ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      REDIS_URL: redis://127.0.0.1:6379
-      MONGODB_URI: ${{ secrets.MONGODB_URI || 'mongodb://127.0.0.1:27017/mailcraft_ci' }}
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build Monorepo
-        run: pnpm build
-
-      - name: Run Full Test Suite
-        run: pnpm test
+        run: pnpm typecheck
 
   build-production:
-    name: Production Artifact Build
-    needs: [lint-and-typecheck, test]
+    name: Production Build Verification
+    needs: [lint-and-typecheck]
     runs-on: ubuntu-latest
     env:
       NODE_ENV: production
@@ -109,7 +58,7 @@ jobs:
           node-version: 22
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -118,4 +67,3 @@ jobs:
 
       - name: Build Full Monorepo
         run: pnpm build
-

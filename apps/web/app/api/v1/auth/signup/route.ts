@@ -16,11 +16,7 @@ import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 export async function POST(request: NextRequest) {
   try {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
-    const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === 'localhost';
-    const rule = isLoopback
-      ? { max: 5000, windowMs: 10 * 60 * 1000 }
-      : 'SESSION_CREATE';
-    const rateLimit = await checkRateLimit(`auth_signup:${ip}`, rule);
+    const rateLimit = await checkRateLimit(`auth_signup:${ip}`, 'SESSION_CREATE');
     if (!rateLimit.success) {
       return jsonError('Too many signup requests. Please try again later.', 429, {
         retryAfter: Math.ceil(rateLimit.resetMs / 1000),

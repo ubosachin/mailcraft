@@ -12,7 +12,6 @@ import {
 } from '@mailcraft/database';
 import {
   createProviderFromConnection,
-  createMockProvider,
   IEmailProvider,
 } from '@mailcraft/email-providers';
 import { compileEmail } from '@mailcraft/email-renderer';
@@ -61,18 +60,21 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
     throw new Error(`Brand ${campaign.brandId} not found for campaign ${campaignId}`);
   }
 
-  // Resolve provider
-  let provider: IEmailProvider;
-  if (campaign.connectionId) {
-    const connection = await EmailConnection.findById(campaign.connectionId);
-    if (connection && connection.status === 'connected') {
-      provider = createProviderFromConnection(connection);
-    } else {
-      provider = createMockProvider();
-    }
-  } else {
-    provider = createMockProvider();
+  // Resolve provider - strictly require an active connected email provider
+  if (!campaign.connectionId) {
+    campaign.status = 'failed';
+    await campaign.save();
+    throw new Error(`Campaign ${campaignId} has no sending provider connection assigned.`);
   }
+
+  const connection = await EmailConnection.findById(campaign.connectionId);
+  if (!connection || connection.status !== 'connected') {
+    campaign.status = 'failed';
+    await campaign.save();
+    throw new Error(`Sending provider connection for campaign ${campaignId} is missing or disconnected.`);
+  }
+
+  const provider: IEmailProvider = createProviderFromConnection(connection);
 
   await provider.connect();
 
@@ -233,22 +235,15 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
           },
         });
 
-        const isMockOrLocal = sendResult.provider === 'mock' || !campaign.connectionId;
-        recipient.status = isMockOrLocal ? 'delivered' : 'accepted';
+        recipient.status = 'accepted';
         recipient.provider = sendResult.provider;
         recipient.providerMessageId = sendResult.messageId;
         recipient.sentAt = new Date();
         recipient.acceptedAt = new Date();
-        if (isMockOrLocal) {
-          recipient.deliveredAt = new Date();
-        }
         recipient.attempts += 1;
         await recipient.save();
 
         campaign.stats.accepted += 1;
-        if (isMockOrLocal) {
-          campaign.stats.delivered += 1;
-        }
 
         // Record normalized EmailEvents
         const eventId = `send_${recipient._id}_${Date.now()}`;
@@ -266,26 +261,10 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
           processingStatus: 'processed',
         });
 
-        if (isMockOrLocal) {
-          await EmailEvent.create({
-            sessionId: campaign.sessionId,
-            campaignId: campaign._id,
-            campaignRecipientId: recipient._id,
-            contactId: recipient.contactId,
-            provider: sendResult.provider,
-            providerMessageId: sendResult.messageId,
-            eventType: 'delivered',
-            eventTimestamp: new Date(),
-            eventId: `deliv_${recipient._id}_${Date.now()}`,
-            metadata: { to: recipient.email },
-            processingStatus: 'processed',
-          });
-        }
-
         await CampaignEvent.create({
           campaignId: campaign._id,
           recipientId: recipient._id,
-          eventType: isMockOrLocal ? 'delivered' : 'sent',
+          eventType: 'sent',
           metadata: { messageId: sendResult.messageId, provider: sendResult.provider },
           occurredAt: new Date(),
         });
@@ -327,10 +306,11 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
   // Check final status
   const finalCheck = await Campaign.findById(campaignId);
   if (finalCheck?.status !== 'cancelled' && finalCheck?.status !== 'paused') {
+    const sentCount = (campaign.stats.accepted || 0) + (campaign.stats.delivered || 0);
     campaign.status =
-      campaign.stats.failed > 0 && campaign.stats.delivered > 0
+      campaign.stats.failed > 0 && sentCount > 0
         ? 'partially_completed'
-        : campaign.stats.failed > 0 && campaign.stats.delivered === 0
+        : campaign.stats.failed > 0 && sentCount === 0
         ? 'failed'
         : 'completed';
     campaign.completedAt = new Date();
@@ -339,6 +319,6 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
 
   await provider.disconnect();
   console.log(
-    `[Worker] Finished campaign ${campaignId}! Delivered: ${campaign.stats.delivered}, Failed: ${campaign.stats.failed}, Status: ${campaign.status}`
+    `[Worker] Finished campaign ${campaignId}! Accepted: ${campaign.stats.accepted}, Delivered: ${campaign.stats.delivered}, Failed: ${campaign.stats.failed}, Status: ${campaign.status}`
   );
 }

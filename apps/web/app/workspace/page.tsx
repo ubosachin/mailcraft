@@ -110,14 +110,14 @@ export default function WorkspacePage() {
 
   // 1. Brand State
   const [brand, setBrand] = useState<BrandState>({
-    brandName: 'Aurora Studio',
-    senderName: 'Sarah Connor',
-    senderEmail: 'sarah@aurora.io',
-    website: 'https://aurora.io',
-    logoUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=160&auto=format&fit=crop&q=80',
+    brandName: '',
+    senderName: '',
+    senderEmail: '',
+    website: '',
+    logoUrl: '',
     primaryColor: '#4F46E5',
     secondaryColor: '#10B981',
-    footerAddress: '100 Innovation Way, Suite 400, San Francisco, CA 94107',
+    footerAddress: '',
   });
   const [savingBrand, setSavingBrand] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -126,7 +126,6 @@ export default function WorkspacePage() {
   const [showVerifyModal, setShowVerifyModal] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationLoading, setVerificationLoading] = useState(false);
-  const [otpDevCode, setOtpDevCode] = useState<string | null>(null);
 
   // 2. Connections State
   const [connections, setConnections] = useState<ConnectionSummary[]>([]);
@@ -307,7 +306,6 @@ export default function WorkspacePage() {
 
   const handleRequestOtp = async () => {
     setVerificationLoading(true);
-    setOtpDevCode(null);
     try {
       const res = await fetch('/api/v1/account/verify-email', {
         method: 'POST',
@@ -317,10 +315,6 @@ export default function WorkspacePage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to request OTP');
 
-      if (data.data?.devCode) {
-        setOtpDevCode(data.data.devCode);
-        setVerificationCode(data.data.devCode);
-      }
       setShowVerifyModal(true);
     } catch (err) {
       setStatusMessage({
@@ -935,7 +929,7 @@ export default function WorkspacePage() {
                 <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-3">Connected Accounts</span>
                 {connections.length === 0 ? (
                   <div className="p-6 rounded-xl border border-dashed border-slate-300 text-center text-xs text-slate-500">
-                    No sending accounts connected yet. Connect Brevo or Gmail below. (Mock provider active for local testing).
+                    No sending accounts connected yet. Connect Gmail, Brevo, or Amazon SES below to send emails.
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -1550,12 +1544,6 @@ export default function WorkspacePage() {
               Enter the 6-digit verification code sent to <span className="font-semibold text-slate-900">{brand.senderEmail}</span>.
             </p>
 
-            {otpDevCode && (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800">
-                <p className="font-semibold">Local Development Code:</p>
-                <p className="text-xl font-mono font-bold tracking-widest mt-1">{otpDevCode}</p>
-              </div>
-            )}
 
             <input
               type="text"

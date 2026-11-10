@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IWebhookEventLogDoc extends Document {
-  provider: 'brevo' | 'ses' | 'mock' | 'generic';
+  provider: 'brevo' | 'ses' | 'generic';
   eventId?: string;
   signatureValid: boolean;
   rawHeaders?: Record<string, string>;
@@ -15,7 +15,7 @@ const WebhookEventLogSchema = new Schema<IWebhookEventLogDoc>(
   {
     provider: {
       type: String,
-      enum: ['brevo', 'ses', 'mock', 'generic'],
+      enum: ['brevo', 'ses', 'generic'],
       required: true,
       index: true,
     },

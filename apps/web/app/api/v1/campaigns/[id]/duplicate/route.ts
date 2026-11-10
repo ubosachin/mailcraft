@@ -35,7 +35,7 @@ export async function POST(
       preheader: original.preheader || '',
       senderName: original.senderName,
       senderEmail: original.senderEmail,
-      provider: original.provider || 'mock',
+      provider: original.provider || 'unassigned',
       templateId: original.templateId || null,
       editorData: original.editorData || {},
       audienceType: original.audienceType || 'all_eligible',

@@ -590,7 +590,7 @@ function CampaignDetailContent() {
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-bold text-white">{campaign.campaignName}</h1>
                 <span className="text-xs px-2.5 py-0.5 rounded bg-indigo-950 border border-indigo-800 text-indigo-300 uppercase font-semibold">
-                  {campaign.provider || 'mock'}
+                  {campaign.provider && campaign.provider !== 'unassigned' ? campaign.provider : 'Not Assigned'}
                 </span>
               </div>
               <p className="text-sm text-slate-400 max-w-2xl">

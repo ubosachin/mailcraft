@@ -103,16 +103,6 @@ export class GmailProvider implements IEmailProvider {
   }
 
   async sendEmail(payload: SendEmailPayload): Promise<SendEmailResult> {
-    // If mock token provided for offline integration tests
-    if (this.refreshToken.startsWith('mock_')) {
-      return {
-        messageId: `<gmail-mock-${Date.now()}@mail.gmail.com>`,
-        accepted: true,
-        provider: 'gmail',
-        rawResponse: { simulated: true, to: payload.to },
-      };
-    }
-
     const token = await this.getAccessToken();
     const result = await this.apiClient.sendMessage({
       accessToken: token,

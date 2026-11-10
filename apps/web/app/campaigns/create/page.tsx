@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   AlertCircle,
   Clock,
-  Sparkles,
   Server,
   Users,
   Layers,
@@ -317,6 +316,11 @@ function CampaignWizardContent() {
       }
       const savedId = await saveCampaignDraft();
       if (!savedId) return;
+    }
+
+    if (currentStep === 2 && !connectionId) {
+      showNotification('Please select an active email sending provider before continuing', 'error');
+      return;
     }
 
     if (currentStep === 4 && templateId) {
@@ -736,33 +740,29 @@ function CampaignWizardContent() {
             </div>
 
             <div className="space-y-4">
-              {/* Option 1: Sandbox / Mock Safe Mode */}
-              <div
-                onClick={() => setConnectionId('')}
-                className={`p-4 rounded-xl border cursor-pointer transition flex items-start justify-between gap-4 ${
-                  !connectionId
-                    ? 'bg-indigo-950/50 border-indigo-500 shadow-md shadow-indigo-500/10'
-                    : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0">
-                    <Sparkles className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-white text-sm flex items-center gap-2">
-                      Local Sandbox / Safe Test Mode
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-950 border border-indigo-800 text-indigo-300">
-                        Zero Risk
-                      </span>
+              {connections.length === 0 && (
+                <div className="p-6 rounded-xl bg-slate-950/60 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-amber-950/50 border border-amber-500/30 flex items-center justify-center shrink-0">
+                      <AlertTriangle className="w-5 h-5 text-amber-400" />
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">
-                      Simulates complete queue workers, event delivery lifecycle, and tracking without sending live emails.
-                    </p>
+                    <div>
+                      <div className="font-semibold text-white text-sm">
+                        No Email Sending Providers Connected
+                      </div>
+                      <p className="text-xs text-slate-400 mt-1">
+                        You must connect and verify at least one email provider (Gmail, Brevo, or Amazon SES) to launch campaigns.
+                      </p>
+                    </div>
                   </div>
+                  <Link
+                    href="/connect"
+                    className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shrink-0 transition"
+                  >
+                    Connect Provider
+                  </Link>
                 </div>
-                {!connectionId && <CheckCircle className="w-5 h-5 text-indigo-400 shrink-0 mt-1" />}
-              </div>
+              )}
 
               {/* Connected live providers */}
               {connections.map((c) => (
@@ -1443,7 +1443,7 @@ function CampaignWizardContent() {
                 <div>
                   <span className="text-slate-500">Sender Provider:</span>
                   <div className="text-slate-200 font-medium mt-0.5">
-                    {connections.find((c) => c.id === connectionId)?.provider.toUpperCase() || 'Sandbox'}
+                    {connections.find((c) => c.id === connectionId)?.provider.toUpperCase() || 'Not Selected'}
                   </div>
                 </div>
                 <div>

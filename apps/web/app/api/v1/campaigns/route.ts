@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       return jsonError('Brand not found or does not belong to session', 404);
     }
 
-    let providerName = 'mock';
+    let providerName = 'unassigned';
     if (validated.connectionId) {
       const conn = await EmailConnection.findOne({
         _id: validated.connectionId,
@@ -163,7 +163,7 @@ export async function GET(request: NextRequest) {
         subject: c.subject,
         preheader: c.preheader,
         status: c.status,
-        provider: c.provider || c.connectionId?.provider || 'mock',
+        provider: c.provider || c.connectionId?.provider || 'unassigned',
         recipientCount: c.recipientCount || 0,
         eligibleRecipientCount: c.eligibleRecipientCount || 0,
         stats: c.stats || { accepted: 0, delivered: 0, bounced: 0, clicked: 0, unsubscribed: 0, failed: 0 },

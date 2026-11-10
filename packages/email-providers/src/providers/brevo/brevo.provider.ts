@@ -29,30 +29,10 @@ export class BrevoProvider implements IEmailProvider {
   }
 
   async connect(): Promise<void> {
-    if (this.isMock()) return;
     await this.client.getAccount();
   }
 
-  private isMock(): boolean {
-    return (
-      this.apiKey.startsWith('mock_') ||
-      this.apiKey.includes('mock') ||
-      this.apiKey === 'xkeysib-test-brevo-key-999' ||
-      this.apiKey === 'xkeysib-valid-test-key-123'
-    );
-  }
-
   async verifyConnection(): Promise<ConnectionVerificationResult> {
-    if (this.isMock()) {
-      return {
-        valid: true,
-        provider: 'brevo',
-        senderEmail: this.defaultSenderEmail,
-        accountStatus: 'active',
-        dailyQuotaRemaining: 300,
-      };
-    }
-
     try {
       const account = await this.client.getAccount();
       const credits = account.plan?.reduce((acc, p) => acc + (p.credits || 0), 0) ?? 300;
@@ -76,35 +56,6 @@ export class BrevoProvider implements IEmailProvider {
   async verifySender(requestedSender?: string): Promise<SenderVerificationResult> {
     const emailToVerify = (requestedSender || this.defaultSenderEmail).toLowerCase().trim();
     const domain = emailToVerify.split('@')[1] || '';
-
-    if (this.isMock()) {
-      return {
-        verified: true,
-        senderEmail: emailToVerify,
-        domain,
-        domainVerified: true,
-        spfStatus: 'verified',
-        dkimStatus: 'verified',
-        dmarcStatus: 'verified',
-        dnsRecords: [
-          {
-            type: 'TXT',
-            name: domain,
-            value: 'v=spf1 include:spf.sendinblue.com ~all',
-            status: 'verified',
-            description: 'SPF authorization record',
-          },
-          {
-            type: 'TXT',
-            name: `mail._domainkey.${domain}`,
-            value: 'k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQ...',
-            status: 'verified',
-            description: 'DKIM cryptographic signature',
-          },
-        ],
-        instructions: ['Sender identity is verified in Brevo account.'],
-      };
-    }
 
     try {
       const sendersRes = await this.client.getSenders();
@@ -172,15 +123,6 @@ export class BrevoProvider implements IEmailProvider {
   }
 
   async sendEmail(payload: SendEmailPayload): Promise<SendEmailResult> {
-    if (this.isMock()) {
-      return {
-        messageId: `<brevo-mock-${Date.now()}@brevo.com>`,
-        accepted: true,
-        provider: 'brevo',
-        rawResponse: { simulated: true, to: payload.to },
-      };
-    }
-
     const res = await this.client.sendEmail({
       to: payload.to,
       fromEmail: payload.from || this.defaultSenderEmail,

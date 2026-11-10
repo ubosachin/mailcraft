@@ -144,7 +144,7 @@ export async function POST(
         await EmailEvent.create({
           sessionId: campaign.sessionId,
           campaignId: campaign._id,
-          provider: campaign.provider || 'mock',
+          provider: campaign.provider || 'generic',
           eventType: 'unsubscribed',
           eventTimestamp: new Date(),
           eventId: `unsub_${emailHash}_${Date.now()}`,

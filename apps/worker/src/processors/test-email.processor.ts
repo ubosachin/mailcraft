@@ -7,7 +7,6 @@ import {
 } from '@mailcraft/database';
 import {
   createProviderFromConnection,
-  createMockProvider,
   IEmailProvider,
 } from '@mailcraft/email-providers';
 import { compileEmail } from '@mailcraft/email-renderer';
@@ -34,17 +33,24 @@ export async function processTestEmailJob(job: Job<TestEmailJobPayload>): Promis
     throw new Error(`Brand ${campaign.brandId} not found`);
   }
 
-  let provider: IEmailProvider;
-  if (campaign.connectionId) {
-    const connection = await EmailConnection.findById(campaign.connectionId);
-    if (connection && connection.status === 'connected') {
-      provider = createProviderFromConnection(connection);
-    } else {
-      provider = createMockProvider();
-    }
-  } else {
-    provider = createMockProvider();
+  let connection = campaign.connectionId
+    ? await EmailConnection.findById(campaign.connectionId)
+    : null;
+
+  if (!connection || connection.status !== 'connected') {
+    connection = await EmailConnection.findOne({
+      sessionId: campaign.sessionId,
+      status: 'connected',
+    }).sort({ updatedAt: -1 });
   }
+
+  if (!connection || connection.status !== 'connected') {
+    throw new Error(
+      'No connected email sending provider found. Connect Gmail, Brevo, or Amazon SES to send a test email.'
+    );
+  }
+
+  const provider: IEmailProvider = createProviderFromConnection(connection);
 
   await provider.connect();
 

@@ -1,6 +1,5 @@
 import { decryptCredentials, IEmailConnectionDoc } from '@mailcraft/database';
 import { IEmailProvider } from './types.js';
-import { MockProvider } from './providers/mock.provider.js';
 import { BrevoProvider } from './providers/brevo/brevo.provider.js';
 import { GmailProvider } from './providers/gmail/gmail.provider.js';
 import { SesProvider } from './providers/ses/ses.provider.js';
@@ -52,10 +51,6 @@ export function createProviderFromConnection(
     }
 
     default:
-      return new MockProvider();
+      throw new Error(`Unsupported email provider: ${connection.provider}`);
   }
-}
-
-export function createMockProvider(): IEmailProvider {
-  return new MockProvider();
 }

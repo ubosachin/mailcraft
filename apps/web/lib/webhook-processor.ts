@@ -11,7 +11,7 @@ import {
 import { EmailEventType } from '@mailcraft/shared-types';
 
 export interface NormalizedWebhookEvent {
-  provider: 'brevo' | 'ses' | 'mock' | 'generic';
+  provider: 'brevo' | 'ses' | 'generic';
   eventId: string;
   providerMessageId?: string;
   recipientEmail: string;

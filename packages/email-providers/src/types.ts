@@ -13,13 +13,13 @@ export interface SendEmailPayload {
 export interface SendEmailResult {
   messageId: string;
   accepted: boolean;
-  provider: 'gmail' | 'brevo' | 'ses' | 'mock';
+  provider: 'gmail' | 'brevo' | 'ses';
   rawResponse?: unknown;
 }
 
 export interface ConnectionVerificationResult {
   valid: boolean;
-  provider: 'gmail' | 'brevo' | 'ses' | 'mock';
+  provider: 'gmail' | 'brevo' | 'ses';
   senderEmail?: string;
   accountStatus?: string;
   dailyQuotaRemaining?: number;
@@ -29,7 +29,7 @@ export interface ConnectionVerificationResult {
 export type SenderVerificationResult = SenderVerificationDetails;
 
 export interface IEmailProvider {
-  readonly providerType: 'gmail' | 'brevo' | 'ses' | 'mock';
+  readonly providerType: 'gmail' | 'brevo' | 'ses';
   connect(): Promise<void>;
   verifyConnection(): Promise<ConnectionVerificationResult>;
   verifySender(senderEmail?: string): Promise<SenderVerificationResult>;
