@@ -5,7 +5,7 @@
   "description": "MailCraft BullMQ background campaign worker service",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "pnpm -C ../.. --filter @mailcraft/shared-types build && pnpm -C ../.. --filter @mailcraft/validation build && pnpm -C ../.. --filter @mailcraft/email-renderer build && pnpm -C ../.. --filter @mailcraft/database build && pnpm -C ../.. --filter @mailcraft/email-providers build && tsc",
     "start": "node dist/index.js",
     "dev": "tsc -w"
   },

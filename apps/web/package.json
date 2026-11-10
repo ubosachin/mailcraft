@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "pnpm -C ../.. --filter @mailcraft/shared-types build && pnpm -C ../.. --filter @mailcraft/validation build && pnpm -C ../.. --filter @mailcraft/email-renderer build && pnpm -C ../.. --filter @mailcraft/database build && pnpm -C ../.. --filter @mailcraft/email-providers build && next build",
     "start": "next start --port 3000",
     "lint": "next lint"
   },
