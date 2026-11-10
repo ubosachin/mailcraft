@@ -89,6 +89,8 @@ interface CampaignSummary {
   campaignName: string;
   subject: string;
   status: string;
+  connectionId?: string | null;
+  provider?: string;
   recipientCount: number;
   stats: {
     accepted: number;
@@ -162,6 +164,8 @@ export default function WorkspacePage() {
   const [selectedCampaignForAnalytics, setSelectedCampaignForAnalytics] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<Record<string, unknown> | null>(null);
   const [showSendModal, setShowSendModal] = useState<CampaignSummary | null>(null);
+  const [selectedSendConnectionId, setSelectedSendConnectionId] = useState<string>('');
+  const [sendModalError, setSendModalError] = useState<string | null>(null);
   const [sendingCampaign, setSendingCampaign] = useState(false);
 
   // Initial Load
@@ -651,16 +655,32 @@ export default function WorkspacePage() {
   };
 
   // --- CAMPAIGN ACTIONS ---
+  const openSendModal = (camp: CampaignSummary) => {
+    setSendModalError(null);
+    const matchingConn = camp.connectionId
+      ? connections.find((c) => c.id === camp.connectionId)
+      : undefined;
+    setSelectedSendConnectionId(matchingConn?.id || connections[0]?.id || '');
+    setShowSendModal(camp);
+  };
+
   const handleLaunchCampaign = async () => {
     if (!showSendModal) return;
     setSendingCampaign(true);
+    setSendModalError(null);
     setStatusMessage(null);
     try {
       const res = await fetch(`/api/v1/campaigns/${showSendModal.id}/send`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          connectionId: selectedSendConnectionId || undefined,
+        }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to dispatch campaign');
+      if (!res.ok) {
+        throw new Error(extractApiErrorMessage(data, 'Failed to dispatch campaign'));
+      }
 
       setShowSendModal(null);
       await fetchCampaigns();
@@ -669,9 +689,11 @@ export default function WorkspacePage() {
         text: `Campaign "${showSendModal.campaignName}" queued for campaign delivery!`,
       });
     } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Dispatch failed';
+      setSendModalError(msg);
       setStatusMessage({
         type: 'error',
-        text: err instanceof Error ? err.message : 'Dispatch failed',
+        text: msg,
       });
     } finally {
       setSendingCampaign(false);
@@ -751,8 +773,16 @@ export default function WorkspacePage() {
     );
   }
 
-  const isEmailVerified =
-    session?.verifiedEmail && session.verifiedEmail.toLowerCase() === brand.senderEmail.toLowerCase();
+  const isEmailVerified = Boolean(
+    (session?.verifiedEmail &&
+      session.verifiedEmail.toLowerCase() === brand.senderEmail.toLowerCase()) ||
+      connections.some(
+        (c) =>
+          c.status === 'connected' &&
+          c.senderEmail &&
+          c.senderEmail.toLowerCase() === brand.senderEmail.toLowerCase()
+      )
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
@@ -1580,7 +1610,7 @@ export default function WorkspacePage() {
                           {camp.status === 'draft' && (
                             <button
                               type="button"
-                              onClick={() => setShowSendModal(camp)}
+                              onClick={() => openSendModal(camp)}
                               className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition flex items-center gap-1"
                             >
                               <Play className="w-3.5 h-3.5" />
@@ -1736,7 +1766,56 @@ export default function WorkspacePage() {
                   {isEmailVerified ? 'Verified' : 'Pending OTP Verification'}
                 </span>
               </div>
+
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase">
+                  Sending Provider
+                </label>
+                {connections.length > 0 ? (
+                  <select
+                    value={selectedSendConnectionId}
+                    onChange={(e) => setSelectedSendConnectionId(e.target.value)}
+                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 bg-white text-xs font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    {connections.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.provider === 'gmail_smtp' ? 'Gmail App Password' : c.provider.toUpperCase()} &bull; {c.senderEmail}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="flex items-center justify-between gap-2 text-amber-800">
+                    <span>No active email provider connected.</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSendModal(null);
+                        setActiveTab('sending');
+                      }}
+                      className="text-indigo-600 font-bold hover:underline shrink-0"
+                    >
+                      Connect Now &rarr;
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+
+            {contacts.length === 0 && (
+              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800 flex items-center justify-between gap-2">
+                <span>Add at least 1 opted-in contact before launching.</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSendModal(null);
+                    setActiveTab('recipients');
+                  }}
+                  className="font-bold text-indigo-700 hover:underline shrink-0"
+                >
+                  Add Contacts &rarr;
+                </button>
+              </div>
+            )}
 
             {!isEmailVerified && (
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
@@ -1744,11 +1823,17 @@ export default function WorkspacePage() {
               </div>
             )}
 
+            {sendModalError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 font-medium leading-relaxed">
+                {sendModalError}
+              </div>
+            )}
+
             <div className="pt-2 flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleLaunchCampaign}
-                disabled={sendingCampaign || !isEmailVerified || contacts.length === 0}
+                disabled={sendingCampaign || !isEmailVerified || contacts.length === 0 || connections.length === 0}
                 className="flex-1 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold text-xs rounded-lg transition"
               >
                 {sendingCampaign ? 'Queueing Broadcast...' : 'Confirm & Launch Now'}

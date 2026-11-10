@@ -46,23 +46,44 @@ export function extractApiErrorMessage(payload: unknown, fallback: string): stri
     return fallback;
   }
 
-  const record = payload as { error?: unknown; message?: unknown };
+  const record = payload as {
+    error?: unknown;
+    message?: unknown;
+    details?: {
+      errors?: Array<{ message?: unknown }>;
+    } | Array<{ message?: unknown }>;
+  };
+
+  let base = '';
   if (typeof record.error === 'string' && record.error.trim()) {
-    return record.error;
-  }
-  if (
+    base = record.error;
+  } else if (
     record.error &&
     typeof record.error === 'object' &&
     'message' in record.error &&
     typeof (record.error as { message?: unknown }).message === 'string'
   ) {
-    return (record.error as { message: string }).message;
-  }
-  if (typeof record.message === 'string' && record.message.trim()) {
-    return record.message;
+    base = (record.error as { message: string }).message;
+  } else if (typeof record.message === 'string' && record.message.trim()) {
+    base = record.message;
   }
 
-  return fallback;
+  const nestedErrors = Array.isArray(record.details)
+    ? record.details
+    : Array.isArray(record.details?.errors)
+    ? record.details.errors
+    : [];
+  const detailMessages = nestedErrors
+    .map((item) => (typeof item?.message === 'string' ? item.message.trim() : ''))
+    .filter(Boolean);
+
+  if (detailMessages.length > 0) {
+    const joined = detailMessages.join(' ');
+    if (!base) return joined;
+    return base.includes(detailMessages[0]) ? base : `${base}: ${joined}`;
+  }
+
+  return base || fallback;
 }
 
 /**

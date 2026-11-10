@@ -19,6 +19,7 @@ export async function POST(
     const result = await validateCampaignReadiness({
       sessionId: session._id,
       campaignId: id,
+      connectionId: typeof body.connectionId === 'string' ? body.connectionId : undefined,
       idempotencyKey: body.idempotencyKey,
     });
 

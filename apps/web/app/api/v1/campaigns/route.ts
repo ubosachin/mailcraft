@@ -163,6 +163,7 @@ export async function GET(request: NextRequest) {
         subject: c.subject,
         preheader: c.preheader,
         status: c.status,
+        connectionId: c.connectionId?._id?.toString() || c.connectionId?.toString() || null,
         provider: c.provider || c.connectionId?.provider || 'unassigned',
         recipientCount: c.recipientCount || 0,
         eligibleRecipientCount: c.eligibleRecipientCount || 0,

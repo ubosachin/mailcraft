@@ -65,14 +65,27 @@ export async function POST(
     const validation = await validateCampaignReadiness({
       sessionId: session._id,
       campaignId: id,
+      connectionId: typeof body.connectionId === 'string' ? body.connectionId : undefined,
       idempotencyKey: idempotencyKey || undefined,
     });
 
     if (!validation.valid) {
-      return jsonError('Campaign failed validation checks', 400, {
-        errors: validation.errors,
-        warnings: validation.warnings,
-      });
+      const detailSummary = validation.errors.map((e) => e.message).join(' ');
+      return jsonError(
+        detailSummary
+          ? `Campaign failed validation checks: ${detailSummary}`
+          : 'Campaign failed validation checks',
+        400,
+        {
+          errors: validation.errors,
+          warnings: validation.warnings,
+        }
+      );
+    }
+
+    if (validation.campaign) {
+      campaign.connectionId = validation.campaign.connectionId;
+      campaign.provider = validation.campaign.provider;
     }
 
     // Verify brand

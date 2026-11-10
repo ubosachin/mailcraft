@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   Send,
   ArrowLeft,
@@ -379,7 +380,7 @@ function CampaignWizardContent() {
       if (data.success && data.data) {
         setValidationResult(data.data);
       } else {
-        showNotification(data.message || 'Validation request failed', 'error');
+        showNotification(extractApiErrorMessage(data, 'Validation request failed'), 'error');
       }
     } catch {
       showNotification('Network error validating campaign', 'error');
@@ -471,7 +472,7 @@ function CampaignWizardContent() {
           showNotification('Campaign scheduled successfully!', 'success');
           router.push(`/campaigns/${campaignId}`);
         } else {
-          showNotification(data.message || 'Failed to schedule campaign', 'error');
+          showNotification(extractApiErrorMessage(data, 'Failed to schedule campaign'), 'error');
         }
       } else {
         // Immediate launch
@@ -480,6 +481,7 @@ function CampaignWizardContent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            connectionId: connectionId || undefined,
             audienceType,
             segmentId: audienceType === 'segment' ? selectedSegmentId : undefined,
             tag: audienceType === 'tag' ? selectedTag : undefined,
@@ -492,7 +494,7 @@ function CampaignWizardContent() {
           showNotification('Campaign launched successfully! Delivery started.', 'success');
           router.push(`/campaigns/${campaignId}`);
         } else {
-          showNotification(data.message || 'Failed to launch campaign', 'error');
+          showNotification(extractApiErrorMessage(data, 'Failed to launch campaign'), 'error');
         }
       }
     } catch {

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { connectToDatabase, Campaign, Brand } from '@mailcraft/database';
+import { connectToDatabase, Campaign, Brand, EmailConnection } from '@mailcraft/database';
 import { resolveAuthSession } from '@/lib/session';
 import { resolveTemplateByIdOrSlug } from '@/lib/templates';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
@@ -36,6 +36,11 @@ export async function POST(
       });
     }
 
+    const activeConnection = await EmailConnection.findOne({
+      sessionId: session._id,
+      status: 'connected',
+    }).sort({ updatedAt: -1 });
+
     // Optional campaign name override from body
     let campaignName = `${template.name} Campaign`;
     try {
@@ -50,6 +55,10 @@ export async function POST(
     const campaign = await Campaign.create({
       sessionId: session._id,
       brandId: brand._id,
+      connectionId: activeConnection?._id || null,
+      provider: activeConnection?.provider || 'unassigned',
+      senderName: brand.senderName,
+      senderEmail: brand.senderEmail,
       campaignName,
       subject: `Exclusive Announcement: Discover our ${template.name}`,
       preheader: template.description || 'Special update from our team',

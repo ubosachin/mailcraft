@@ -20,6 +20,7 @@ import { applySegmentFilters } from './contact-service';
 export interface ValidationContext {
   sessionId: Types.ObjectId | string;
   campaignId: Types.ObjectId | string;
+  connectionId?: string;
   idempotencyKey?: string;
 }
 
@@ -63,6 +64,35 @@ export async function validateCampaignReadiness(
       code: 'INVALID_CAMPAIGN_STATUS',
       message: `Campaign cannot be launched because its current status is '${campaign.status}'`,
     });
+  }
+
+  // Bind explicit override or fall back to workspace's active provider when campaign has none yet
+  let connectionMutated = false;
+  if (context.connectionId && Types.ObjectId.isValid(context.connectionId)) {
+    const requestedConn = await EmailConnection.findOne({
+      _id: new Types.ObjectId(context.connectionId),
+      sessionId: sessionObjId,
+      status: 'connected',
+    });
+    if (requestedConn) {
+      campaign.connectionId = requestedConn._id as Types.ObjectId;
+      campaign.provider = requestedConn.provider;
+      connectionMutated = true;
+    }
+  } else if (!campaign.connectionId) {
+    const fallbackConn = await EmailConnection.findOne({
+      sessionId: sessionObjId,
+      status: 'connected',
+    }).sort({ updatedAt: -1 });
+    if (fallbackConn) {
+      campaign.connectionId = fallbackConn._id as Types.ObjectId;
+      campaign.provider = fallbackConn.provider;
+      connectionMutated = true;
+    }
+  }
+
+  if (connectionMutated && !['queued', 'sending', 'completed'].includes(campaign.status)) {
+    await campaign.save();
   }
 
   // 3: Brand exists

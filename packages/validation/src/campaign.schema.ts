@@ -33,6 +33,7 @@ export const scheduleCampaignSchema = z.object({
 });
 
 export const sendCampaignSchema = z.object({
+  connectionId: z.string().optional(),
   audienceType: campaignAudienceTypeEnum.optional().default('all_eligible'),
   segmentId: z.string().optional(),
   tag: z.string().optional(),
