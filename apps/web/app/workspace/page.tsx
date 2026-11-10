@@ -158,6 +158,7 @@ export default function WorkspacePage() {
 
   // 4. Campaigns State
   const [campaigns, setCampaigns] = useState<CampaignSummary[]>([]);
+  const [focusedCampaignId, setFocusedCampaignId] = useState<string | null>(null);
   const [selectedCampaignForAnalytics, setSelectedCampaignForAnalytics] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<Record<string, unknown> | null>(null);
   const [showSendModal, setShowSendModal] = useState<CampaignSummary | null>(null);
@@ -171,10 +172,15 @@ export default function WorkspacePage() {
         if (typeof window !== 'undefined') {
           const params = new URLSearchParams(window.location.search);
           const tabParam = params.get('tab');
+          const focusParam = params.get('focus');
           const statusParam = params.get('status');
           const providerParam = params.get('provider');
           const authParam = params.get('auth');
           const errorParam = params.get('error');
+
+          if (focusParam) {
+            setFocusedCampaignId(focusParam);
+          }
 
           if (
             tabParam === 'brand' ||
@@ -313,10 +319,15 @@ export default function WorkspacePage() {
 
   const fetchConnections = async () => {
     try {
-      const res = await fetch('/api/v1/connections');
+      const res = await fetch('/api/v1/connections', { cache: 'no-store', credentials: 'same-origin' });
       if (res.ok) {
         const data = await res.json();
-        setConnections(data.data || []);
+        const list = Array.isArray(data.data)
+          ? data.data
+          : Array.isArray(data.data?.connections)
+          ? data.data.connections
+          : [];
+        setConnections(list);
       }
     } catch {
       // Ignored
@@ -325,10 +336,15 @@ export default function WorkspacePage() {
 
   const fetchContacts = async () => {
     try {
-      const res = await fetch('/api/v1/contacts?limit=100');
+      const res = await fetch('/api/v1/contacts?limit=100', { cache: 'no-store', credentials: 'same-origin' });
       if (res.ok) {
         const data = await res.json();
-        setContacts(data.data?.contacts || []);
+        const list = Array.isArray(data.data?.contacts)
+          ? data.data.contacts
+          : Array.isArray(data.data)
+          ? data.data
+          : [];
+        setContacts(list);
       }
     } catch {
       // Ignored
@@ -337,10 +353,15 @@ export default function WorkspacePage() {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch('/api/v1/campaigns');
+      const res = await fetch('/api/v1/campaigns?limit=50', { cache: 'no-store', credentials: 'same-origin' });
       if (res.ok) {
         const data = await res.json();
-        setCampaigns(data.data || []);
+        const list = Array.isArray(data.data?.campaigns)
+          ? data.data.campaigns
+          : Array.isArray(data.data)
+          ? data.data
+          : [];
+        setCampaigns(list);
       }
     } catch {
       // Ignored
@@ -1505,15 +1526,21 @@ export default function WorkspacePage() {
 
               {/* Campaigns List */}
               <div className="mt-6 space-y-4">
-                {campaigns.length === 0 ? (
+                {!Array.isArray(campaigns) || campaigns.length === 0 ? (
                   <div className="text-center py-12 text-slate-500 text-xs">
                     <p>No campaigns created yet. Click Create Campaign or open the Email Studio to design your first broadcast.</p>
                   </div>
                 ) : (
-                  campaigns.map((camp) => (
+                  campaigns.map((camp) => {
+                    const isFocused = focusedCampaignId === camp.id;
+                    return (
                     <div
                       key={camp.id}
-                      className="p-5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white transition space-y-4"
+                      className={`p-5 rounded-xl border transition space-y-4 ${
+                        isFocused
+                          ? 'border-indigo-500 bg-indigo-50/40 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 bg-slate-50 hover:bg-white'
+                      }`}
                     >
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
@@ -1532,12 +1559,24 @@ export default function WorkspacePage() {
                             >
                               {camp.status}
                             </span>
+                            {isFocused && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">
+                                Current Draft
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">Subject: {camp.subject}</p>
                         </div>
 
                         {/* Controls */}
                         <div className="flex items-center gap-2">
+                          <Link
+                            href={`/editor/${camp.id}`}
+                            className="px-3 py-1.5 rounded-lg bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold text-xs transition"
+                          >
+                            Edit Design
+                          </Link>
+
                           {camp.status === 'draft' && (
                             <button
                               type="button"
@@ -1585,31 +1624,31 @@ export default function WorkspacePage() {
                       <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs">
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Recipients</span>
-                          <p className="font-bold text-slate-900">{camp.recipientCount}</p>
+                          <p className="font-bold text-slate-900">{camp.recipientCount ?? 0}</p>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Accepted</span>
-                          <p className="font-bold text-indigo-600">{camp.stats.accepted}</p>
+                          <p className="font-bold text-indigo-600">{camp.stats?.accepted ?? 0}</p>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Delivered</span>
-                          <p className="font-bold text-emerald-600">{camp.stats.delivered}</p>
+                          <p className="font-bold text-emerald-600">{camp.stats?.delivered ?? 0}</p>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Bounces</span>
-                          <p className="font-bold text-amber-600">{camp.stats.bounced}</p>
+                          <p className="font-bold text-amber-600">{camp.stats?.bounced ?? 0}</p>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Clicks</span>
-                          <p className="font-bold text-blue-600">{camp.stats.clicked}</p>
+                          <p className="font-bold text-blue-600">{camp.stats?.clicked ?? 0}</p>
                         </div>
                         <div className="p-2 bg-white rounded-lg border border-slate-200">
                           <span className="text-[10px] text-slate-400">Unsubscribes</span>
-                          <p className="font-bold text-rose-600">{camp.stats.unsubscribed}</p>
+                          <p className="font-bold text-rose-600">{camp.stats?.unsubscribed ?? 0}</p>
                         </div>
                       </div>
                     </div>
-                  ))
+                  );})
                 )}
               </div>
             </div>
@@ -1640,7 +1679,7 @@ export default function WorkspacePage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {((analyticsData.recipients as unknown[]) || []).map((r: any) => (
+                      {(Array.isArray(analyticsData.recipients) ? analyticsData.recipients : []).map((r: any) => (
                         <tr key={r.id} className="hover:bg-slate-50">
                           <td className="p-2.5 font-mono text-slate-800">{r.email}</td>
                           <td className="p-2.5">
