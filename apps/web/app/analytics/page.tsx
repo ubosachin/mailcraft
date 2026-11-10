@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   BarChart3,
   TrendingUp,
@@ -87,7 +88,7 @@ function AnalyticsDashboardContent() {
         setTimeline(json.data.timeline || []);
         setProviders(json.data.providers || []);
       } else {
-        throw new Error(json.error?.message || 'Error processing analytics data');
+        throw new Error(extractApiErrorMessage(json, 'Error processing analytics data'));
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to fetch analytics');

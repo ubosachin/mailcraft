@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   ShieldAlert,
   Search,
@@ -109,7 +110,7 @@ function SuppressionContent() {
           setTotalCount(data.data.pagination.total || 0);
         }
       } else {
-        showNotification(data.message || 'Failed to load suppressions', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to load suppressions'), 'error');
       }
     } catch {
       showNotification('Network error loading suppressions', 'error');
@@ -142,7 +143,7 @@ function SuppressionContent() {
         setAddForm({ email: '', reason: 'manual', scope: 'session', notes: '' });
         fetchSuppressions();
       } else {
-        showNotification(data.message || 'Failed to add suppression', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to add suppression'), 'error');
       }
     } catch {
       showNotification('Network error adding suppression', 'error');
@@ -177,7 +178,7 @@ function SuppressionContent() {
         setForceRemove(false);
         fetchSuppressions();
       } else {
-        showNotification(data.message || 'Failed to remove suppression', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to remove suppression'), 'error');
       }
     } catch {
       showNotification('Network error removing suppression', 'error');

@@ -388,7 +388,7 @@ function ConnectPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Failed to disconnect account.',
+          message: extractApiErrorMessage(json, 'Failed to disconnect account.'),
         });
       }
     } catch {
@@ -429,7 +429,7 @@ function ConnectPageContent() {
       } else {
         setTestResult({
           success: false,
-          message: json.error?.message || 'Test email delivery failed.',
+          message: extractApiErrorMessage(json, 'Test email delivery failed.'),
         });
       }
     } catch {

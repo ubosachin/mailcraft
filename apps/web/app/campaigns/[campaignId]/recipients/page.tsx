@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams } from 'next/navigation';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   ArrowLeft,
   Users,
@@ -93,7 +94,7 @@ function RecipientsListContent() {
           setRecipients(json.data.recipients || []);
           setPagination(json.data.pagination || { page: 1, limit: 25, total: 0, totalPages: 1 });
         } else {
-          throw new Error(json.error?.message || 'Error parsing recipient data');
+          throw new Error(extractApiErrorMessage(json, 'Error parsing recipient data'));
         }
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to fetch recipients');

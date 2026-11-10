@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Suspense, useRef } from 'react
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   Users,
   UserPlus,
@@ -303,7 +304,7 @@ function ContactsPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Failed to add contact.',
+          message: extractApiErrorMessage(json, 'Failed to add contact.'),
         });
       }
     } catch {
@@ -368,7 +369,7 @@ function ContactsPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Failed to import bulk contacts.',
+          message: extractApiErrorMessage(json, 'Failed to import bulk contacts.'),
         });
       }
     } catch {
@@ -401,7 +402,7 @@ function ContactsPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Could not parse uploaded file.',
+          message: extractApiErrorMessage(json, 'Could not parse uploaded file.'),
         });
       }
     } catch {
@@ -467,7 +468,7 @@ function ContactsPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Import confirmation failed.',
+          message: extractApiErrorMessage(json, 'Import confirmation failed.'),
         });
       }
     } catch {
@@ -510,7 +511,7 @@ function ContactsPageContent() {
       } else {
         setNotification({
           type: 'error',
-          message: json.error?.message || 'Failed to update contact.',
+          message: extractApiErrorMessage(json, 'Failed to update contact.'),
         });
       }
     } catch {

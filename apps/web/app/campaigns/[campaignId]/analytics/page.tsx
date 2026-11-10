@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   ArrowLeft,
   BarChart3,
@@ -80,7 +81,7 @@ function AnalyticsContent() {
       if (json.success && json.data?.analytics) {
         setData(json.data.analytics);
       } else {
-        throw new Error(json.error?.message || 'Failed to parse analytics data');
+        throw new Error(extractApiErrorMessage(json, 'Failed to parse analytics data'));
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred loading analytics');

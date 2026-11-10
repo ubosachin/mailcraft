@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   Send,
   ArrowLeft,
@@ -142,7 +143,7 @@ function CampaignDetailContent() {
       if (data.success && data.data) {
         setCampaign(data.data);
       } else {
-        showNotification(data.message || 'Failed to load campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to load campaign'), 'error');
       }
     } catch {
       showNotification('Network error loading campaign', 'error');
@@ -208,7 +209,7 @@ function CampaignDetailContent() {
         showNotification('Campaign sending paused', 'info');
         fetchCampaign();
       } else {
-        showNotification(data.message || 'Failed to pause campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to pause campaign'), 'error');
       }
     } catch {
       showNotification('Network error pausing campaign', 'error');
@@ -226,7 +227,7 @@ function CampaignDetailContent() {
         showNotification('Campaign delivery resumed', 'success');
         fetchCampaign();
       } else {
-        showNotification(data.message || 'Failed to resume campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to resume campaign'), 'error');
       }
     } catch {
       showNotification('Network error resuming campaign', 'error');
@@ -248,7 +249,7 @@ function CampaignDetailContent() {
         fetchCampaign();
         fetchRecipients();
       } else {
-        showNotification(data.message || 'Failed to cancel campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to cancel campaign'), 'error');
       }
     } catch {
       showNotification('Network error cancelling campaign', 'error');
@@ -266,7 +267,7 @@ function CampaignDetailContent() {
         showNotification('Campaign cloned into draft! Redirecting...', 'success');
         router.push(`/campaigns/${data.data.id}`);
       } else {
-        showNotification(data.message || 'Failed to duplicate campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to duplicate campaign'), 'error');
       }
     } catch {
       showNotification('Network error duplicating campaign', 'error');

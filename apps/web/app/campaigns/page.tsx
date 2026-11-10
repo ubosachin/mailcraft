@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   Send,
   Plus,
@@ -151,7 +152,7 @@ function CampaignsContent() {
           setTotalCount(data.data.pagination.total || 0);
         }
       } else {
-        showNotification(data.message || 'Failed to load campaigns', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to load campaigns'), 'error');
       }
     } catch {
       showNotification('Network error loading campaigns', 'error');
@@ -190,7 +191,7 @@ function CampaignsContent() {
         showNotification('Campaign duplicated successfully into a new draft!', 'success');
         fetchCampaigns();
       } else {
-        showNotification(data.message || 'Failed to duplicate campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to duplicate campaign'), 'error');
       }
     } catch {
       showNotification('Network error duplicating campaign', 'error');
@@ -210,7 +211,7 @@ function CampaignsContent() {
         showNotification('Campaign paused', 'info');
         fetchCampaigns();
       } else {
-        showNotification(data.message || 'Failed to pause campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to pause campaign'), 'error');
       }
     } catch {
       showNotification('Network error pausing campaign', 'error');
@@ -230,7 +231,7 @@ function CampaignsContent() {
         showNotification('Campaign delivery resumed', 'success');
         fetchCampaigns();
       } else {
-        showNotification(data.message || 'Failed to resume campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to resume campaign'), 'error');
       }
     } catch {
       showNotification('Network error resuming campaign', 'error');
@@ -253,7 +254,7 @@ function CampaignsContent() {
         showNotification('Campaign cancelled', 'info');
         fetchCampaigns();
       } else {
-        showNotification(data.message || 'Failed to cancel campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to cancel campaign'), 'error');
       }
     } catch {
       showNotification('Network error cancelling campaign', 'error');
@@ -276,7 +277,7 @@ function CampaignsContent() {
         showNotification('Campaign deleted successfully', 'success');
         fetchCampaigns();
       } else {
-        showNotification(data.message || 'Failed to delete campaign', 'error');
+        showNotification(extractApiErrorMessage(data, 'Failed to delete campaign'), 'error');
       }
     } catch {
       showNotification('Network error deleting campaign', 'error');

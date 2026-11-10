@@ -15,6 +15,12 @@ import { TestEmailModal } from '../components/TestEmailModal';
 import { useEditorHistory } from '../hooks/useEditorHistory';
 import { useAutosave } from '../hooks/useAutosave';
 
+const DEFAULT_EDITOR_SCHEMA: IEditorSchema = TEMPLATE_CATALOG[0]?.editorSchema || {
+  version: 1,
+  settings: { contentWidth: 600, background: '#F8F9FA', fontFamily: 'sans-serif' },
+  blocks: [],
+};
+
 interface PageProps {
   params: Promise<{ campaignId: string }>;
 }
@@ -56,13 +62,6 @@ export default function CampaignEditorPage({ params }: PageProps) {
   const [previewByteSize, setPreviewByteSize] = useState<number | undefined>(undefined);
   const [showTestModal, setShowTestModal] = useState(false);
 
-  // Default fallback schema
-  const defaultSchema: IEditorSchema = TEMPLATE_CATALOG[0]?.editorSchema || {
-    version: 1,
-    settings: { contentWidth: 600, background: '#F8F9FA', fontFamily: 'sans-serif' },
-    blocks: [],
-  };
-
   const {
     schema,
     updateSchema,
@@ -71,7 +70,7 @@ export default function CampaignEditorPage({ params }: PageProps) {
     redo,
     canUndo,
     canRedo,
-  } = useEditorHistory(defaultSchema);
+  } = useEditorHistory(DEFAULT_EDITOR_SCHEMA);
 
   const {
     saveStatus,
@@ -142,7 +141,7 @@ export default function CampaignEditorPage({ params }: PageProps) {
 
       let loadedSchema = campaign.editorData as IEditorSchema;
       if (!loadedSchema || !loadedSchema.blocks || loadedSchema.blocks.length === 0) {
-        loadedSchema = defaultSchema;
+        loadedSchema = DEFAULT_EDITOR_SCHEMA;
       }
 
       resetHistory(loadedSchema);

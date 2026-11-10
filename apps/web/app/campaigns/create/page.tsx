@@ -1,9 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { IEditorSchema } from '@mailcraft/shared-types';
 import { extractApiErrorMessage } from '@/lib/oauth-helpers';
+import { compileTemplatePreview } from '@/lib/template-preview';
 import {
   Send,
   ArrowLeft,
@@ -54,19 +56,27 @@ interface ConnectionItem {
 }
 
 interface TemplateItem {
-  _id: string;
+  id?: string;
+  _id?: string;
+  slug?: string;
   name: string;
   category: string;
   description: string;
+  thumbnail?: string;
   thumbnailUrl?: string;
   defaultSubject?: string;
+  editorSchema?: Record<string, unknown>;
   editorData?: Record<string, unknown>;
 }
+
+const getTemplateId = (t: TemplateItem): string => t.id || t._id || t.slug || t.name;
+const getTemplateSchema = (t: TemplateItem): Record<string, unknown> | undefined =>
+  t.editorSchema || t.editorData;
 
 interface ValidationIssue {
   code: string;
   message: string;
-  ruleNumber: number;
+  ruleNumber?: number;
   field?: string;
 }
 
@@ -165,16 +175,21 @@ function CampaignWizardContent() {
 
         if (brandsData.success && brandsData.data?.length > 0) {
           setBrands(brandsData.data);
-          if (!brandId) setBrandId(brandsData.data[0].id);
+          setBrandId((prev) => prev || brandsData.data[0].id);
         }
 
-        if (connsData.success && connsData.data) {
+        if (connsData.success && Array.isArray(connsData.data)) {
           setConnections(connsData.data);
-          const active = connsData.data.find(
-            (c: ConnectionItem) => c.status === 'connected' && c.senderVerificationStatus === 'verified'
+          const verifiedConn = connsData.data.find(
+            (c: ConnectionItem) =>
+              c.status === 'connected' && c.senderVerificationStatus === 'verified'
           );
-          if (active && !connectionId) {
-            setConnectionId(active.id);
+          const connectedFallback = connsData.data.find(
+            (c: ConnectionItem) => c.status === 'connected'
+          );
+          const preferred = verifiedConn || connectedFallback;
+          if (preferred) {
+            setConnectionId((prev) => prev || preferred.id);
           }
         }
 
@@ -279,7 +294,7 @@ function CampaignWizardContent() {
         if (data.success) {
           return campaignId;
         } else {
-          showNotification(data.message || 'Failed to update campaign', 'error');
+          showNotification(extractApiErrorMessage(data, 'Failed to update campaign'), 'error');
           return null;
         }
       } else {
@@ -294,7 +309,7 @@ function CampaignWizardContent() {
           setCampaignId(data.data.id);
           return data.data.id;
         } else {
-          showNotification(data.message || 'Failed to create campaign draft', 'error');
+          showNotification(extractApiErrorMessage(data, 'Failed to create campaign draft'), 'error');
           return null;
         }
       }
@@ -328,14 +343,14 @@ function CampaignWizardContent() {
     }
 
     if (currentStep === 4 && templateId) {
-      // Find template
-      const selectedTmpl = templates.find((t) => t._id === templateId);
+      const selectedTmpl = templates.find((t) => getTemplateId(t) === templateId);
       if (selectedTmpl) {
         if (!subject && selectedTmpl.defaultSubject) {
           setSubject(selectedTmpl.defaultSubject);
         }
-        if (selectedTmpl.editorData && Object.keys(editorData).length === 0) {
-          setEditorData(selectedTmpl.editorData);
+        const tplSchema = getTemplateSchema(selectedTmpl);
+        if (tplSchema && Object.keys(editorData).length === 0) {
+          setEditorData(tplSchema);
         }
       }
     }
@@ -516,6 +531,35 @@ function CampaignWizardContent() {
     { number: 8, title: 'Validation' },
     { number: 9, title: 'Confirm & Launch' },
   ];
+
+  const livePreviewHtml = useMemo(() => {
+    if (renderedHtml) return renderedHtml;
+    const schemaCandidate = editorData as unknown as IEditorSchema;
+    if (!schemaCandidate || !Array.isArray(schemaCandidate.blocks) || schemaCandidate.blocks.length === 0) {
+      return '';
+    }
+    const activeBrand = brands.find((b) => b.id === brandId);
+    try {
+      return compileTemplatePreview(
+        {
+          name: campaignName || 'Campaign Preview',
+          description: preheader || description,
+          editorSchema: schemaCandidate,
+        },
+        activeBrand
+          ? {
+              brandName: activeBrand.brandName,
+              senderName: activeBrand.senderName,
+              logoUrl: activeBrand.logoUrl,
+              primaryColor: activeBrand.primaryColor,
+              website: activeBrand.website,
+            }
+          : undefined
+      );
+    } catch {
+      return '';
+    }
+  }, [renderedHtml, editorData, brands, brandId, campaignName, preheader, description]);
 
   if (loadingInitial) {
     return (
@@ -1002,16 +1046,21 @@ function CampaignWizardContent() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-1">
-              {templates.map((tmpl) => (
+              {templates.map((tmpl) => {
+                const tid = getTemplateId(tmpl);
+                const isSelected = Boolean(templateId && templateId === tid);
+                return (
                 <div
-                  key={tmpl._id}
+                  key={tid}
                   onClick={() => {
-                    setTemplateId(tmpl._id);
+                    setTemplateId(tid);
+                    setRenderedHtml('');
                     if (tmpl.defaultSubject && !subject) setSubject(tmpl.defaultSubject);
-                    if (tmpl.editorData) setEditorData(tmpl.editorData);
+                    const tplSchema = getTemplateSchema(tmpl);
+                    if (tplSchema) setEditorData(tplSchema);
                   }}
                   className={`p-4 rounded-xl border cursor-pointer transition flex flex-col justify-between ${
-                    templateId === tmpl._id
+                    isSelected
                       ? 'bg-indigo-50/70 border-indigo-500 ring-2 ring-indigo-500/20'
                       : 'bg-slate-50/80 border-slate-200 hover:border-slate-300'
                   }`}
@@ -1021,7 +1070,7 @@ function CampaignWizardContent() {
                       <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-white border border-slate-200 text-slate-600">
                         {tmpl.category}
                       </span>
-                      {templateId === tmpl._id && (
+                      {isSelected && (
                         <CheckCircle className="w-4 h-4 text-indigo-600" />
                       )}
                     </div>
@@ -1032,11 +1081,12 @@ function CampaignWizardContent() {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-indigo-600 font-semibold">
-                    <span>{templateId === tmpl._id ? 'Selected' : 'Use this template'}</span>
+                    <span>{isSelected ? 'Selected' : 'Use this template'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -1202,23 +1252,19 @@ function CampaignWizardContent() {
             {/* Rendered View Frame */}
             <div className="flex justify-center bg-slate-100 border border-slate-200 rounded-xl p-4 overflow-hidden">
               <div
-                className={`bg-white text-slate-900 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 p-6 overflow-y-auto max-h-[600px] ${
+                className={`bg-white text-slate-900 rounded-xl shadow-lg border border-slate-200 transition-all duration-300 overflow-hidden ${
                   previewDevice === 'mobile' ? 'w-full max-w-[375px]' : 'w-full max-w-[600px]'
                 }`}
               >
-                {renderedHtml ? (
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: renderedHtml
-                        .replace(/{{first_name}}/g, 'Alex')
-                        .replace(/{{last_name}}/g, 'Taylor')
-                        .replace(/{{brand_name}}/g, 'MailCraft')
-                        .replace(/{{coupon_code}}/g, 'SAVE20')
-                        .replace(/{{unsubscribe_url}}/g, '#'),
-                    }}
+                {livePreviewHtml ? (
+                  <iframe
+                    title="Campaign Preview"
+                    srcDoc={livePreviewHtml}
+                    sandbox="allow-same-origin"
+                    className="w-full h-[560px] border-0 bg-white block"
                   />
                 ) : (
-                  <div className="space-y-4 text-center py-12">
+                  <div className="space-y-4 text-center py-12 p-6">
                     <div className="text-2xl font-bold text-slate-900">
                       {subject || 'Exclusive Announcement'}
                     </div>
@@ -1227,7 +1273,7 @@ function CampaignWizardContent() {
                         'Thank you for being a valued subscriber. Discover our latest offers.'}
                     </p>
                     <div className="p-6 rounded-lg bg-indigo-50 border border-indigo-100 text-indigo-900 font-medium text-sm">
-                      Template: {templates.find((t) => t._id === templateId)?.name || 'Default Layout'}
+                      Template: {templates.find((t) => getTemplateId(t) === templateId)?.name || 'Default Layout'}
                     </div>
                     <div className="text-xs text-slate-400 pt-8 border-t border-slate-200">
                       © 2026 MailCraft. All rights reserved. •{' '}
@@ -1385,7 +1431,9 @@ function CampaignWizardContent() {
                       >
                         <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
                         <div>
-                          <span className="font-bold">Rule {err.ruleNumber} ({err.code}):</span>{' '}
+                          <span className="font-bold">
+                            {err.ruleNumber ? `Rule ${err.ruleNumber} (${err.code}):` : `${err.code}:`}
+                          </span>{' '}
                           {err.message}
                         </div>
                       </div>
@@ -1406,7 +1454,10 @@ function CampaignWizardContent() {
                       >
                         <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600 mt-0.5" />
                         <div>
-                          <span className="font-bold">Rule {warn.ruleNumber}:</span> {warn.message}
+                          <span className="font-bold">
+                            {warn.ruleNumber ? `Rule ${warn.ruleNumber}:` : `${warn.code}:`}
+                          </span>{' '}
+                          {warn.message}
                         </div>
                       </div>
                     ))}

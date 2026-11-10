@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   ArrowLeft,
   MousePointer,
@@ -60,7 +61,7 @@ function EngagementContent() {
       if (json.success && json.data) {
         setData(json.data);
       } else {
-        throw new Error(json.error?.message || 'Error processing engagement data');
+        throw new Error(extractApiErrorMessage(json, 'Error processing engagement data'));
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error fetching engagement data');

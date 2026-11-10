@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   ArrowLeft,
   ShieldCheck,
@@ -63,7 +64,7 @@ function DeliverabilityContent() {
       if (json.success && json.data) {
         setData(json.data);
       } else {
-        throw new Error(json.error?.message || 'Error parsing deliverability data');
+        throw new Error(extractApiErrorMessage(json, 'Error parsing deliverability data'));
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error fetching deliverability report');

@@ -89,8 +89,8 @@ export async function processTestEmailJob(job: Job<TestEmailJobPayload>): Promis
 
   const sendResult = await provider.sendEmail({
     to: testEmail,
-    from: brand.senderEmail,
-    fromName: `[TEST] ${brand.senderName}`,
+    from: brand.senderEmail || connection.senderEmail,
+    fromName: `[TEST] ${brand.senderName || brand.brandName}`,
     subject: `[TEST PREVIEW] ${campaign.subject}`,
     html: compiled.html,
     text: compiled.text,

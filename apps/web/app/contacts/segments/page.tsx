@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DashboardHeader } from '@/components/DashboardHeader';
+import { extractApiErrorMessage } from '@/lib/oauth-helpers';
 import {
   Users,
   Filter,
@@ -218,7 +219,7 @@ function SegmentsPageContent() {
 
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to save segment');
+        throw new Error(extractApiErrorMessage(data, 'Failed to save segment'));
       }
 
       showToast(
@@ -249,7 +250,7 @@ function SegmentsPageContent() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to delete segment');
+        throw new Error(extractApiErrorMessage(data, 'Failed to delete segment'));
       }
       showToast('success', 'Segment deleted');
       fetchData();
@@ -271,7 +272,7 @@ function SegmentsPageContent() {
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error?.message || 'Failed to preview segment contacts');
+        throw new Error(extractApiErrorMessage(data, 'Failed to preview segment contacts'));
       }
       setPreviewData(data.data);
     } catch (err: unknown) {

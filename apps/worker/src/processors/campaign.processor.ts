@@ -246,8 +246,8 @@ export async function processCampaignJob(job: Job<CampaignJobPayload>): Promise<
 
         const sendResult = await provider.sendEmail({
           to: recipient.email,
-          from: brand.senderEmail,
-          fromName: brand.senderName,
+          from: brand.senderEmail || connection.senderEmail,
+          fromName: brand.senderName || brand.brandName,
           subject,
           html,
           text,

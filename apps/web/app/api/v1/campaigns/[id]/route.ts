@@ -28,6 +28,17 @@ export async function GET(
       return jsonError('Campaign not found', 404);
     }
 
+    const rawConnection = campaign.connectionId as unknown as
+      | string
+      | { _id?: { toString(): string }; toString?: () => string }
+      | null;
+    const resolvedConnectionId =
+      rawConnection && typeof rawConnection === 'object' && '_id' in rawConnection && rawConnection._id
+        ? rawConnection._id.toString()
+        : typeof rawConnection === 'string'
+        ? rawConnection
+        : null;
+
     return jsonSuccess({
       id: campaign._id.toString(),
       campaignName: campaign.campaignName,
@@ -35,7 +46,7 @@ export async function GET(
       subject: campaign.subject,
       preheader: campaign.preheader,
       templateId: campaign.templateId?.toString(),
-      connectionId: campaign.connectionId?.toString(),
+      connectionId: resolvedConnectionId,
       provider: campaign.provider || 'unassigned',
       editorData: campaign.editorData,
       renderedHtml: campaign.renderedHtml,
