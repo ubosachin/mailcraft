@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'MailCraft – No-Login Promotional Email Marketing Platform',
+  title: 'MailCraft – Promotional Email Marketing Platform',
   description:
-    'Design stunning promotional emails, customize brand colors, connect your sending account, and launch high-converting campaigns — without creating an account.',
-  keywords: ['email marketing', 'no login email builder', 'promotional email', 'gmail marketing', 'brevo bulk email'],
+    'Design stunning promotional emails, customize brand colors, connect your Gmail or bulk sending account, and launch high-converting campaigns.',
+  keywords: ['email marketing', 'promotional email builder', 'gmail marketing', 'brevo bulk email'],
 };
 
 export default function RootLayout({

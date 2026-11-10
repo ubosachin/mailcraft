@@ -6,8 +6,6 @@ import {
   verifyPassword,
 } from '@mailcraft/database';
 import {
-  resolveGuestSession,
-  upgradeSessionToUser,
   createAuthenticatedSession,
   setSessionCookie,
 } from '@/lib/session';
@@ -37,26 +35,8 @@ export async function POST(request: NextRequest) {
       return jsonError('Invalid email or password.', 401);
     }
 
-    // 3. Update last login timestamp
-    user.lastLoginAt = new Date();
-    await user.save();
-
-    // 4. Session management
-    const existingSession = await resolveGuestSession(request);
-    let sessionDoc;
-    let sessionToken: string | null = null;
-    let isGuestUpgraded = false;
-
-    if (existingSession && !existingSession.userId) {
-      // Upgrade existing guest session to this user so current work is claimed
-      sessionDoc = await upgradeSessionToUser(existingSession, user);
-      isGuestUpgraded = true;
-    } else {
-      // Generate a new authenticated session
-      const created = await createAuthenticatedSession(request, user);
-      sessionDoc = created.session;
-      sessionToken = created.token;
-    }
+    // 3. Create or restore user's persistent workspace session
+    const { session, token } = await createAuthenticatedSession(request, user);
 
     const response = jsonSuccess({
       user: {
@@ -69,19 +49,14 @@ export async function POST(request: NextRequest) {
         createdAt: user.createdAt.toISOString(),
       },
       session: {
-        id: sessionDoc._id.toString(),
-        expiresAt: sessionDoc.expiresAt.toISOString(),
-        isGuestUpgraded,
+        id: session._id.toString(),
+        expiresAt: session.expiresAt.toISOString(),
       },
     });
 
-    if (sessionToken) {
-      setSessionCookie(response, sessionToken, sessionDoc.expiresAt);
-    }
-
+    setSessionCookie(response, token, session.expiresAt);
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 }
-

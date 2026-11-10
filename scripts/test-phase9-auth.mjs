@@ -183,30 +183,46 @@ async function runAuthTests() {
   console.log('✓ Test 7 Passed: Unauthenticated request reported authenticated: false\n');
 
   // -------------------------------------------------------------
-  // TEST 8: Guest-to-User Workspace Upgrade & Data Preservation
+  // TEST 8: Guest Mode Removal & Cross-Login Workspace Persistence
   // -------------------------------------------------------------
-  console.log('🧪 TEST 8: Guest-to-User Workspace Upgrade & Data Preservation...');
-  // 8a. Start as anonymous guest
+  console.log('🧪 TEST 8: Guest Mode Removal (410 Gone) & Workspace Persistence...');
+  // 8a. Verify guest endpoints are disabled
   const guestStartRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ brandName: 'Should Fail' }),
+  });
+  assert.strictEqual(guestStartRes.status, 410, 'Guest start must return 410 Gone');
+
+  const guestMeRes = await fetch(`${BASE_URL}/api/v1/guest/me`);
+  assert.strictEqual(guestMeRes.status, 410, 'Guest me must return 410 Gone');
+
+  // 8b. Verify unauthenticated UI route redirects cleanly to /login
+  const workspaceRedirectRes = await fetch(`${BASE_URL}/workspace`, { redirect: 'manual' });
+  assert([307, 308, 302].includes(workspaceRedirectRes.status), 'Protected /workspace must redirect unauthenticated request');
+  assert(workspaceRedirectRes.headers.get('location')?.includes('/login'), 'Redirect target must be /login');
+
+  // 8c. Create user with initial brand and contacts, logout, and log back in
+  const newAccountGmail = `founder.quantum.${runId}@gmail.com`;
+  const newAccountPass = `QuantumPass#${runId}`;
+  const upgradeSignupRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      email: newAccountGmail,
+      password: newAccountPass,
+      name: 'Quantum Founder',
       brandName: `Quantum Craft ${runId}`,
-      senderEmail: `initial.sender.${runId}@test.com`,
     }),
   });
-  const guestStartData = await guestStartRes.json();
-  const guestCookieRaw = guestStartRes.headers.get('set-cookie');
-  assert(guestCookieRaw, 'Must receive guest session cookie');
-  const guestCookie = guestCookieRaw.split(';')[0];
+  assert.strictEqual(upgradeSignupRes.status, 201);
+  const firstCookie = upgradeSignupRes.headers.get('set-cookie')?.split(';')[0];
+  assert(firstCookie, 'Must receive authenticated cookie');
 
-  // 8b. Add a contact under this guest session
+  // Add contact under this user workspace
   const addContactRes = await fetch(`${BASE_URL}/api/v1/contacts`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: guestCookie,
-    },
+    headers: { 'Content-Type': 'application/json', Cookie: firstCookie },
     body: JSON.stringify({
       email: `lead.${runId}@client.org`,
       firstName: 'Samantha',
@@ -215,44 +231,40 @@ async function runAuthTests() {
       consentConfirmed: true,
     }),
   });
-  assert.strictEqual(addContactRes.status, 201, 'Must create contact in guest workspace');
+  assert.strictEqual(addContactRes.status, 201, 'Must create contact in user workspace');
 
-  // 8c. Sign up as a registered user using the guest session cookie
-  const newAccountGmail = `founder.quantum.${runId}@gmail.com`;
-  const upgradeSignupRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
+  // Logout
+  await fetch(`${BASE_URL}/api/v1/auth/logout`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Cookie: guestCookie,
-    },
-    body: JSON.stringify({
-      email: newAccountGmail,
-      password: `QuantumPass#${runId}`,
-      name: 'Quantum Founder',
-    }),
+    headers: { Cookie: firstCookie },
   });
 
-  const upgradeData = await upgradeSignupRes.json();
-  assert.strictEqual(upgradeSignupRes.status, 201, 'Signup with guest cookie must return 201');
-  assert.strictEqual(upgradeData.data.session.isGuestUpgraded, true, 'Guest session must be upgraded');
+  // Log back in
+  const reloginRes = await fetch(`${BASE_URL}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: newAccountGmail, password: newAccountPass }),
+  });
+  assert.strictEqual(reloginRes.status, 200);
+  const reloginCookie = reloginRes.headers.get('set-cookie')?.split(';')[0];
+  assert(reloginCookie, 'Must receive fresh login cookie');
 
-  // 8d. Verify the brand still exists in the user workspace
+  // Verify the brand & contacts persisted across logout and re-login
   const brandCheckRes = await fetch(`${BASE_URL}/api/v1/brands/current`, {
-    headers: { Cookie: guestCookie },
+    headers: { Cookie: reloginCookie },
   });
   const brandCheckData = await brandCheckRes.json();
   assert.strictEqual(brandCheckRes.status, 200);
   assert.strictEqual(brandCheckData.data.brandName, `Quantum Craft ${runId}`);
 
-  // 8e. Verify contacts were preserved
   const contactCheckRes = await fetch(`${BASE_URL}/api/v1/contacts`, {
-    headers: { Cookie: guestCookie },
+    headers: { Cookie: reloginCookie },
   });
   const contactCheckData = await contactCheckRes.json();
   assert.strictEqual(contactCheckRes.status, 200);
-  assert(contactCheckData.data.contacts.length >= 1, 'Contacts must be preserved in upgraded workspace');
+  assert(contactCheckData.data.contacts.length >= 1, 'Contacts must persist across logout/login');
   assert.strictEqual(contactCheckData.data.contacts[0].email, `lead.${runId}@client.org`);
-  console.log('✓ Test 8 Passed: Guest workspace seamlessly upgraded to user account without data loss\n');
+  console.log('✓ Test 8 Passed: Guest mode disabled (410), protected route redirects verified & user workspace persisted across login cycles\n');
 
   // -------------------------------------------------------------
   // TEST 9: User Logout
@@ -298,3 +310,4 @@ runAuthTests().catch((err) => {
   console.error('\n❌ PHASE 9 AUTH TEST FAILED:', err);
   process.exit(1);
 });
+

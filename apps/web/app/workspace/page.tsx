@@ -161,48 +161,46 @@ export default function WorkspacePage() {
   useEffect(() => {
     async function initWorkspace() {
       try {
-        // Check if authenticated user
         const authRes = await fetch('/api/v1/auth/me');
-        if (authRes.ok) {
-          const authData = await authRes.json();
-          if (authData.data?.user) {
-            setUser(authData.data.user);
-          }
+        if (!authRes.ok) {
+          router.replace('/login?redirect=/workspace');
+          return;
         }
 
-        const meRes = await fetch('/api/v1/guest/me');
-        if (meRes.ok) {
-          const data = await meRes.json();
-          if (data.data?.session) {
-            setSession(data.data.session);
-            if (data.data.brand) {
-              setBrand({
-                id: data.data.brand.id,
-                brandName: data.data.brand.brandName || '',
-                senderName: data.data.brand.senderName || '',
-                senderEmail: data.data.brand.senderEmail || '',
-                website: data.data.brand.website || '',
-                logoUrl: data.data.brand.logoUrl || '',
-                primaryColor: data.data.brand.primaryColor || '#4F46E5',
-                secondaryColor: data.data.brand.secondaryColor || '#10B981',
-                footerAddress: data.data.brand.footerAddress || '',
-              });
-            }
+        const authData = await authRes.json();
+        if (!authData.data?.authenticated || !authData.data?.user || !authData.data?.session) {
+          router.replace('/login?redirect=/workspace');
+          return;
+        }
+
+        setUser(authData.data.user);
+        setSession(authData.data.session);
+
+        // Fetch full brand settings
+        const brandRes = await fetch('/api/v1/brands/current');
+        if (brandRes.ok) {
+          const brandJson = await brandRes.json();
+          if (brandJson.data) {
+            setBrand({
+              id: brandJson.data.id,
+              brandName: brandJson.data.brandName || '',
+              senderName: brandJson.data.senderName || '',
+              senderEmail: brandJson.data.senderEmail || authData.data.user.email || '',
+              website: brandJson.data.website || '',
+              logoUrl: brandJson.data.logoUrl || '',
+              primaryColor: brandJson.data.primaryColor || '#4F46E5',
+              secondaryColor: brandJson.data.secondaryColor || '#10B981',
+              footerAddress: brandJson.data.footerAddress || '',
+            });
           }
         } else {
-          // Initialize guest session
-          const startRes = await fetch('/api/v1/guest/start', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              brandName: 'Aurora Studio',
-              senderEmail: 'sarah@aurora.io',
-            }),
-          });
-          const startData = await startRes.json();
-          if (startData.data?.session) {
-            setSession(startData.data.session);
-          }
+          // Initialize brand defaults from user profile
+          setBrand((prev) => ({
+            ...prev,
+            brandName: authData.data.user.name ? `${authData.data.user.name}'s Brand` : 'My Brand',
+            senderName: authData.data.user.name || 'Marketing Team',
+            senderEmail: authData.data.user.email || '',
+          }));
         }
 
         // Fetch connections, contacts, and campaigns
@@ -215,7 +213,7 @@ export default function WorkspacePage() {
     }
 
     initWorkspace();
-  }, []);
+  }, [router]);
 
   const fetchConnections = async () => {
     try {
@@ -311,7 +309,7 @@ export default function WorkspacePage() {
     setVerificationLoading(true);
     setOtpDevCode(null);
     try {
-      const res = await fetch('/api/v1/guest/verify-email', {
+      const res = await fetch('/api/v1/account/verify-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: brand.senderEmail }),
@@ -337,7 +335,7 @@ export default function WorkspacePage() {
   const handleConfirmOtp = async () => {
     setVerificationLoading(true);
     try {
-      const res = await fetch('/api/v1/guest/verify-email/confirm', {
+      const res = await fetch('/api/v1/account/verify-email/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -539,7 +537,7 @@ export default function WorkspacePage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-medium text-slate-600">Connecting to guest workspace...</p>
+          <p className="text-sm font-medium text-slate-600">Loading your workspace...</p>
         </div>
       </div>
     );
@@ -563,32 +561,13 @@ export default function WorkspacePage() {
               </span>
             </Link>
 
-            {user ? (
+            {user && (
               <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
                   <CheckCircle2 className="w-3.5 h-3.5 text-indigo-600" />
                   {user.name || user.email}
                 </span>
                 <span className="text-xs text-slate-500 font-medium hidden md:inline">({user.email})</span>
-              </div>
-            ) : (
-              <div className="hidden sm:flex items-center gap-2 pl-4 border-l border-slate-200">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Guest Workspace
-                </span>
-                <Link
-                  href="/signup"
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-2 py-0.5 rounded-md border border-indigo-200 transition"
-                >
-                  Save Work (Sign Up)
-                </Link>
-                <Link
-                  href="/login"
-                  className="text-xs font-medium text-slate-500 hover:text-slate-800 transition"
-                >
-                  Log in
-                </Link>
               </div>
             )}
           </div>
@@ -604,54 +583,20 @@ export default function WorkspacePage() {
 
             <button
               onClick={() => {
-                if (user) {
-                  if (confirm('Log out of your MailCraft account?')) {
-                    fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
-                      window.location.href = '/login';
-                    });
-                  }
-                } else {
-                  if (confirm('End guest session?')) {
-                    fetch('/api/v1/guest/session', { method: 'DELETE' }).then(() => {
-                      window.location.href = '/';
-                    });
-                  }
+                if (confirm('Log out of your MailCraft account?')) {
+                  fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                    window.location.href = '/login';
+                  });
                 }
               }}
               className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition"
-              title={user ? 'Log Out' : 'End Guest Session'}
+              title="Log Out"
             >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </div>
       </header>
-
-      {/* Guest Workspace Prompt Banner */}
-      {!user && (
-        <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border-b border-indigo-100 px-4 py-2 text-xs text-slate-700 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-indigo-600 flex-shrink-0" />
-            <span>
-              <strong>Guest Studio Active:</strong> Your drafts and contacts are stored in this browser session. Create an account with your Gmail ID to access your campaigns anywhere.
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="font-medium text-slate-600 hover:text-indigo-600 px-2 py-0.5 rounded transition"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-md transition shadow-sm"
-            >
-              Sign Up with Gmail ID
-            </Link>
-          </div>
-        </div>
-      )}
 
       {/* Navigation Wizard Tabs */}
       <div className="bg-white border-b border-slate-200">

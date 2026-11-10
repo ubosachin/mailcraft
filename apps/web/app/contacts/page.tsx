@@ -168,6 +168,10 @@ function ContactsPageContent() {
       if (tagFilter !== 'all') params.set('tag', tagFilter);
 
       const res = await fetch(`/api/v1/contacts?${params.toString()}`);
+      if (res.status === 401) {
+        window.location.href = '/login?redirect=/contacts';
+        return;
+      }
       const data = await res.json();
 
       if (data.success && data.data) {
@@ -614,12 +618,16 @@ function ContactsPageContent() {
               <Filter className="w-3.5 h-3.5 text-indigo-400" />
               Saved Segments ({segments.length})
             </Link>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-sm"
+            <button
+              onClick={() => {
+                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                  window.location.href = '/login';
+                });
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-rose-950/50 text-slate-300 hover:text-rose-400 border border-slate-700 transition"
             >
-              Sign Up / Log In
-            </Link>
+              Log Out
+            </button>
           </div>
         </div>
       </header>

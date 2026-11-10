@@ -15,7 +15,7 @@ export async function GET(
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const { id } = await params;

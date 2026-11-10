@@ -3,6 +3,7 @@ import { GuestSessionStatus } from '@mailcraft/shared-types';
 
 export interface IGuestSessionDoc extends Document {
   sessionTokenHash: string;
+  tokenHashes?: string[];
   userId?: Types.ObjectId | null;
   verifiedEmail?: string | null;
   verificationCodeHash?: string | null;
@@ -21,6 +22,11 @@ const GuestSessionSchema = new Schema<IGuestSessionDoc>(
       type: String,
       required: true,
       unique: true,
+      index: true,
+    },
+    tokenHashes: {
+      type: [String],
+      default: [],
       index: true,
     },
     userId: {

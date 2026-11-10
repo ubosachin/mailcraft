@@ -35,12 +35,18 @@ async function waitForServer(url, timeoutMs = 15000) {
 }
 
 async function createGuestSession(brandName = 'Test Brand', senderEmail = 'test@example.com') {
-  const res = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  const unique = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+  const email = `${senderEmail.split('@')[0]}.${unique}@gmail.com`;
+  const res = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ brandName, senderEmail }),
+    body: JSON.stringify({
+      email,
+      password: `PassCampaign#${unique}`,
+      brandName,
+    }),
   });
-  assert.strictEqual(res.status, 201, 'Guest session start must return 201');
+  assert.strictEqual(res.status, 201, 'Auth signup must return 201');
   const cookie = res.headers.get('set-cookie')?.split(';')[0];
   assert(cookie, 'Must return session cookie');
   const data = await res.json();

@@ -14,7 +14,7 @@ export async function GET(
 ) {
   try {
     const session = await resolveGuestSession(request);
-    if (!session) return jsonError('Guest session required', 401);
+    if (!session) return jsonError('Authentication required', 401);
 
     const { id } = await params;
     await connectToDatabase();
@@ -55,7 +55,7 @@ export async function DELETE(
 ) {
   try {
     const session = await resolveGuestSession(request);
-    if (!session) return jsonError('Guest session required', 401);
+    if (!session) return jsonError('Authentication required', 401);
 
     const { id } = await params;
     const body = await request.json().catch(() => ({}));

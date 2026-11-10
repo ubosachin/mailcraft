@@ -53,7 +53,7 @@ export default function PricingPage() {
 
             <div>
               <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Workspace Access</span>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">Guest Studio</h3>
+              <h3 className="text-2xl font-black text-slate-900 mt-1">Starter Studio</h3>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-4xl font-extrabold text-slate-900">$0</span>
                 <span className="text-xs text-slate-500">/ forever</span>
@@ -65,7 +65,7 @@ export default function PricingPage() {
               <ul className="mt-6 space-y-3 text-xs text-slate-700">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>No account or credit card required</span>
+                  <span>Free Gmail ID signup, zero credit card required</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -83,10 +83,10 @@ export default function PricingPage() {
             </div>
 
             <Link
-              href="/workspace"
+              href="/signup"
               className="mt-8 w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg text-center transition"
             >
-              Start Creating Now →
+              Sign Up Free Now →
             </Link>
           </div>
 

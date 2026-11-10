@@ -1,38 +1,41 @@
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { GmailOAuthClient } from '@mailcraft/email-providers';
-import { resolveGuestSession, createGuestSession, setSessionCookie } from '@/lib/session';
 import { jsonSuccess, handleApiError } from '@/lib/api-response';
+
+const OAUTH_NONCE_COOKIE = 'mailcraft_oauth_nonce';
 
 export async function GET(request: NextRequest) {
   try {
-    let session = await resolveGuestSession(request);
-    let cookieToken: string | null = null;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const client = new GmailOAuthClient({
+      redirectUri: `${appUrl}/api/v1/auth/google/callback`,
+    });
 
-    if (!session) {
-      const created = await createGuestSession(request);
-      session = created.session;
-      cookieToken = created.token;
-    }
-
-    const client = new GmailOAuthClient();
-    const state = `auth_${client.generateState(session._id.toString())}`;
+    const oauthNonce = crypto.randomBytes(16).toString('hex');
+    const state = `auth_${client.generateState(oauthNonce)}`;
     const url = client.buildAuthorizationUrl(state);
 
     const wantsJson =
       request.headers.get('accept')?.includes('application/json') ||
       request.nextUrl.searchParams.get('format') === 'json';
 
-    if (wantsJson) {
-      return jsonSuccess({ url, state });
-    }
+    const response = wantsJson
+      ? jsonSuccess({ url, state })
+      : NextResponse.redirect(url);
 
-    const response = NextResponse.redirect(url);
-    if (cookieToken) {
-      setSessionCookie(response, cookieToken, session.expiresAt);
-    }
+    response.cookies.set({
+      name: OAUTH_NONCE_COOKIE,
+      value: oauthNonce,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 600,
+    });
+
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 }
-

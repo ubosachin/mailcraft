@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const rateLimit = await checkRateLimit(`camp_create:${session._id}`, 'CAMPAIGN_CREATE');
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const searchParams = request.nextUrl.searchParams;

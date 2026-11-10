@@ -45,24 +45,21 @@ export default function HomePage() {
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/v1/guest/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brandName: brandName.trim() || undefined,
-          senderEmail: senderEmail.trim() || undefined,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to initialize guest workspace');
+      const meRes = await fetch('/api/v1/auth/me');
+      if (meRes.ok) {
+        const meData = await meRes.json();
+        if (meData.data?.authenticated) {
+          router.push('/workspace');
+          return;
+        }
       }
 
-      router.push('/workspace');
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'An error occurred');
-      setLoading(false);
+      const params = new URLSearchParams();
+      if (brandName.trim()) params.set('brandName', brandName.trim());
+      if (senderEmail.trim()) params.set('email', senderEmail.trim());
+      router.push(`/signup${params.toString() ? `?${params.toString()}` : ''}`);
+    } catch {
+      router.push('/signup');
     }
   };
 
@@ -71,7 +68,7 @@ export default function HomePage() {
       {/* Top Banner */}
       <div className="bg-slate-900 text-slate-300 px-4 py-2 text-xs md:text-sm text-center font-medium flex items-center justify-center gap-2">
         <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>MailCraft v1.0 – Guest mode active. No registration or credit card required.</span>
+        <span>MailCraft – Create. Customize. Send. Sign up with your Gmail ID to launch promotional campaigns.</span>
       </div>
 
       {/* Navigation */}
@@ -83,7 +80,7 @@ export default function HomePage() {
             </div>
             <div>
               <span className="text-xl font-black tracking-tight text-slate-900">Mail<span className="text-indigo-600">Craft</span></span>
-              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">Guest Studio</span>
+              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">Studio</span>
             </div>
           </div>
 
@@ -122,7 +119,7 @@ export default function HomePage() {
             <div className="lg:col-span-7 space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 text-indigo-800 text-xs font-semibold">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Zero Account Setup · Instant Campaign Dispatch</span>
+                <span>Persistent Cloud Workspace · Instant Campaign Dispatch</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-[1.1]">
@@ -133,17 +130,17 @@ export default function HomePage() {
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-600 font-normal leading-relaxed max-w-2xl">
-                MailCraft is the guest-first promotional email marketing platform. Design professional, mobile-ready emails, customize your brand identity, connect your sending account, and launch to your permission-based audience in minutes.
+                MailCraft is the modern promotional email marketing platform. Design professional, mobile-ready emails, customize your brand identity, connect your sending account, and launch to your permission-based audience in minutes.
               </p>
 
               <div className="flex flex-wrap items-center gap-6 pt-2 text-sm text-slate-600">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>No login or password</span>
+                  <span>Sign up with Gmail &amp; password</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Gmail OAuth + Brevo</span>
+                  <span>Gmail OAuth + Brevo + SES</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -157,11 +154,11 @@ export default function HomePage() {
               <div className="bg-white rounded-2xl shadow-xl shadow-indigo-100/60 border border-slate-200/80 p-6 sm:p-8 relative">
                 <div className="flex items-center justify-between pb-5 border-b border-slate-100">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">MailCraft Workspace</span>
-                    <h2 className="text-xl font-bold text-slate-900">Start a new campaign</h2>
+                    <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">MailCraft Studio</span>
+                    <h2 className="text-xl font-bold text-slate-900">Start your workspace</h2>
                   </div>
-                  <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    Guest Mode
+                  <span className="px-2.5 py-1 text-xs font-medium rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
+                    Free Account
                   </span>
                 </div>
 
@@ -187,17 +184,17 @@ export default function HomePage() {
 
                   <div>
                     <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
-                      Your Sender Email
+                      Your Gmail ID / Email
                     </label>
                     <input
                       type="email"
-                      placeholder="you@brand.com"
+                      placeholder="you@gmail.com"
                       value={senderEmail}
                       onChange={(e) => setSenderEmail(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-lg border border-slate-300 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition"
                     />
                     <p className="mt-1 text-xs text-slate-500">
-                      We will verify ownership with a 6-digit code before sending.
+                      Create an account to save drafts, brands, and analytics across devices.
                     </p>
                   </div>
 
@@ -207,10 +204,10 @@ export default function HomePage() {
                     className="w-full mt-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-75 text-white font-semibold rounded-lg shadow-md shadow-indigo-200 transition flex items-center justify-center gap-2 group text-sm"
                   >
                     {loading ? (
-                      <span>Initializing Guest Workspace...</span>
+                      <span>Redirecting to Setup...</span>
                     ) : (
                       <>
-                        <span>Create Campaign</span>
+                        <span>Get Started Free</span>
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
                       </>
                     )}
@@ -220,9 +217,9 @@ export default function HomePage() {
                 <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                   <div className="flex items-center gap-1.5">
                     <Lock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Cryptographic session cookie</span>
+                    <span>Encrypted AES-256 vault</span>
                   </div>
-                  <span>7-day persistence</span>
+                  <span>Multi-device sync</span>
                 </div>
               </div>
             </div>
@@ -409,9 +406,9 @@ export default function HomePage() {
 
           <div className="space-y-4">
             <div className="bg-white p-6 rounded-xl border border-slate-200">
-              <h4 className="font-bold text-slate-900 text-base">How does guest mode work without an account?</h4>
+              <h4 className="font-bold text-slate-900 text-base">How do accounts and workspaces work?</h4>
               <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                When you visit MailCraft, we issue a high-entropy 256-bit token stored in a Secure, HttpOnly cookie. The database stores only the SHA-256 hash. Your workspace, brand settings, and draft campaigns persist for 7 days. You can also verify your sender email to recover access across devices.
+                Sign up with your Gmail ID and password or click Continue with Google. Passwords are salted and hashed with scrypt, and authentication sessions are secured via 256-bit HttpOnly cookies. All your brands, templates, contacts, and campaign analytics stay permanently synchronized across your devices.
               </p>
             </div>
 
@@ -440,7 +437,7 @@ export default function HomePage() {
               <Mail className="w-3.5 h-3.5" />
             </div>
             <span className="font-bold text-slate-200">MailCraft</span>
-            <span className="text-slate-500">· No-login promotional email platform</span>
+            <span className="text-slate-500">· Promotional email marketing platform</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-6">

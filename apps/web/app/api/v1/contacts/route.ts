@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     await connectToDatabase();
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const body = await request.json();

@@ -673,7 +673,7 @@ function CampaignWizardContent() {
                 </label>
                 {brands.length === 0 ? (
                   <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-900/60 text-amber-200 text-sm space-y-2">
-                    <p>No brand profile found for your guest session.</p>
+                    <p>No brand profile found for your workspace.</p>
                     <Link
                       href="/workspace"
                       className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:underline"

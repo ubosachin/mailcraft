@@ -48,7 +48,7 @@ export default function TemplatesPage() {
   const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile' | 'full'>('desktop');
   const [previewHtml, setPreviewHtml] = useState<string>('');
   const [cloningSlug, setCloningSlug] = useState<string | null>(null);
-  const [guestBrand, setGuestBrand] = useState<{
+  const [userBrand, setUserBrand] = useState<{
     brandName?: string;
     logoUrl?: string;
     primaryColor?: string;
@@ -56,13 +56,13 @@ export default function TemplatesPage() {
     footerAddress?: string;
   } | null>(null);
 
-  // Load guest brand if session exists
+  // Load user brand if authenticated
   useEffect(() => {
     fetch('/api/v1/brands/current')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.data) {
-          setGuestBrand(data.data);
+          setUserBrand(data.data);
         }
       })
       .catch(() => {});
@@ -111,7 +111,7 @@ export default function TemplatesPage() {
     // Compile actual email HTML using brand if available
     const rendered = compileEmail({
       schema: template.editorSchema,
-      brand: guestBrand || {
+      brand: userBrand || {
         brandName: 'MailCraft Studio',
         senderName: 'Founder',
         primaryColor: '#4F46E5',
@@ -138,14 +138,12 @@ export default function TemplatesPage() {
   const handleUseTemplate = async (template: TemplateDefinition) => {
     setCloningSlug(template.slug);
     try {
-      // 1. Ensure guest session exists
-      const meRes = await fetch('/api/v1/guest/me');
-      if (!meRes.ok) {
-        await fetch('/api/v1/guest/start', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ brandName: 'My Brand' }),
-        });
+      // 1. Check authentication status
+      const meRes = await fetch('/api/v1/auth/me');
+      const meData = await meRes.json();
+      if (!meRes.ok || !meData.data?.authenticated) {
+        router.push('/login?redirect=/templates');
+        return;
       }
 
       // 2. Clone template into a new Campaign

@@ -17,6 +17,11 @@ export const signupSchema = z.object({
     .min(1, 'Name cannot be empty')
     .max(100)
     .optional(),
+  brandName: z
+    .string()
+    .trim()
+    .max(100)
+    .optional(),
 });
 
 export type SignupInput = z.infer<typeof signupSchema>;

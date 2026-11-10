@@ -1,8 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const PROTECTED_PAGE_PREFIXES = [
+  '/workspace',
+  '/editor',
+  '/campaigns',
+  '/contacts',
+  '/analytics',
+  '/connect',
+  '/suppression',
+  '/settings',
+];
+
 export function middleware(request: NextRequest) {
   const origin = request.headers.get('origin') || '*';
-  const isApi = request.nextUrl.pathname.startsWith('/api/');
+  const pathname = request.nextUrl.pathname;
+  const isApi = pathname.startsWith('/api/');
+
+  // Redirect unauthenticated users away from protected studio routes
+  if (!isApi) {
+    const isProtected = PROTECTED_PAGE_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
+    if (isProtected) {
+      const sessionCookie = request.cookies.get('mailcraft_session')?.value;
+      if (!sessionCookie) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+  }
 
   // Handle CORS preflight OPTIONS requests for API
   if (isApi && request.method === 'OPTIONS') {

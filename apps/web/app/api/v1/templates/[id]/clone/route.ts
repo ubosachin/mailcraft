@@ -11,7 +11,7 @@ export async function POST(
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required to clone a template into a campaign', 401);
+      return jsonError('Authentication required to clone a template into a campaign', 401);
     }
 
     const { id } = await params;

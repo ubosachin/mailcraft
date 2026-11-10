@@ -92,19 +92,26 @@ export default function CampaignEditorPage({ params }: PageProps) {
     setLoadError(null);
 
     try {
-      // 1. Fetch Guest session & Brand
-      const meRes = await fetch('/api/v1/guest/me');
-      if (meRes.ok) {
-        const meData = await meRes.json();
-        if (meData.data?.brand) {
+      // 1. Verify Authenticated Session & Load Brand
+      const authRes = await fetch('/api/v1/auth/me');
+      const authData = authRes.ok ? await authRes.json() : null;
+      if (!authData?.data?.authenticated) {
+        window.location.href = `/login?redirect=/editor/${campaignId}`;
+        return;
+      }
+
+      const brandRes = await fetch('/api/v1/brands/current');
+      if (brandRes.ok) {
+        const brandData = await brandRes.json();
+        if (brandData.data) {
           setBrand({
-            brandName: meData.data.brand.brandName || 'MailCraft Studio',
-            logoUrl: meData.data.brand.logoUrl || '',
-            senderName: meData.data.brand.senderName || '',
-            senderEmail: meData.data.brand.senderEmail || '',
-            primaryColor: meData.data.brand.primaryColor || '#4F46E5',
-            secondaryColor: meData.data.brand.secondaryColor || '#10B981',
-            footerAddress: meData.data.brand.footerAddress || '',
+            brandName: brandData.data.brandName || 'MailCraft Studio',
+            logoUrl: brandData.data.logoUrl || '',
+            senderName: brandData.data.senderName || '',
+            senderEmail: brandData.data.senderEmail || '',
+            primaryColor: brandData.data.primaryColor || '#4F46E5',
+            secondaryColor: brandData.data.secondaryColor || '#10B981',
+            footerAddress: brandData.data.footerAddress || '',
           });
         }
       }

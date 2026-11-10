@@ -139,6 +139,10 @@ function CampaignsContent() {
       if (statusFilter !== 'all') params.set('status', statusFilter);
 
       const res = await fetch(`/api/v1/campaigns?${params.toString()}`);
+      if (res.status === 401) {
+        window.location.href = '/login?redirect=/campaigns';
+        return;
+      }
       const data = await res.json();
 
       if (data.success && data.data) {
@@ -468,12 +472,16 @@ function CampaignsContent() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/signup"
-              className="text-xs font-semibold text-slate-400 hover:text-white px-2 py-1 transition"
+            <button
+              onClick={() => {
+                fetch('/api/v1/auth/logout', { method: 'POST' }).then(() => {
+                  window.location.href = '/login';
+                });
+              }}
+              className="text-xs font-semibold text-slate-400 hover:text-rose-400 px-2 py-1 transition"
             >
-              Sign Up / Log In
-            </Link>
+              Log Out
+            </button>
             <Link
               href="/campaigns/create"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm shadow-lg shadow-indigo-600/20 transition transform active:scale-95"

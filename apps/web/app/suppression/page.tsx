@@ -566,7 +566,7 @@ function SuppressionContent() {
                   onChange={(e) => setAddForm({ ...addForm, scope: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-indigo-500"
                 >
-                  <option value="session">Workspace Session (Applies to this guest session)</option>
+                  <option value="session">Account Workspace (Applies to your workspace)</option>
                   <option value="global">Global (Barred platform-wide)</option>
                 </select>
               </div>

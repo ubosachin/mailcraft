@@ -213,16 +213,21 @@ async function runPhase2Tests() {
   assert(prevData.data.text.includes('Minimalist Leather Folio'));
   console.log(`✓ GET /api/v1/templates/:id/preview: Rendered preview HTML (${prevData.data.html.length} bytes)`);
 
-  // 4.4 POST /api/v1/templates/:id/clone (Requires guest session)
-  // First start a guest session
-  const guestRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  // 4.4 POST /api/v1/templates/:id/clone (Requires authenticated user session)
+  // First sign up user
+  const runId = Date.now();
+  const authRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ brandName: 'Nordic Audio Co' }),
+    body: JSON.stringify({
+      email: `nordic.${runId}@gmail.com`,
+      password: `PassNordic#${runId}`,
+      brandName: 'Nordic Audio Co',
+    }),
   });
-  const guestData = await guestRes.json();
-  assert.strictEqual(guestRes.status, 201);
-  const cookieHeader = guestRes.headers.get('set-cookie')?.split(';')[0];
+  const authData = await authRes.json();
+  assert.strictEqual(authRes.status, 201);
+  const cookieHeader = authRes.headers.get('set-cookie')?.split(';')[0];
   assert(cookieHeader, 'Session cookie must be returned');
 
   // Clone template into new campaign

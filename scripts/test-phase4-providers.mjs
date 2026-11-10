@@ -171,24 +171,33 @@ async function runPhase4Tests() {
   console.log('  ✓ Amazon SES Provider connection & Easy-DKIM guidance validated\n');
 
   // --------------------------------------------------------------------------
-  // TEST 4: GUEST SESSIONS FOR MULTI-TENANT ISOLATION TESTS
+  // TEST 3: AUTHENTICATED USER SESSIONS FOR MULTI-TENANT ISOLATION TESTS
   // --------------------------------------------------------------------------
-  console.log('--- TEST 3: Guest Sessions & Multi-Tenant Isolation ---');
-  // Create Session A
-  const sessionARes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  console.log('--- TEST 3: Authenticated Sessions & Multi-Tenant Isolation ---');
+  const runId = Date.now();
+  // Create User Session A
+  const sessionARes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ brandName: 'Brand Alpha', senderEmail: 'alpha@example.com' }),
+    body: JSON.stringify({
+      email: `alpha.${runId}@gmail.com`,
+      password: `AlphaPass#${runId}`,
+      brandName: 'Brand Alpha',
+    }),
   });
   const sessionAData = await sessionARes.json();
   const cookieA = sessionARes.headers.get('set-cookie')?.split(';')[0];
   const sessionAId = sessionAData.data.session.id;
 
-  // Create Session B
-  const sessionBRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  // Create User Session B
+  const sessionBRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ brandName: 'Brand Beta', senderEmail: 'beta@example.com' }),
+    body: JSON.stringify({
+      email: `beta.${runId}@gmail.com`,
+      password: `BetaPass#${runId}`,
+      brandName: 'Brand Beta',
+    }),
   });
   const sessionBData = await sessionBRes.json();
   const cookieB = sessionBRes.headers.get('set-cookie')?.split(';')[0];
@@ -196,7 +205,7 @@ async function runPhase4Tests() {
 
   console.log(`  Session A: ${sessionAId}`);
   console.log(`  Session B: ${sessionBId}`);
-  console.log('✓ Dual guest sessions initialized\n');
+  console.log('✓ Dual authenticated sessions initialized\n');
 
   // --------------------------------------------------------------------------
   // TEST 5: GMAIL OAUTH FLOW & TOKEN ENCRYPTION

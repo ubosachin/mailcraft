@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   connectToDatabase,
@@ -10,7 +11,6 @@ import {
 } from '@mailcraft/database';
 
 export const SESSION_COOKIE_NAME = 'mailcraft_session';
-const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days for guest sessions
 const AUTH_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days for authenticated users
 
 export function extractSessionToken(request: NextRequest): string | null {
@@ -27,7 +27,11 @@ export function extractSessionToken(request: NextRequest): string | null {
   return null;
 }
 
-export async function resolveGuestSession(
+/**
+ * Resolves an authenticated user workspace session.
+ * Unauthenticated guest sessions are strictly disallowed.
+ */
+export async function resolveAuthSession(
   request: NextRequest
 ): Promise<IGuestSessionDoc | null> {
   await connectToDatabase();
@@ -38,51 +42,31 @@ export async function resolveGuestSession(
   }
 
   const tokenHash = hashSessionToken(rawToken);
+  const now = new Date();
+
   const session = await GuestSession.findOne({
-    sessionTokenHash: tokenHash,
+    userId: { $ne: null },
     status: 'active',
-    expiresAt: { $gt: new Date() },
+    expiresAt: { $gt: now },
+    $or: [{ sessionTokenHash: tokenHash }, { tokenHashes: tokenHash }],
   });
 
   if (session) {
-    // Touch last activity
-    session.lastActivityAt = new Date();
+    session.lastActivityAt = now;
+    session.expiresAt = new Date(now.getTime() + AUTH_SESSION_TTL_MS);
     await session.save();
   }
 
   return session;
 }
 
-export async function createGuestSession(
-  request?: NextRequest,
-  seedEmail?: string
-): Promise<{ session: IGuestSessionDoc; token: string }> {
-  await connectToDatabase();
-
-  const token = generateSessionToken();
-  const tokenHash = hashSessionToken(token);
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + SESSION_TTL_MS);
-
-  const userAgent = request?.headers.get('user-agent') || undefined;
-
-  const session = await GuestSession.create({
-    sessionTokenHash: tokenHash,
-    status: 'active',
-    verifiedEmail: seedEmail ? seedEmail.toLowerCase().trim() : null,
-    userAgent,
-    createdAt: now,
-    expiresAt,
-    lastActivityAt: now,
-  });
-
-  return { session, token };
-}
+// Keep alias so existing API imports transparently enforce authenticated sessions
+export const resolveGuestSession = resolveAuthSession;
 
 export async function resolveUser(
   request: NextRequest
 ): Promise<{ session: IGuestSessionDoc; user: IUserDoc | null } | null> {
-  const session = await resolveGuestSession(request);
+  const session = await resolveAuthSession(request);
   if (!session) {
     return null;
   }
@@ -92,28 +76,16 @@ export async function resolveUser(
     user = await User.findById(session.userId);
   }
 
+  if (!user) {
+    return null;
+  }
+
   return { session, user };
 }
 
-export async function upgradeSessionToUser(
-  session: IGuestSessionDoc,
-  user: IUserDoc
-): Promise<IGuestSessionDoc> {
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + AUTH_SESSION_TTL_MS);
-
-  session.userId = user._id;
-  session.verifiedEmail = user.email;
-  session.expiresAt = expiresAt;
-  session.lastActivityAt = now;
-  await session.save();
-
-  user.primarySessionId = session._id;
-  await user.save();
-
-  return session;
-}
-
+/**
+ * Creates or restores the persistent workspace session for an authenticated user.
+ */
 export async function createAuthenticatedSession(
   request: NextRequest | undefined,
   user: IUserDoc
@@ -124,11 +96,34 @@ export async function createAuthenticatedSession(
   const tokenHash = hashSessionToken(token);
   const now = new Date();
   const expiresAt = new Date(now.getTime() + AUTH_SESSION_TTL_MS);
-
   const userAgent = request?.headers.get('user-agent') || undefined;
+
+  if (user.primarySessionId) {
+    const existingSession = await GuestSession.findById(user.primarySessionId);
+    if (existingSession) {
+      const existingHashes = (existingSession.tokenHashes || []).slice(-9);
+      existingHashes.push(tokenHash);
+
+      existingSession.tokenHashes = existingHashes;
+      if (existingSession.sessionTokenHash.startsWith('revoked_')) {
+        existingSession.sessionTokenHash = tokenHash;
+      }
+      existingSession.status = 'active';
+      existingSession.expiresAt = expiresAt;
+      existingSession.lastActivityAt = now;
+      if (userAgent) existingSession.userAgent = userAgent;
+      await existingSession.save();
+
+      user.lastLoginAt = now;
+      await user.save();
+
+      return { session: existingSession, token };
+    }
+  }
 
   const session = await GuestSession.create({
     sessionTokenHash: tokenHash,
+    tokenHashes: [tokenHash],
     userId: user._id,
     status: 'active',
     verifiedEmail: user.email,
@@ -143,6 +138,31 @@ export async function createAuthenticatedSession(
   await user.save();
 
   return { session, token };
+}
+
+export async function revokeSessionToken(
+  session: IGuestSessionDoc,
+  rawToken: string | null
+): Promise<void> {
+  if (!rawToken) {
+    session.status = 'revoked';
+    await session.save();
+    return;
+  }
+
+  const tokenHash = hashSessionToken(rawToken);
+  const filteredHashes = (session.tokenHashes || []).filter((h) => h !== tokenHash);
+  session.tokenHashes = filteredHashes;
+
+  if (session.sessionTokenHash === tokenHash) {
+    session.sessionTokenHash = `revoked_${crypto.randomBytes(16).toString('hex')}`;
+  }
+
+  if (filteredHashes.length === 0) {
+    session.status = 'revoked';
+  }
+
+  await session.save();
 }
 
 export function setSessionCookie(
@@ -165,5 +185,3 @@ export function setSessionCookie(
 export function clearSessionCookie(response: NextResponse): void {
   response.cookies.delete(SESSION_COOKIE_NAME);
 }
-
-

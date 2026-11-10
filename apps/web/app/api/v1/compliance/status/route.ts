@@ -12,7 +12,7 @@ import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 export async function GET(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
-    if (!session) return jsonError('Guest session required', 401);
+    if (!session) return jsonError('Authentication required', 401);
 
     await connectToDatabase();
 

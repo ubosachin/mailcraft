@@ -8,11 +8,11 @@ import {
 } from '@mailcraft/database';
 import { GmailOAuthClient } from '@mailcraft/email-providers';
 import {
-  resolveGuestSession,
-  upgradeSessionToUser,
   createAuthenticatedSession,
   setSessionCookie,
 } from '@/lib/session';
+
+const OAUTH_NONCE_COOKIE = 'mailcraft_oauth_nonce';
 
 export async function GET(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -31,14 +31,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${appUrl}/login?error=missing_oauth_code`);
     }
 
-    const session = await resolveGuestSession(request);
-    if (!session) {
-      return NextResponse.redirect(`${appUrl}/login?error=session_missing`);
+    const oauthNonce = request.cookies.get(OAUTH_NONCE_COOKIE)?.value;
+    if (!oauthNonce) {
+      return NextResponse.redirect(`${appUrl}/login?error=invalid_oauth_state`);
     }
 
     const rawState = state.replace(/^auth_/, '');
-    const client = new GmailOAuthClient();
-    const isValidState = client.validateState(rawState, session._id.toString());
+    const client = new GmailOAuthClient({
+      redirectUri: `${appUrl}/api/v1/auth/google/callback`,
+    });
+
+    const isValidState = client.validateState(rawState, oauthNonce);
     if (!isValidState) {
       return NextResponse.redirect(`${appUrl}/login?error=invalid_oauth_state`);
     }
@@ -71,19 +74,10 @@ export async function GET(request: NextRequest) {
       await user.save();
     }
 
-    // Session handling
-    let sessionDoc = session;
-    let sessionToken: string | null = null;
+    // Create or restore authenticated workspace session
+    const { session: sessionDoc, token: sessionToken } = await createAuthenticatedSession(request, user);
 
-    if (!session.userId) {
-      sessionDoc = await upgradeSessionToUser(session, user);
-    } else if (session.userId.toString() !== user._id.toString()) {
-      const created = await createAuthenticatedSession(request, user);
-      sessionDoc = created.session;
-      sessionToken = created.token;
-    }
-
-    // Upsert Brand with user's verified sender email
+    // Ensure Brand exists for user workspace
     const existingBrand = await Brand.findOne({ sessionId: sessionDoc._id });
     if (!existingBrand) {
       await Brand.create({
@@ -121,9 +115,8 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.redirect(`${appUrl}/workspace?auth=success`);
-    if (sessionToken) {
-      setSessionCookie(response, sessionToken, sessionDoc.expiresAt);
-    }
+    setSessionCookie(response, sessionToken, sessionDoc.expiresAt);
+    response.cookies.delete(OAUTH_NONCE_COOKIE);
 
     return response;
   } catch {

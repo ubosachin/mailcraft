@@ -426,7 +426,7 @@ function CampaignDetailContent() {
         <AlertTriangle className="w-12 h-12 text-rose-400" />
         <h2 className="text-xl font-bold text-white">Campaign Not Found</h2>
         <p className="text-slate-400 text-sm max-w-sm">
-          The requested campaign does not exist or has been removed from this guest session.
+          The requested campaign does not exist or has been removed from your workspace.
         </p>
         <Link
           href="/campaigns"

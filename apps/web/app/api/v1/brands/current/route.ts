@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const brand = await Brand.findOne({ sessionId: session._id }).sort({ createdAt: -1 });

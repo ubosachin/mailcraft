@@ -49,36 +49,50 @@ async function runE2ETests() {
   assert.strictEqual(healthData.database, 'connected');
   console.log('✓ Healthcheck endpoint operational (/api/v1/health)');
 
-  // 2. Start Guest Session
-  const startRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  // 2. Verify Guest Mode Disabled
+  const disabledGuestRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  assert.strictEqual(disabledGuestRes.status, 410, 'Guest mode must return 410 Gone');
+  console.log('✓ Confirmed guest mode is disabled (/api/v1/guest/start -> 410)');
+
+  // 3. Sign Up Authenticated User
+  const runId = Date.now();
+  const userEmail = `elena.${runId}@gmail.com`;
+  const signupRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      email: userEmail,
+      password: `StarlightPass#${runId}`,
+      name: 'Elena Rostova',
       brandName: 'Starlight Apparel',
-      senderEmail: 'hello@starlight.com',
     }),
   });
-  const startData = await startRes.json();
-  assert.strictEqual(startRes.status, 201);
-  assert(startData.data.session.id, 'Session ID must exist');
-  assert(startData.data.token.startsWith('mc_sess_'), 'Token must be prefixed with mc_sess_');
+  const signupData = await signupRes.json();
+  assert.strictEqual(signupRes.status, 201);
+  assert(signupData.data.session.id, 'Session ID must exist');
+  assert.strictEqual(signupData.data.user.email, userEmail);
 
   // Extract cookie from Set-Cookie header
-  const rawCookie = startRes.headers.get('set-cookie');
+  const rawCookie = signupRes.headers.get('set-cookie');
   assert(rawCookie, 'Set-Cookie header must be returned');
   const sessionCookie = rawCookie.split(';')[0];
-  console.log(`✓ Guest session created: ${startData.data.session.id} with secure cookie`);
+  console.log(`✓ Authenticated user created: ${userEmail} (${signupData.data.session.id})`);
 
-  // 3. Query Me with Cookie
-  const meRes = await fetch(`${BASE_URL}/api/v1/guest/me`, {
+  // 4. Query Me with Cookie
+  const meRes = await fetch(`${BASE_URL}/api/v1/auth/me`, {
     headers: { Cookie: sessionCookie },
   });
   const meData = await meRes.json();
   assert.strictEqual(meRes.status, 200);
-  assert.strictEqual(meData.data.session.id, startData.data.session.id);
-  console.log('✓ Active guest session resolved via HttpOnly cookie (/api/v1/guest/me)');
+  assert.strictEqual(meData.data.authenticated, true);
+  assert.strictEqual(meData.data.session.id, signupData.data.session.id);
+  console.log('✓ Authenticated user session resolved via HttpOnly cookie (/api/v1/auth/me)');
 
-  // 4. Save/Update Brand Profile
+  // 5. Save/Update Brand Profile
   const brandRes = await fetch(`${BASE_URL}/api/v1/brands`, {
     method: 'POST',
     headers: {
@@ -102,7 +116,7 @@ async function runE2ETests() {
   assert.strictEqual(brandData.data.primaryColor, '#6366F1');
   console.log('✓ Brand profile & color tokens persisted (/api/v1/brands)');
 
-  // 5. Query Current Brand
+  // 6. Query Current Brand
   const curBrandRes = await fetch(`${BASE_URL}/api/v1/brands/current`, {
     headers: { Cookie: sessionCookie },
   });
@@ -111,8 +125,8 @@ async function runE2ETests() {
   assert.strictEqual(curBrandData.data.brandName, 'Starlight Apparel');
   console.log('✓ Current brand retrieved (/api/v1/brands/current)');
 
-  // 6. Request OTP Verification
-  const verifyRes = await fetch(`${BASE_URL}/api/v1/guest/verify-email`, {
+  // 7. Request OTP Verification
+  const verifyRes = await fetch(`${BASE_URL}/api/v1/account/verify-email`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -126,8 +140,8 @@ async function runE2ETests() {
   const otpCode = verifyData.data.devCode;
   console.log(`✓ OTP verification code requested and received: ${otpCode}`);
 
-  // 7. Confirm OTP Verification
-  const confirmRes = await fetch(`${BASE_URL}/api/v1/guest/verify-email/confirm`, {
+  // 8. Confirm OTP Verification
+  const confirmRes = await fetch(`${BASE_URL}/api/v1/account/verify-email/confirm`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -141,27 +155,17 @@ async function runE2ETests() {
   const confirmData = await confirmRes.json();
   assert.strictEqual(confirmRes.status, 200);
   assert.strictEqual(confirmData.data.verified, true);
-  console.log('✓ Email verification confirmed and bound to session (/api/v1/guest/verify-email/confirm)');
+  console.log('✓ Email verification confirmed and bound to account (/api/v1/account/verify-email/confirm)');
 
-  // 8. Refresh Session
-  const refreshRes = await fetch(`${BASE_URL}/api/v1/guest/refresh`, {
+  // 9. Logout & Revoke Session
+  const endRes = await fetch(`${BASE_URL}/api/v1/auth/logout`, {
     method: 'POST',
-    headers: { Cookie: sessionCookie },
-  });
-  const refreshData = await refreshRes.json();
-  assert.strictEqual(refreshRes.status, 200);
-  assert(refreshData.data.expiresAt, 'Refreshed expiresAt timestamp');
-  console.log('✓ Session expiry refreshed by 7 days (/api/v1/guest/refresh)');
-
-  // 9. End Session
-  const endRes = await fetch(`${BASE_URL}/api/v1/guest/session`, {
-    method: 'DELETE',
     headers: { Cookie: sessionCookie },
   });
   const endData = await endRes.json();
   assert.strictEqual(endRes.status, 200);
-  assert.strictEqual(endData.data.revoked, true);
-  console.log('✓ Session revoked and cookie cleared (/api/v1/guest/session)');
+  assert.strictEqual(endData.data.loggedOut, true);
+  console.log('✓ Session revoked and cookie cleared (/api/v1/auth/logout)');
 
   console.log('\n🎉 ALL END-TO-END API INTEGRATION TESTS PASSED PERFECTLY!\n');
 

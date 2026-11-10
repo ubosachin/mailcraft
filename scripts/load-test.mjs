@@ -115,18 +115,18 @@ async function main() {
     }, 60)
   );
 
-  // 4. Session Validation & Me Endpoint
+  // 4. Auth Session Resolution Endpoint
   results.push(
-    await runScenario('Guest Session Auth Resolution (/api/v1/guest/me)', async () => {
-      const res = await fetch(`${BASE_URL}/api/v1/guest/me`);
-      return res.status === 401 || res.status === 200; // Expected 401 without cookie
+    await runScenario('User Auth Resolution (/api/v1/auth/me)', async () => {
+      const res = await fetch(`${BASE_URL}/api/v1/auth/me`);
+      return res.status === 200;
     }, 60)
   );
 
-  // 5. Educational DNS Compliance Guidance Page
+  // 5. Public Templates Browsing Page
   results.push(
-    await runScenario('Email Authentication Page (/settings/email-authentication)', async () => {
-      const res = await fetch(`${BASE_URL}/settings/email-authentication`);
+    await runScenario('Public Templates Catalog (/templates)', async () => {
+      const res = await fetch(`${BASE_URL}/templates`);
       return res.status === 200;
     }, 60)
   );

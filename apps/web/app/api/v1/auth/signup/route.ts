@@ -7,15 +7,26 @@ import {
   hashPassword,
 } from '@mailcraft/database';
 import {
-  resolveGuestSession,
-  upgradeSessionToUser,
   createAuthenticatedSession,
   setSessionCookie,
 } from '@/lib/session';
+import { checkRateLimit } from '@/lib/rate-limiter';
 import { jsonSuccess, jsonError, handleApiError } from '@/lib/api-response';
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '127.0.0.1';
+    const isLoopback = ip === '127.0.0.1' || ip === '::1' || ip === 'localhost';
+    const rule = isLoopback
+      ? { max: 5000, windowMs: 10 * 60 * 1000 }
+      : 'SESSION_CREATE';
+    const rateLimit = await checkRateLimit(`auth_signup:${ip}`, rule);
+    if (!rateLimit.success) {
+      return jsonError('Too many signup requests. Please try again later.', 429, {
+        retryAfter: Math.ceil(rateLimit.resetMs / 1000),
+      });
+    }
+
     await connectToDatabase();
 
     const body = await request.json();
@@ -42,28 +53,20 @@ export async function POST(request: NextRequest) {
       lastLoginAt: new Date(),
     });
 
-    // 4. Check if client has an active guest session to upgrade
-    const existingSession = await resolveGuestSession(request);
-    let sessionDoc;
-    let sessionToken: string | null = null;
-    let isGuestUpgraded = false;
+    // 4. Create authenticated workspace session
+    const { session, token } = await createAuthenticatedSession(request, user);
 
-    if (existingSession && !existingSession.userId) {
-      // Upgrade existing guest session to this user
-      sessionDoc = await upgradeSessionToUser(existingSession, user);
-      isGuestUpgraded = true;
-
-      // Ensure existing brand has the verified email
-      const existingBrand = await Brand.findOne({ sessionId: sessionDoc._id });
-      if (existingBrand && !existingBrand.senderEmail) {
-        existingBrand.senderEmail = user.email;
-        await existingBrand.save();
-      }
-    } else {
-      // Create fresh authenticated session
-      const created = await createAuthenticatedSession(request, user);
-      sessionDoc = created.session;
-      sessionToken = created.token;
+    // 5. Initialize default brand if brandName provided
+    let brandDoc = null;
+    if (validated.brandName) {
+      brandDoc = await Brand.create({
+        sessionId: session._id,
+        brandName: validated.brandName,
+        senderName: user.name || validated.brandName,
+        senderEmail: user.email,
+        primaryColor: '#4F46E5',
+        secondaryColor: '#10B981',
+      });
     }
 
     const response = jsonSuccess(
@@ -78,22 +81,23 @@ export async function POST(request: NextRequest) {
           createdAt: user.createdAt.toISOString(),
         },
         session: {
-          id: sessionDoc._id.toString(),
-          expiresAt: sessionDoc.expiresAt.toISOString(),
-          isGuestUpgraded,
+          id: session._id.toString(),
+          expiresAt: session.expiresAt.toISOString(),
         },
+        brand: brandDoc
+          ? {
+              id: brandDoc._id.toString(),
+              brandName: brandDoc.brandName,
+              senderEmail: brandDoc.senderEmail,
+            }
+          : null,
       },
       201
     );
 
-    // Set cookie if a new session was generated
-    if (sessionToken) {
-      setSessionCookie(response, sessionToken, sessionDoc.expiresAt);
-    }
-
+    setSessionCookie(response, token, session.expiresAt);
     return response;
   } catch (error) {
     return handleApiError(error);
   }
 }
-

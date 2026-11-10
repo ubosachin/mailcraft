@@ -53,22 +53,25 @@ async function runPhase3Tests() {
   await connectToDatabase();
 
   // --------------------------------------------------------------------------
-  // TEST 2: GUEST SESSION & BRAND INITIALIZATION
+  // TEST 1: USER ACCOUNT & BRAND INITIALIZATION
   // --------------------------------------------------------------------------
-  console.log('--- TEST 1: Guest Session & Workspace Preparation ---');
-  const sessionRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+  console.log('--- TEST 1: Authenticated Account & Workspace Preparation ---');
+  const runId = Date.now();
+  const sessionRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      email: `founders.${runId}@velocitacycles.com`,
+      password: `VelocitaPass#${runId}`,
+      name: 'Marco Rossi',
       brandName: 'Velocita Cycles',
-      senderEmail: 'founders@velocitacycles.com',
     }),
   });
   const sessionData = await sessionRes.json();
   assert.strictEqual(sessionRes.status, 201);
   const cookieHeader = sessionRes.headers.get('set-cookie')?.split(';')[0];
   assert(cookieHeader, 'HttpOnly session cookie required');
-  console.log(`✓ Guest session initialized: ${sessionData.data.session.id}`);
+  console.log(`✓ Authenticated session initialized: ${sessionData.data.session.id}`);
 
   // Create Brand Profile
   const brandRes = await fetch(`${BASE_URL}/api/v1/brands`, {

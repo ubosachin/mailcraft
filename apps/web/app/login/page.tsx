@@ -59,10 +59,11 @@ function LoginForm() {
         throw new Error(data.error || 'Invalid email or password');
       }
 
+      const redirectTarget = searchParams.get('redirect') || '/workspace';
       setSuccessMsg('Logged in successfully! Redirecting to workspace...');
       setTimeout(() => {
-        router.push('/workspace');
-      }, 800);
+        router.push(redirectTarget.startsWith('/') ? redirectTarget : '/workspace');
+      }, 600);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
       setLoading(false);
@@ -218,17 +219,6 @@ function LoginForm() {
               Sign up here
             </Link>
           </div>
-        </div>
-
-        {/* Guest fallback */}
-        <div className="mt-4 text-center">
-          <Link
-            href="/workspace"
-            className="text-xs text-slate-500 hover:text-slate-700 font-medium inline-flex items-center gap-1"
-          >
-            <span>Or continue in guest mode without an account</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
         </div>
       </div>
     </div>

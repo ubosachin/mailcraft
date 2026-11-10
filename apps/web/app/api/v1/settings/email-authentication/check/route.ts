@@ -8,7 +8,7 @@ import { IDnsCheckResult } from '@mailcraft/shared-types';
 export async function POST(request: NextRequest) {
   try {
     const session = await resolveGuestSession(request);
-    if (!session) return jsonError('Guest session required', 401);
+    if (!session) return jsonError('Authentication required', 401);
 
     const body = await request.json();
     const { domain } = dnsCheckSchema.parse(body);

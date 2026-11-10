@@ -111,7 +111,7 @@ async function runPhase8E2ETest() {
     assert(secRes.headers.get('content-security-policy')?.includes("default-src 'self'"));
 
     // CORS preflight OPTIONS check
-    const corsRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+    const corsRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
       method: 'OPTIONS',
       headers: { Origin: 'https://external-client.test' },
     });
@@ -121,16 +121,18 @@ async function runPhase8E2ETest() {
     console.log('✓ Step 2 Passed: CSP, X-Frame-Options, nosniff & CORS preflight verified\n');
 
     // -------------------------------------------------------------
-    // 3. Guest Workspace Initialization
+    // 3. Authenticated User Workspace Initialization
     // -------------------------------------------------------------
-    console.log('🧪 3. Initializing Ephemeral Guest Workspace Session...');
+    console.log('🧪 3. Initializing Authenticated User Workspace Session...');
     const senderEmail = `campaign.director.${runId}@apexstudios.co`;
-    const sessionRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+    const sessionRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: senderEmail,
+        password: `ApexPass#${runId}`,
+        name: 'Apex Studio Director',
         brandName: 'Apex Creative Studios',
-        senderEmail,
       }),
     });
     assert.strictEqual(sessionRes.status, 201);
@@ -156,7 +158,7 @@ async function runPhase8E2ETest() {
     assert.strictEqual(brandRes.status, 200);
     const brandData = await brandRes.json();
     const brandId = brandData.data.id;
-    console.log('✓ Step 3 Passed: Guest session created and brand profile persisted\n');
+    console.log('✓ Step 3 Passed: Authenticated user created and brand profile persisted\n');
 
     // -------------------------------------------------------------
     // 4. Sender Verification & Disposable Domain Defense
@@ -167,7 +169,7 @@ async function runPhase8E2ETest() {
     assert.strictEqual(isDisposableEmail('legitimate@apexstudios.co'), false);
 
     // Attempting OTP on disposable email
-    const dispRes = await fetch(`${BASE_URL}/api/v1/guest/verify-email`, {
+    const dispRes = await fetch(`${BASE_URL}/api/v1/account/verify-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Cookie: cookie },
       body: JSON.stringify({ email: 'abuser@10minutemail.com' }),
@@ -175,7 +177,7 @@ async function runPhase8E2ETest() {
     assert.strictEqual(dispRes.status, 400, 'Disposable email must be rejected with 400');
 
     // Legitimate OTP Verification
-    const otpRes = await fetch(`${BASE_URL}/api/v1/guest/verify-email`, {
+    const otpRes = await fetch(`${BASE_URL}/api/v1/account/verify-email`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Cookie: cookie },
       body: JSON.stringify({ email: senderEmail }),
@@ -185,7 +187,7 @@ async function runPhase8E2ETest() {
     const devCode = otpData.data.devCode;
 
     // Confirm OTP code
-    const confirmRes = await fetch(`${BASE_URL}/api/v1/guest/verify-email/confirm`, {
+    const confirmRes = await fetch(`${BASE_URL}/api/v1/account/verify-email/confirm`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Cookie: cookie },
       body: JSON.stringify({ email: senderEmail, code: devCode }),

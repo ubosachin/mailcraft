@@ -28,9 +28,9 @@ export default function PrivacyPage() {
         </div>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-slate-900">1. Guest-First Architecture & Data Minimization</h2>
+          <h2 className="text-lg font-bold text-slate-900">1. Account Security & Data Minimization</h2>
           <p>
-            MailCraft operates under a no-registration philosophy. We do not require usernames, passwords, or personal account profiles to use our platform. Workspace identity is maintained through high-entropy 256-bit cryptographic tokens stored solely as SHA-256 hashes in our database and provided to your browser in a Secure, HttpOnly cookie.
+            MailCraft protects user accounts using salted scrypt password hashing (or Google OAuth 2.0) and high-entropy 256-bit cryptographic session tokens stored solely as SHA-256 hashes in our database and provided to your browser in Secure, HttpOnly cookies. We collect only the essential profile information required to run your campaigns.
           </p>
         </section>
 
@@ -42,9 +42,9 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-slate-900">3. Retention & Automatic Expiration</h2>
+          <h2 className="text-lg font-bold text-slate-900">3. Retention & Compliance</h2>
           <p>
-            Inactive guest workspaces and drafts expire automatically after 7 days via database TTL indexes. To honor recipient privacy and legally mandated opt-outs under US CAN-SPAM, GDPR, and India DPDP regulations, suppression records (hashes of unsubscribed addresses) are retained persistently to ensure suppressed recipients are never messaged again across subsequent sessions.
+            Your account workspace, brand profiles, templates, and analytics persist cleanly across sessions. To honor recipient privacy and legally mandated opt-outs under US CAN-SPAM, GDPR, and India DPDP regulations, suppression records (hashes of unsubscribed addresses) are retained persistently to ensure suppressed recipients are never messaged again.
           </p>
         </section>
 

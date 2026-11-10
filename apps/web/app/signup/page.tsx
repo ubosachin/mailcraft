@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Mail,
   Lock,
@@ -12,15 +12,14 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  Sparkles,
-  ShieldCheck,
-  Zap,
 } from 'lucide-react';
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [name, setName] = useState('');
+  const [brandName, setBrandName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,6 +27,13 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    const paramEmail = searchParams.get('email');
+    const paramBrand = searchParams.get('brandName');
+    if (paramEmail) setEmail(paramEmail);
+    if (paramBrand) setBrandName(paramBrand);
+  }, [searchParams]);
 
   // Password strength calculation
   const getPasswordStrength = (pwd: string) => {
@@ -77,6 +83,7 @@ export default function SignupPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim() || undefined,
+          brandName: brandName.trim() || undefined,
           email: email.trim(),
           password,
         }),
@@ -294,14 +301,6 @@ export default function SignupPage() {
             </div>
           </form>
 
-          {/* Existing guest work note */}
-          <div className="mt-6 p-3 rounded-xl bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-800 flex items-start gap-2">
-            <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0 text-indigo-600" />
-            <span>
-              If you currently have a draft campaign, templates, or contacts in progress, creating an account will automatically link and save your existing work!
-            </span>
-          </div>
-
           <div className="mt-6 text-center text-xs text-slate-500">
             Already have an account?{' '}
             <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-700">
@@ -309,19 +308,16 @@ export default function SignupPage() {
             </Link>
           </div>
         </div>
-
-        {/* Guest fallback */}
-        <div className="mt-4 text-center">
-          <Link
-            href="/workspace"
-            className="text-xs text-slate-500 hover:text-slate-700 font-medium inline-flex items-center gap-1"
-          >
-            <span>Or continue in guest mode without an account</span>
-            <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-sm text-slate-500">Loading...</div>}>
+      <SignupForm />
+    </Suspense>
   );
 }
 

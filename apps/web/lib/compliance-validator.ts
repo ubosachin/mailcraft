@@ -35,7 +35,7 @@ export async function validateCampaignCompliance(
           status: 'blocked',
           ruleId: 'RULE_COMP_00',
           severity: 'critical',
-          description: 'Campaign record not found or inaccessible in current guest session.',
+          description: 'Campaign record not found or inaccessible in current account workspace.',
           suggestedAction: 'Ensure campaign was created within this active session.',
         },
       ],

@@ -13,7 +13,7 @@ export async function POST(
   try {
     const session = await resolveGuestSession(request);
     if (!session) {
-      return jsonError('Guest session required', 401);
+      return jsonError('Authentication required', 401);
     }
 
     const rateLimit = await checkRateLimit(`test_email:${session._id}`, 'TEST_EMAIL');

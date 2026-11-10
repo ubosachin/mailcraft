@@ -72,13 +72,16 @@ async function runCampaignWorkerE2E() {
     assert.strictEqual(health.status, 'healthy');
     console.log('1. Health check passed:', health);
 
-    // 2. Start Guest Session
-    const startRes = await fetch(`${BASE_URL}/api/v1/guest/start`, {
+    // 2. Sign Up Authenticated User
+    const runId = Date.now();
+    const startRes = await fetch(`${BASE_URL}/api/v1/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        email: `founders.${runId}@auroralight.co`,
+        password: `AuroraPass#${runId}`,
+        name: 'Clara Vance',
         brandName: 'Aurora Modern Lighting',
-        senderEmail: 'founders@auroralight.co',
       }),
     });
     const startData = await startRes.json();
@@ -87,7 +90,7 @@ async function runCampaignWorkerE2E() {
     assert(rawCookie, 'Set-Cookie header must be returned');
     const sessionCookie = rawCookie.split(';')[0];
     const sessionId = startData.data.session.id;
-    console.log(`2. Guest session initialized: ${sessionId}`);
+    console.log(`2. Authenticated session initialized: ${sessionId}`);
 
     // 3. Save Brand Profile
     const brandRes = await fetch(`${BASE_URL}/api/v1/brands`, {
@@ -112,7 +115,7 @@ async function runCampaignWorkerE2E() {
     console.log(`3. Brand profile configured: ${brandId}`);
 
     // 4. Trigger OTP verification & Confirm
-    const otpReq = await fetch(`${BASE_URL}/api/v1/guest/verify-email`, {
+    const otpReq = await fetch(`${BASE_URL}/api/v1/account/verify-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -125,7 +128,7 @@ async function runCampaignWorkerE2E() {
     const devOtp = otpData.data.devCode || '123456';
     console.log(`4a. OTP verification initiated. Dev code: ${devOtp}`);
 
-    const confirmReq = await fetch(`${BASE_URL}/api/v1/guest/verify-email/confirm`, {
+    const confirmReq = await fetch(`${BASE_URL}/api/v1/account/verify-email/confirm`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

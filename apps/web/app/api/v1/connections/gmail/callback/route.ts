@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const session = await resolveGuestSession(request);
     if (!session) {
-      return NextResponse.redirect(`${appUrl}/connect?error=guest_session_missing`);
+      return NextResponse.redirect(`${appUrl}/connect?error=authentication_required`);
     }
 
     const client = new GmailOAuthClient();
