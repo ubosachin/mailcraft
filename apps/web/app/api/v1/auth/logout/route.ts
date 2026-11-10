@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     const response = jsonSuccess({ loggedOut: true });
-    clearSessionCookie(response);
+    clearSessionCookie(response, request);
     return response;
   } catch (error) {
     return handleApiError(error);

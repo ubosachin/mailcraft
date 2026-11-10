@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
   connectToDatabase,
   Brand,
@@ -6,7 +6,22 @@ import {
   Contact,
 } from '@mailcraft/database';
 import { resolveUser } from '@/lib/session';
-import { jsonSuccess, handleApiError } from '@/lib/api-response';
+import { handleApiError } from '@/lib/api-response';
+
+export const dynamic = 'force-dynamic';
+
+function jsonNoStore(data: unknown) {
+  return NextResponse.json(
+    { success: true, data },
+    {
+      status: 200,
+      headers: {
+        'Cache-Control': 'private, no-store, no-cache, must-revalidate',
+        Vary: 'Cookie',
+      },
+    }
+  );
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     const authContext = await resolveUser(request);
     if (!authContext) {
-      return jsonSuccess({
+      return jsonNoStore({
         authenticated: false,
         user: null,
         session: null,
@@ -32,7 +47,7 @@ export async function GET(request: NextRequest) {
       Contact.countDocuments({ sessionId: session._id }),
     ]);
 
-    return jsonSuccess({
+    return jsonNoStore({
       authenticated: !!user,
       user: user
         ? {

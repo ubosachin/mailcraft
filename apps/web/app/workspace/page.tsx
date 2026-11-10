@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { MailCraftLogo } from '@/components/MailCraftLogo';
 import {
   ShieldCheck,
@@ -100,8 +99,6 @@ interface CampaignSummary {
 }
 
 export default function WorkspacePage() {
-  const router = useRouter();
-
   const [activeTab, setActiveTab] = useState<'brand' | 'sending' | 'recipients' | 'templates' | 'campaigns'>('brand');
   const [session, setSession] = useState<SessionState | null>(null);
   const [user, setUser] = useState<UserState | null>(null);
@@ -160,15 +157,28 @@ export default function WorkspacePage() {
   useEffect(() => {
     async function initWorkspace() {
       try {
-        const authRes = await fetch('/api/v1/auth/me');
+        const authRes = await fetch('/api/v1/auth/me', {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        });
+
+        if (authRes.status === 401) {
+          window.location.assign('/login?redirect=/workspace');
+          return;
+        }
+
         if (!authRes.ok) {
-          router.replace('/login?redirect=/workspace');
+          setStatusMessage({
+            type: 'error',
+            text: 'Unable to reach server to verify session. Please refresh and try again.',
+          });
+          setLoading(false);
           return;
         }
 
         const authData = await authRes.json();
         if (!authData.data?.authenticated || !authData.data?.user || !authData.data?.session) {
-          router.replace('/login?redirect=/workspace');
+          window.location.assign('/login?redirect=/workspace');
           return;
         }
 
@@ -212,7 +222,7 @@ export default function WorkspacePage() {
     }
 
     initWorkspace();
-  }, [router]);
+  }, []);
 
   const fetchConnections = async () => {
     try {

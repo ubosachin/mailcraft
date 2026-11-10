@@ -51,9 +51,13 @@ export async function resolveAuthSession(
   });
 
   if (session) {
+    const nextExpiresAt = new Date(now.getTime() + AUTH_SESSION_TTL_MS);
     session.lastActivityAt = now;
-    session.expiresAt = new Date(now.getTime() + AUTH_SESSION_TTL_MS);
-    await session.save();
+    session.expiresAt = nextExpiresAt;
+    await UserSession.updateOne(
+      { _id: session._id },
+      { $set: { lastActivityAt: now, expiresAt: nextExpiresAt } }
+    );
   }
 
   return session;
@@ -157,23 +161,48 @@ export async function revokeSessionToken(
   await session.save();
 }
 
+function shouldUseSecureCookie(request?: NextRequest): boolean {
+  if (request) {
+    const forwardedProto = request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim().toLowerCase();
+    if (forwardedProto) {
+      return forwardedProto === 'https';
+    }
+    if (request.nextUrl?.protocol) {
+      return request.nextUrl.protocol === 'https:';
+    }
+  }
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || '';
+  if (appUrl.startsWith('https://')) return true;
+  if (appUrl.startsWith('http://')) return false;
+  return process.env.NODE_ENV === 'production';
+}
+
 export function setSessionCookie(
   response: NextResponse,
   token: string,
-  expiresAt: Date
+  expiresAt: Date,
+  request?: NextRequest
 ): void {
-  const isProduction = process.env.NODE_ENV === 'production';
   response.cookies.set({
     name: SESSION_COOKIE_NAME,
     value: token,
     httpOnly: true,
-    secure: isProduction,
+    secure: shouldUseSecureCookie(request),
     sameSite: 'lax',
     path: '/',
     expires: expiresAt,
   });
 }
 
-export function clearSessionCookie(response: NextResponse): void {
-  response.cookies.delete(SESSION_COOKIE_NAME);
+export function clearSessionCookie(response: NextResponse, request?: NextRequest): void {
+  response.cookies.set({
+    name: SESSION_COOKIE_NAME,
+    value: '',
+    httpOnly: true,
+    secure: shouldUseSecureCookie(request),
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 0,
+  });
 }

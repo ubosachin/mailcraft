@@ -59,23 +59,34 @@ export default function TemplatesPage() {
 
   // Verify user auth and load brand
   useEffect(() => {
-    fetch('/api/v1/auth/me')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((authData) => {
-        if (!authData?.data?.authenticated) {
-          router.replace('/login?redirect=/templates');
-          return;
+    fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
+      .then(async (res) => {
+        if (res.status === 401) {
+          window.location.assign('/login?redirect=/templates');
+          return null;
         }
-        return fetch('/api/v1/brands/current')
-          .then((res) => (res.ok ? res.json() : null))
-          .then((data) => {
-            if (data?.data) {
-              setUserBrand(data.data);
-            }
-          });
+        if (!res.ok) return null;
+        const authData = await res.json();
+        if (authData?.data?.authenticated === false) {
+          window.location.assign('/login?redirect=/templates');
+          return null;
+        }
+        if (!authData?.data?.authenticated) return null;
+
+        const brandRes = await fetch('/api/v1/brands/current', {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        });
+        if (brandRes.ok) {
+          const data = await brandRes.json();
+          if (data?.data) {
+            setUserBrand(data.data);
+          }
+        }
+        return null;
       })
       .catch(() => {});
-  }, [router]);
+  }, []);
 
   // Filter and sort templates
   const filteredTemplates = useMemo(() => {
@@ -148,10 +159,17 @@ export default function TemplatesPage() {
     setCloningSlug(template.slug);
     try {
       // 1. Check authentication status
-      const meRes = await fetch('/api/v1/auth/me');
-      const meData = await meRes.json();
-      if (!meRes.ok || !meData.data?.authenticated) {
-        router.push('/login?redirect=/templates');
+      const meRes = await fetch('/api/v1/auth/me', {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
+      if (meRes.status === 401) {
+        window.location.assign('/login?redirect=/templates');
+        return;
+      }
+      const meData = meRes.ok ? await meRes.json() : null;
+      if (meRes.ok && meData?.data?.authenticated === false) {
+        window.location.assign('/login?redirect=/templates');
         return;
       }
 

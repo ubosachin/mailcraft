@@ -39,11 +39,23 @@ function EditorRedirector() {
 
       // Check existing draft campaigns
       try {
-        const campRes = await fetch('/api/v1/campaigns');
+        const campRes = await fetch('/api/v1/campaigns', {
+          cache: 'no-store',
+          credentials: 'same-origin',
+        });
+        if (campRes.status === 401) {
+          window.location.assign('/login?redirect=/editor');
+          return;
+        }
         if (campRes.ok) {
           const campData = await campRes.json();
-          if (Array.isArray(campData.data) && campData.data.length > 0) {
-            const latest = campData.data[0];
+          const list = Array.isArray(campData.data?.campaigns)
+            ? campData.data.campaigns
+            : Array.isArray(campData.data)
+            ? campData.data
+            : [];
+          if (list.length > 0) {
+            const latest = list[0];
             router.replace(`/editor/${latest.id}`);
             return;
           }

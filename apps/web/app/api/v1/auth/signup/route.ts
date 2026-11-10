@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       201
     );
 
-    setSessionCookie(response, token, session.expiresAt);
+    setSessionCookie(response, token, session.expiresAt, request);
     return response;
   } catch (error) {
     return handleApiError(error);

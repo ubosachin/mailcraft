@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Mail,
   Lock,
@@ -16,7 +16,6 @@ import {
 import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [email, setEmail] = useState('');
@@ -36,7 +35,24 @@ function LoginForm() {
       } else {
         setErrorMsg(`Login failed: ${errorParam}`);
       }
+      return;
     }
+
+    // If user already holds a valid active session, skip login screen
+    const redirectParam = searchParams.get('redirect');
+    const safeTarget =
+      redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
+        ? redirectParam
+        : '/workspace';
+
+    fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.data?.authenticated) {
+          window.location.assign(safeTarget);
+        }
+      })
+      .catch(() => {});
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,6 +65,7 @@ function LoginForm() {
       const res = await fetch('/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           email: email.trim(),
           password,
@@ -61,10 +78,12 @@ function LoginForm() {
       }
 
       const redirectTarget = searchParams.get('redirect') || '/workspace';
+      const safeTarget =
+        redirectTarget.startsWith('/') && !redirectTarget.startsWith('//')
+          ? redirectTarget
+          : '/workspace';
       setSuccessMsg('Logged in successfully! Redirecting to workspace...');
-      setTimeout(() => {
-        router.push(redirectTarget.startsWith('/') ? redirectTarget : '/workspace');
-      }, 600);
+      window.location.assign(safeTarget);
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Invalid credentials. Please try again.');
       setLoading(false);

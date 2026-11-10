@@ -22,17 +22,38 @@ export function middleware(request: NextRequest) {
   const isApi = pathname.startsWith('/api/');
 
   // Redirect unauthenticated users away from protected studio routes
-  if (!isApi) {
-    const isProtected = PROTECTED_PAGE_PREFIXES.some(
+  const isProtected =
+    !isApi &&
+    PROTECTED_PAGE_PREFIXES.some(
       (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
     );
-    if (isProtected) {
-      const sessionCookie = request.cookies.get('mailcraft_session')?.value;
-      if (!sessionCookie) {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(loginUrl);
+
+  if (isProtected) {
+    const sessionCookie = request.cookies.get('mailcraft_session')?.value;
+    if (!sessionCookie) {
+      const isPrefetch =
+        request.headers.get('next-router-prefetch') === '1' ||
+        request.headers.get('x-middleware-prefetch') === '1' ||
+        request.headers.get('purpose') === 'prefetch' ||
+        Boolean(request.headers.get('sec-purpose')?.includes('prefetch'));
+
+      if (isPrefetch) {
+        // Prevent Next.js Router Cache from caching a /login redirect during background link prefetching
+        return new NextResponse(null, {
+          status: 401,
+          headers: {
+            'Cache-Control': 'private, no-store, no-cache, must-revalidate',
+            Vary: 'Cookie',
+          },
+        });
       }
+
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      const redirectRes = NextResponse.redirect(loginUrl);
+      redirectRes.headers.set('Cache-Control', 'private, no-store, no-cache, must-revalidate');
+      redirectRes.headers.set('Vary', 'Cookie');
+      return redirectRes;
     }
   }
 

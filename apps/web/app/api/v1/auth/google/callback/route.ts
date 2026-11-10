@@ -116,7 +116,7 @@ export async function GET(request: NextRequest) {
     }
 
     const response = NextResponse.redirect(`${appUrl}/workspace?auth=success`);
-    setSessionCookie(response, sessionToken, sessionDoc.expiresAt);
+    setSessionCookie(response, sessionToken, sessionDoc.expiresAt, request);
     response.cookies.delete(OAUTH_NONCE_COOKIE);
 
     return response;

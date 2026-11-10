@@ -14,11 +14,12 @@ export default function PricingPage() {
           </Link>
 
           <div className="flex items-center gap-4 text-xs font-semibold">
-            <Link href="/templates" className="text-slate-600 hover:text-slate-900 transition">
+            <Link href="/templates" prefetch={false} className="text-slate-600 hover:text-slate-900 transition">
               Templates
             </Link>
             <Link
               href="/workspace"
+              prefetch={false}
               className="px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
             >
               Enter Workspace

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Mail,
   Lock,
@@ -16,7 +16,6 @@ import {
 import { MailCraftLogo } from '@/components/MailCraftLogo';
 
 function SignupForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [name, setName] = useState('');
@@ -34,6 +33,16 @@ function SignupForm() {
     const paramBrand = searchParams.get('brandName');
     if (paramEmail) setEmail(paramEmail);
     if (paramBrand) setBrandName(paramBrand);
+
+    // Redirect already-authenticated users straight to workspace
+    fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.data?.authenticated) {
+          window.location.assign('/workspace');
+        }
+      })
+      .catch(() => {});
   }, [searchParams]);
 
   // Password strength calculation
@@ -82,6 +91,7 @@ function SignupForm() {
       const res = await fetch('/api/v1/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
         body: JSON.stringify({
           name: name.trim() || undefined,
           brandName: brandName.trim() || undefined,
@@ -96,9 +106,7 @@ function SignupForm() {
       }
 
       setSuccessMsg('Account created successfully! Redirecting to workspace...');
-      setTimeout(() => {
-        router.push('/workspace');
-      }, 1000);
+      window.location.assign('/workspace');
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'An error occurred during signup');
       setLoading(false);

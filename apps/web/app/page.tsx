@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -38,6 +38,18 @@ export default function HomePage() {
   const [senderEmail, setSenderEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/v1/auth/me', { cache: 'no-store', credentials: 'same-origin' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.data?.authenticated) {
+          setIsAuthenticated(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleStartCampaign = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +91,7 @@ export default function HomePage() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link href="/templates" className="hover:text-indigo-600 transition">12+ Templates</Link>
+            <Link href="/templates" prefetch={false} className="hover:text-indigo-600 transition">12+ Templates</Link>
             <Link href="/pricing" className="hover:text-indigo-600 transition">Pricing & Quotas</Link>
             <a href="#how-it-works" className="hover:text-indigo-600 transition">How it Works</a>
             <a href="#sending" className="hover:text-indigo-600 transition">Sending Channels</a>
@@ -87,19 +99,39 @@ export default function HomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
-            >
-              Sign up
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/campaigns"
+                  className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
+                >
+                  Campaigns
+                </Link>
+                <Link
+                  href="/workspace"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+                >
+                  Open Workspace
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-semibold text-slate-700 hover:text-indigo-600 px-3 py-2 transition"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow-sm transition"
+                >
+                  Sign up
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -432,8 +464,8 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-6">
-            <Link href="/workspace" className="hover:text-slate-200 transition">Workspace</Link>
-            <Link href="/templates" className="hover:text-slate-200 transition">Templates</Link>
+            <Link href="/workspace" prefetch={false} className="hover:text-slate-200 transition">Workspace</Link>
+            <Link href="/templates" prefetch={false} className="hover:text-slate-200 transition">Templates</Link>
             <Link href="/pricing" className="hover:text-slate-200 transition">Pricing & Quotas</Link>
             <Link href="/privacy" className="hover:text-slate-200 transition">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-slate-200 transition">Terms & Anti-Spam</Link>

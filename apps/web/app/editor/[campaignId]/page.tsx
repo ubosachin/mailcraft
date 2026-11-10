@@ -93,11 +93,20 @@ export default function CampaignEditorPage({ params }: PageProps) {
 
     try {
       // 1. Verify Authenticated Session & Load Brand
-      const authRes = await fetch('/api/v1/auth/me');
-      const authData = authRes.ok ? await authRes.json() : null;
-      if (!authData?.data?.authenticated) {
-        window.location.href = `/login?redirect=/editor/${campaignId}`;
+      const authRes = await fetch('/api/v1/auth/me', {
+        cache: 'no-store',
+        credentials: 'same-origin',
+      });
+      if (authRes.status === 401) {
+        window.location.assign(`/login?redirect=/editor/${campaignId}`);
         return;
+      }
+      if (authRes.ok) {
+        const authData = await authRes.json();
+        if (authData?.data?.authenticated === false) {
+          window.location.assign(`/login?redirect=/editor/${campaignId}`);
+          return;
+        }
       }
 
       const brandRes = await fetch('/api/v1/brands/current');
